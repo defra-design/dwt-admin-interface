@@ -4,47 +4,13 @@
 //
 
 window.GOVUKPrototypeKit.documentReady(() => {
-  initCopyTableButtons()
+  initDownloadCsvButtons()
   initPatReview()
 })
 
 // ---------------------------------------------------------------------------
-// Copy a table to the clipboard as tab-separated values (brief §4).
-// One row per line, cells separated by tabs, so a single paste lands in
-// discrete spreadsheet cells.
+// Download a results table as a CSV file.
 // ---------------------------------------------------------------------------
-
-function tableToTsv (table) {
-  return Array.from(table.querySelectorAll('tr'))
-    .map((row) =>
-      Array.from(row.querySelectorAll('th, td'))
-        .map((cell) => cell.textContent.trim())
-        .join('\t')
-    )
-    .join('\n')
-}
-
-function copyText (text) {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    return navigator.clipboard.writeText(text)
-  }
-  // Fallback for older browsers / insecure contexts.
-  const area = document.createElement('textarea')
-  area.value = text
-  area.setAttribute('readonly', '')
-  area.style.position = 'absolute'
-  area.style.left = '-9999px'
-  document.body.appendChild(area)
-  area.select()
-  try {
-    document.execCommand('copy')
-    return Promise.resolve()
-  } catch (err) {
-    return Promise.reject(err)
-  } finally {
-    document.body.removeChild(area)
-  }
-}
 
 function flashStatus (button, message) {
   const status = button.parentNode.querySelector('.app-copy-status')
@@ -54,14 +20,38 @@ function flashStatus (button, message) {
   }
 }
 
-function initCopyTableButtons () {
-  document.querySelectorAll('[data-copy-table]').forEach((button) => {
+function tableToCsv (table) {
+  const escape = (value) => {
+    const v = value.replace(/—/g, '-') // em dash -> hyphen for spreadsheets
+    return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v
+  }
+  return Array.from(table.querySelectorAll('tr'))
+    .map((row) =>
+      Array.from(row.querySelectorAll('th, td'))
+        .map((cell) => escape(cell.textContent.trim()))
+        .join(',')
+    )
+    .join('\r\n')
+}
+
+function initDownloadCsvButtons () {
+  document.querySelectorAll('[data-download-csv]').forEach((button) => {
+    if (button.dataset.csvBound) return
+    button.dataset.csvBound = 'true'
     button.addEventListener('click', () => {
-      const table = document.querySelector(button.getAttribute('data-copy-table'))
+      const table = document.querySelector(button.getAttribute('data-download-csv'))
       if (!table) return
-      copyText(tableToTsv(table))
-        .then(() => flashStatus(button, 'Copied'))
-        .catch(() => flashStatus(button, 'Could not copy'))
+      const filename = button.getAttribute('data-filename') || 'report.csv'
+      const blob = new Blob([tableToCsv(table)], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+      flashStatus(button, 'Downloaded')
     })
   })
 }
@@ -229,8 +219,6 @@ function renderReport (container, rows) {
     </div>
 
     <p class="govuk-body govuk-!-font-weight-bold">${summaryLine}</p>
-    ${govukButtonHtml('Copy results', { 'data-copy-table': '#review-report-table' })}
-    <span class="app-copy-status govuk-body" role="status" aria-live="polite"></span>
 
     <table class="govuk-table" id="review-report-table">
       <thead class="govuk-table__head">
@@ -246,14 +234,4 @@ function renderReport (container, rows) {
         ${bodyRows}
       </tbody>
     </table>`
-
-  // Wire up the newly-rendered "Copy results" button.
-  initCopyTableButtons()
-}
-
-function govukButtonHtml (text, attrs) {
-  const attrString = Object.keys(attrs)
-    .map((k) => `${k}="${attrs[k]}"`)
-    .join(' ')
-  return `<button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" ${attrString}>${text}</button>`
 }

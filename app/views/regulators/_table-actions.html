@@ -1,0 +1,12 @@
+{#
+  Download CSV button for a results table.
+  Expects `target` (CSS selector for the table) and `filename` (CSV file name).
+#}
+<div class="govuk-button-group app-table-actions">
+  {{ govukButton({
+    text: "Download CSV",
+    classes: "govuk-button--secondary",
+    attributes: { type: "button", "data-download-csv": target, "data-filename": filename | default("report.csv") }
+  }) }}
+  <span class="app-copy-status govuk-body" role="status" aria-live="polite"></span>
+</div>

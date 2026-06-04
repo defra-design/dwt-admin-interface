@@ -1,0 +1,56 @@
+{% extends "layouts/main.html" %}
+
+{% set pageName = "Key metrics" %}
+{% set activeSection = "regulators" %}
+{% set activeSubNav = "metrics" %}
+
+{% block content %}
+<div class="app-section-layout">
+  <div class="app-section-layout__nav">
+    {% include "regulators/_side-nav.html" %}
+  </div>
+
+  <div class="app-section-layout__content">
+    <h1 class="govuk-heading-l">Key metrics</h1>
+    <p class="govuk-body">Registration and reporting activity for waste organisations.</p>
+
+    {% include "regulators/_period-filter.html" %}
+
+    {% if metrics %}
+      <h2 class="govuk-heading-m">Metrics for {{ periodLabel }}</h2>
+
+      <table class="govuk-table" id="regulators-metrics-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Metric</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Value</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Organisations registered (in period)</th>
+            <td class="govuk-table__cell govuk-table__cell--numeric">{{ metrics.registeredInPeriod }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Organisations reporting a receipt (in period)</th>
+            <td class="govuk-table__cell govuk-table__cell--numeric">{{ metrics.reporting }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Registered but not reporting a receipt (in period)</th>
+            <td class="govuk-table__cell govuk-table__cell--numeric">{{ metrics.notReporting }}</td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">% of registered organisations reporting receipts</th>
+            <td class="govuk-table__cell govuk-table__cell--numeric">{{ metrics.pctReporting }}%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {% set target = "#regulators-metrics-table" %}
+      {% set filename = "key-metrics.csv" %}
+      {% include "regulators/_table-actions.html" %}
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

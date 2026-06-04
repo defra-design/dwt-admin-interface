@@ -1,0 +1,57 @@
+{% extends "layouts/main.html" %}
+
+{% set pageName = "Find an organisation" %}
+{% set activeSection = "regulators" %}
+{% set activeSubNav = "find" %}
+
+{% block content %}
+<div class="app-section-layout">
+  <div class="app-section-layout__nav">
+    {% include "regulators/_side-nav.html" %}
+  </div>
+
+  <div class="app-section-layout__content">
+    <h1 class="govuk-heading-l">Find an organisation</h1>
+
+    <form method="get" action="/regulators/organisation">
+      {{ govukInput({
+        id: "q",
+        name: "q",
+        value: query,
+        label: { text: "Search by organisation ID, permit number or name", classes: "govuk-label--s" },
+        classes: "govuk-input--width-20"
+      }) }}
+      {{ govukButton({ text: "Find" }) }}
+    </form>
+
+    {% if searched %}
+      {% if results.length %}
+        <h2 class="govuk-heading-m">{{ results.length }} organisations found</h2>
+        <table class="govuk-table">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Organisation ID</th>
+              <th scope="col" class="govuk-table__header">Name</th>
+              <th scope="col" class="govuk-table__header">Permit number</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for org in results %}
+              <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">
+                  <a class="govuk-link" href="/regulators/organisation/{{ org.id }}">{{ org.id }}</a>
+                </th>
+                <td class="govuk-table__cell">{{ org.name }}</td>
+                <td class="govuk-table__cell">{{ org.permitNumber }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="govuk-body">No organisations found for “{{ query }}”.</p>
+      {% endif %}
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

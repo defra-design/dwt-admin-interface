@@ -7,15 +7,13 @@ const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 
 const patScenarios = require('./data/pat-scenarios')
-
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-]
-
-function formatDate (day, month, year) {
-  return `${day} ${MONTHS[month - 1]} ${year}`
-}
+const reg = require('./data/regulators-data')
+const {
+  formatDateObj,
+  validateDateParts,
+  parsePeriod,
+  defaultPeriod
+} = require('./data/dates')
 
 // --- Service metrics -------------------------------------------------------
 
@@ -33,62 +31,142 @@ router.get('/service-metrics', (req, res) => {
 
 // POST: validate the date (GOV.UK "Dates" pattern), then render the metrics.
 router.post('/service-metrics', (req, res) => {
-  const day = (req.body['metrics-date-day'] || '').trim()
-  const month = (req.body['metrics-date-month'] || '').trim()
-  const year = (req.body['metrics-date-year'] || '').trim()
-
-  const errors = {}
-
-  const dayNum = Number(day)
-  const monthNum = Number(month)
-  const yearNum = Number(year)
-
-  if (!day || !month || !year) {
-    errors.date = 'Enter a date including a day, month and year'
-  } else if (
-    !Number.isInteger(dayNum) || !Number.isInteger(monthNum) || !Number.isInteger(yearNum) ||
-    monthNum < 1 || monthNum > 12 || dayNum < 1 || dayNum > 31 || year.length !== 4
-  ) {
-    errors.date = 'Enter a real date'
-  } else {
-    // Reject dates that do not exist, e.g. 31 February.
-    const probe = new Date(yearNum, monthNum - 1, dayNum)
-    if (
-      probe.getFullYear() !== yearNum ||
-      probe.getMonth() !== monthNum - 1 ||
-      probe.getDate() !== dayNum
-    ) {
-      errors.date = 'Enter a real date'
-    }
+  const dateValues = {
+    day: (req.body['metrics-date-day'] || '').trim(),
+    month: (req.body['metrics-date-month'] || '').trim(),
+    year: (req.body['metrics-date-year'] || '').trim()
   }
 
-  const dateValues = { day, month, year }
+  const { error, date } = validateDateParts(dateValues.day, dateValues.month, dateValues.year)
 
-  if (errors.date) {
+  if (error) {
     return res.render('service-metrics', {
-      errors,
-      errorList: [{ text: errors.date, href: '#metrics-date-day' }],
+      errors: { date: error },
+      errorList: [{ text: error, href: '#metrics-date-day' }],
       dateValues
     })
   }
 
   res.render('service-metrics', {
     dateValues,
-    asAtDate: formatDate(dayNum, monthNum, yearNum),
-    // TODO: value is mocked and static regardless of date. Confirm with the
-    // author whether the count should vary by the chosen date (brief §9.3).
-    // Built as an array so more metric rows can be added later (brief §4).
+    asAtDate: formatDateObj(date),
+    // TODO: value is mocked and static regardless of date (brief §9.3).
     metrics: [
       { name: 'Waste Organisations Registered as Receivers', value: '287' }
     ]
   })
 })
 
-// --- Software Providers -----------------------------------------------------
+// --- Regulators reporting --------------------------------------------------
 
-router.get('/software-providers/review-pat', (req, res) => {
-  res.render('software-providers/review-pat', { scenarios: patScenarios })
+// Resolve the from/to period: submitted values on POST, last-12-months default
+// on GET. Always returns { from, to, values, errors, errorList, hasErrors }.
+function getPeriod (req) {
+  if (req.method === 'POST') return parsePeriod(req.body)
+  const d = defaultPeriod()
+  return { from: d.from, to: d.to, values: d.values, errors: {}, errorList: [], hasErrors: false }
+}
+
+function periodLabel (period) {
+  return `${formatDateObj(period.from)} to ${formatDateObj(period.to)}`
+}
+
+// Key metrics dashboard. Results are only shown after "Show results" (POST).
+function regulatorsMetrics (req, res) {
+  const period = getPeriod(req)
+  if (req.method !== 'POST' || period.hasErrors) {
+    return res.render('regulators/index', { period })
+  }
+  res.render('regulators/index', {
+    period,
+    metrics: reg.metrics(period.from, period.to),
+    periodLabel: periodLabel(period)
+  })
+}
+router.get('/regulators', regulatorsMetrics)
+router.post('/regulators', regulatorsMetrics)
+
+// Organisations not reporting. Results only shown after "Show results" (POST).
+function regulatorsNotReporting (req, res) {
+  const period = getPeriod(req)
+  if (req.method !== 'POST' || period.hasErrors) {
+    return res.render('regulators/not-reporting', { period })
+  }
+  const rows = reg.listNotReporting(period.from, period.to).map((o) => ({
+    id: o.id,
+    name: o.name,
+    permitNumber: o.permitNumber,
+    registered: formatDateObj(o.registeredDate)
+  }))
+  res.render('regulators/not-reporting', { period, rows, periodLabel: periodLabel(period) })
+}
+router.get('/regulators/not-reporting', regulatorsNotReporting)
+router.post('/regulators/not-reporting', regulatorsNotReporting)
+
+// Organisations reporting (+ waste-code breakdown). Results only after POST.
+function regulatorsReporting (req, res) {
+  const period = getPeriod(req)
+  if (req.method !== 'POST' || period.hasErrors) {
+    return res.render('regulators/reporting', { period })
+  }
+  const rows = reg.listReporting(period.from, period.to)
+  res.render('regulators/reporting', {
+    period,
+    rows,
+    totalMovements: rows.reduce((sum, o) => sum + o.movements, 0),
+    wasteRows: reg.wasteCodeBreakdown(period.from, period.to),
+    periodLabel: periodLabel(period)
+  })
+}
+router.get('/regulators/reporting', regulatorsReporting)
+router.post('/regulators/reporting', regulatorsReporting)
+
+// Find an organisation (search).
+router.get('/regulators/organisation', (req, res) => {
+  const query = (req.query.q || '').trim()
+  const searched = Object.prototype.hasOwnProperty.call(req.query, 'q')
+  res.render('regulators/organisation', {
+    query,
+    searched,
+    results: searched ? reg.findOrganisations(query) : []
+  })
 })
+
+// Organisation detail (movement receipts for a period).
+function organisationDetail (req, res) {
+  const org = reg.getOrganisation(req.params.id)
+  if (!org) {
+    return res.status(404).render('placeholder', {
+      heading: 'Organisation not found',
+      activeSection: 'regulators'
+    })
+  }
+
+  const period = getPeriod(req)
+
+  const receipts = period.hasErrors
+    ? []
+    : reg.receiptsForOrg(org.id, period.from, period.to)
+        .slice()
+        .sort((a, b) => b.date - a.date)
+        .map((r) => ({
+          id: r.id,
+          date: formatDateObj(r.date),
+          wasteCode: r.wasteCode,
+          description: reg.wasteCodeDesc.get(r.wasteCode),
+          quantityTonnes: r.quantityTonnes
+        }))
+
+  res.render('regulators/organisation-detail', {
+    org: { ...org, registered: formatDateObj(org.registeredDate) },
+    period,
+    periodLabel: period.hasErrors ? '—' : periodLabel(period),
+    receipts,
+    errorList: period.errorList
+  })
+}
+router.get('/regulators/organisation/:id', organisationDetail)
+router.post('/regulators/organisation/:id', organisationDetail)
 
 // --- Dead links / not-built placeholders (build brief §8) -------------------
 
@@ -100,16 +178,12 @@ router.get('/waste-organisations', (req, res) => {
   })
 })
 
-router.get('/regulators', (req, res) => {
-  res.render('placeholder', {
-    heading: 'Regulators',
-    activeSection: 'regulators',
-    tools: ['Replay data transfer']
-  })
-})
-
 // Renders inside the Software Providers section (side nav retained), even
 // though the feature itself is not built in this prototype.
 router.get('/software-providers/manage-credentials', (req, res) => {
   res.render('software-providers/manage-credentials')
+})
+
+router.get('/software-providers/review-pat', (req, res) => {
+  res.render('software-providers/review-pat', { scenarios: patScenarios })
 })

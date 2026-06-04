@@ -1,0 +1,14 @@
+{#
+  Reusable from/to period filter (form + submit). Expects `period`:
+    { values: { from:{day,month,year}, to:{day,month,year} },
+      errors: { from, to, range }, errorList: [...] }
+  Optional `submitLabel` (default "Show results") and `action` (form post URL).
+#}
+{% if period.errorList and period.errorList.length %}
+  {{ govukErrorSummary({ titleText: "There is a problem", errorList: period.errorList }) }}
+{% endif %}
+
+<form method="post" action="{{ action }}" novalidate>
+  {% include "regulators/_period-fields.html" %}
+  {{ govukButton({ text: submitLabel | default("Show results") }) }}
+</form>

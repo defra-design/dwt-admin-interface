@@ -1,0 +1,25 @@
+{#
+  Regulators sub-navigation (hand-rolled, pure GOV.UK Frontend — see the
+  Software Providers side nav for the same pattern).
+  Pages set `activeSubNav` to one of: metrics, not-reporting, reporting, find.
+#}
+{% set navItems = [
+  { text: "Key metrics", href: "/regulators", key: "metrics" },
+  { text: "Organisations not reporting", href: "/regulators/not-reporting", key: "not-reporting" },
+  { text: "Organisations reporting", href: "/regulators/reporting", key: "reporting" },
+  { text: "Find an organisation", href: "/regulators/organisation", key: "find" }
+] %}
+
+<nav class="app-side-nav" aria-label="Regulators reporting sections">
+  <ul class="govuk-list app-side-nav__list">
+    {% for item in navItems %}
+      <li>
+        <a class="app-side-nav__link{{ ' app-side-nav__link--active' if activeSubNav === item.key }}"
+          href="{{ item.href }}"
+          {{- ' aria-current="location"' | safe if activeSubNav === item.key }}>
+          {{ item.text }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

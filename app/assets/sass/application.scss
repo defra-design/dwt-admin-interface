@@ -134,6 +134,16 @@ $app-page-width: 1200px;
   color: #0b0c0c;
 }
 
+// --- Regulators period filter ----------------------------------------------
+// Lay the From and To date inputs out side by side on wider screens.
+.app-period-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 40px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
 // --- Tinted report rows for fails / errors (brief §6.4) --------------------
 .app-table__row--tinted td,
 .app-table__row--tinted th {

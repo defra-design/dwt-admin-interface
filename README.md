@@ -34,9 +34,13 @@ prototype being publicly accessible, set these environment variables on the host
 | Path | What it is |
 |---|---|
 | `/` | Homepage (service name + placeholder copy) |
-| `/service-metrics` | Date input → metrics table, with "Copy" (TSV) |
+| `/service-metrics` | Date input → metrics table |
 | `/software-providers` | Section landing with side navigation |
 | `/software-providers/review-pat` | PAT review (scenarios, report) |
+| `/regulators` | Regulators section: Key metrics dashboard |
+| `/regulators/not-reporting` | Registered orgs with no receipt in the period |
+| `/regulators/reporting` | Registered orgs reporting, + movements by waste code |
+| `/regulators/organisation` | Find an organisation → detail (movement receipts) |
 | `/waste-organisations` | Dead link → "Not built in this prototype" |
 | `/software-providers/manage-credentials` | Dead link → "Not built in this prototype" |
 
@@ -44,13 +48,22 @@ prototype being publicly accessible, set these environment variables on the host
 
 - **Unbranded layout** (`app/views/layouts/main.html`): extends the kit's
   unbranded layout (no GOV.UK crown / wordmark / black masthead), then adds a
-  simple service-name header, a GOV.UK Service navigation bar, and the standard
-  "Prototype" phase banner.
-- **Side navigation** is hand-rolled from `govuk-list` + CSS
-  (`app/assets/sass/application.scss`), because core GOV.UK Frontend ships no
-  side-nav component.
-- **Service metrics** date validation is server-side (`app/routes.js`) using the
-  GOV.UK "Dates" pattern (error summary + field error).
+  simple Defra-green service-name header and a GOV.UK Service navigation bar.
+- **Defra theming** (`app/assets/sass/application.scss`): the rebrand's CSS
+  custom properties (`--govuk-brand-colour`, `--govuk-link-colour`, …) are
+  overridden at `:root` to Defra greens; focus yellow and semantic tags are left
+  as GOV.UK defaults.
+- **Side navigation** is hand-rolled from `govuk-list` + CSS, because core
+  GOV.UK Frontend ships no side-nav component.
+- **Dates** are validated server-side (`app/routes.js`) using the GOV.UK "Dates"
+  pattern; shared helpers in `app/data/dates.js` (`validateDateParts`,
+  `parsePeriod`) back both Service Metrics and the Regulators period filters.
+- **Regulators reporting** derives every metric and report from one deterministic,
+  seeded mock dataset (`app/data/regulators-data.js`): 287 organisations (matching
+  the Service Metrics "287 registered receivers") + ~2,300 movement receipts with
+  EWC waste codes. Replace that module with real queries to integrate.
+- **Export:** results tables have a "Download CSV" button, client-side in
+  `app/assets/javascripts/application.js`.
 - **PAT review** assessment is client-side. The integration seam is
   `assessScenario()` in `app/assets/javascripts/application.js` — replace it with
   real sandbox API calls.
