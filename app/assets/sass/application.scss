@@ -1,6 +1,141 @@
 //
-// For guidance on how to add CSS and SCSS see:
+// Styles for the Waste Tracking Service prototype.
 // https://prototype-kit.service.gov.uk/docs/adding-css-javascript-and-images
-// 
+//
+// Colour values below mirror the GOV.UK Frontend palette
+// (https://design-system.service.gov.uk/styles/colour/).
+//
 
-// Add extra styles here
+// --- Defra brand colours ---------------------------------------------------
+// GOV.UK Frontend's rebrand is driven by CSS custom properties, so overriding
+// them at :root re-themes links, the service-nav active indicator and other
+// brand accents across the whole app in one place. Accessibility-critical
+// colours (focus yellow, error red) and semantic tag colours are left as the
+// GOV.UK defaults on purpose.
+$defra-green: #00a33b; // bright brand green — header, borders, decorative
+$defra-green-text: #00703c; // darker green that meets contrast on white — links, fills
+$defra-green-hover: #005a30; // hover / visited
+
+:root {
+  --govuk-brand-colour: #{$defra-green};
+  --govuk-link-colour: #{$defra-green-text};
+  --govuk-link-hover-colour: #{$defra-green-hover};
+  --govuk-link-visited-colour: #{$defra-green-hover};
+}
+
+// --- Wider page width ------------------------------------------------------
+// GOV.UK Frontend caps content at 960px, which reads as a narrow centred column.
+// This is an internal admin tool with wide tables, so widen the shared
+// container (used by the header, service nav, phase banner and main content,
+// so they all stay aligned). Keep 15px side gutters until there is room to
+// centre. Adjust $app-page-width to taste.
+$app-page-width: 1200px;
+
+.govuk-width-container {
+  max-width: $app-page-width;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+@media (min-width: ($app-page-width + 30px)) {
+  .govuk-width-container {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// --- Unbranded service header (brief §3) -----------------------------------
+// A simple service-name bar in place of the GOV.UK crown / black masthead.
+.app-service-header {
+  background-color: $defra-green; // Defra brand green
+  padding: 10px 0;
+}
+
+// Replace the rebrand's light-blue (#8eb8dc) border under the service
+// navigation with a subtle neutral-grey separator that fits the Defra theme.
+.govuk-service-navigation {
+  border-bottom: 1px solid #b1b4b6; // govuk mid-grey
+}
+
+.app-service-header__link {
+  display: inline-block;
+  font-family: "GDS Transport", arial, sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.25;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.app-service-header__link:link,
+.app-service-header__link:visited {
+  color: #ffffff;
+}
+
+.app-service-header__link:hover {
+  text-decoration: underline;
+}
+
+.app-service-header__link:focus {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #ffdd00; // govuk focus yellow
+  box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+  text-decoration: none;
+}
+
+// --- Software Providers section layout -------------------------------------
+// Flex layout so the side nav is the SAME tight width on every section page
+// (it shrinks to its content) instead of a 1/3 or 1/4 grid column that varies.
+.app-section-layout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 30px;
+}
+
+.app-section-layout__nav {
+  flex: 0 0 auto; // shrink to content — as tight as the widest nav link
+}
+
+.app-section-layout__content {
+  flex: 1 1 0;
+  min-width: 0; // let wide tables shrink/scroll rather than stretch the page
+}
+
+@media (max-width: 40.0625em) {
+  // Stack on mobile, matching GOV.UK grid behaviour.
+  .app-section-layout__nav,
+  .app-section-layout__content {
+    flex-basis: 100%;
+  }
+}
+
+// --- Hand-rolled side navigation (brief §5) --------------------------------
+.app-side-nav {
+  margin-bottom: 30px;
+}
+
+.app-side-nav__list {
+  margin-top: 0;
+  border-top: 1px solid #b1b4b6;
+}
+
+.app-side-nav__link {
+  display: block;
+  padding: 10px 15px; // equal left and right padding on each item
+  border-bottom: 1px solid #b1b4b6;
+  border-left: 4px solid transparent;
+}
+
+.app-side-nav__link--active {
+  border-left-color: $defra-green; // Defra brand green
+  font-weight: 700;
+  text-decoration: none;
+  color: #0b0c0c;
+}
+
+// --- Tinted report rows for fails / errors (brief §6.4) --------------------
+.app-table__row--tinted td,
+.app-table__row--tinted th {
+  background-color: #fbeaea; // light red tint; the tag text carries the meaning
+}

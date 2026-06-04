@@ -1,6 +1,6 @@
 {
-  "serviceName": "Service name goes here",
-  "useServiceNavigation": true,
+  "serviceName": "Digital Waste Tracking Admin Service",
+  "useServiceNavigation": false,
   "plugins": {
     "govuk-frontend": {
       "rebrand": true

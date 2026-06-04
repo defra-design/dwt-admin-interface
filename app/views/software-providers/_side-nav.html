@@ -1,0 +1,26 @@
+{#
+  Software Providers sub-navigation.
+
+  Hand-rolled in pure GOV.UK Frontend (core GOV.UK Frontend ships no side-nav
+  component). Built from a govuk-list with custom app-side-nav styling.
+  Pages set `activeSubNav` to "credentials" or "review-pat".
+  "Manage credentials" is intentionally a dead link in this prototype.
+#}
+<nav class="app-side-nav" aria-label="Software Providers sections">
+  <ul class="govuk-list app-side-nav__list">
+    <li>
+      <a class="app-side-nav__link{{ ' app-side-nav__link--active' if activeSubNav === 'credentials' }}"
+        href="/software-providers/manage-credentials"
+        {{- ' aria-current="location"' | safe if activeSubNav === 'credentials' }}>
+        Manage credentials
+      </a>
+    </li>
+    <li>
+      <a class="app-side-nav__link{{ ' app-side-nav__link--active' if activeSubNav === 'review-pat' }}"
+        href="/software-providers/review-pat"
+        {{- ' aria-current="location"' | safe if activeSubNav === 'review-pat' }}>
+        PAT review
+      </a>
+    </li>
+  </ul>
+</nav>

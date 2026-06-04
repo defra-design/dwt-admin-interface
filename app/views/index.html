@@ -1,20 +1,24 @@
 {% extends "layouts/main.html" %}
 
-{% set pageName="Home" %}
+{% set pageName = "Home" %}
 
 {% block content %}
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    {% include "govuk-prototype-kit/includes/homepage-top.njk" %}
+    <h1 class="govuk-heading-xl">{{ serviceName }}</h1>
 
-    <h1 class="govuk-heading-xl">
-      {{ serviceName }}
-    </h1>
+    {# Placeholder greeking copy — replace with real service description. #}
+    <p class="govuk-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent
+      euismod, nunc id aliquam dignissim, urna risus laoreet nibh, at facilisis arcu lectus
+      sed massa. Curabitur vitae sapien vel sem porttitor congue. Donec vehicula, justo a
+      tincidunt sodales, lorem velit lacinia ipsum, nec dignissim erat felis eu purus.</p>
 
-    {% include "govuk-prototype-kit/includes/homepage-bottom.njk" %}
+    <p class="govuk-body">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
+      posuere cubilia curae; Aliquam erat volutpat. Sed ut perspiciatis unde omnis iste natus
+      error sit voluptatem accusantium doloremque laudantium, totam rem aperiam. Nemo enim
+      ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
+
   </div>
 </div>
-
 {% endblock %}
