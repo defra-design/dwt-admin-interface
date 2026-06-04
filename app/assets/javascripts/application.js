@@ -60,9 +60,9 @@ function initDownloadCsvButtons () {
 // Review PAT submission (brief §6).
 // ---------------------------------------------------------------------------
 
-// WT ID format. TODO (brief §6.6): replace with the canonical Waste Tracking
-// ID format once it is known.
-const WT_ID_PATTERN = /^WT\d+$/
+// Waste Tracking ID format, per the Digital Waste Tracking Receipt API
+// (`wasteTrackingId`, e.g. "25HRA0B2" — 8-character alphanumeric).
+const WT_ID_PATTERN = /^[0-9A-Z]{8}$/
 
 // Fail reasons keyed by scenario ID. The first six are verbatim from the
 // screenshots (brief §6.5); the rest are authored in the same register for the
@@ -112,7 +112,8 @@ function assessScenario (scenario, mode, context) {
       // submitted row so the response shape is always visible. (brief §6.5)
       if (!WT_ID_PATTERN.test(scenario.wtId) ||
           (context.noneInvalid && scenario.id === context.firstId)) {
-        return { result: 'Error', reason: 'Waste Tracking ID not found' }
+        // Matches the API's PUT /movements/{wasteTrackingId}/receive 404.
+        return { result: 'Error', reason: 'Movement not found' }
       }
       return { result: 'Pass', reason: '—' }
 

@@ -30,15 +30,17 @@ function dateDaysAgo (n) {
 }
 
 // --- EWC waste codes -------------------------------------------------------
+// Shaped to match the Receipt API GET /reference-data/ewc-codes response:
+// a six-digit `code` (no spaces) and an `isHazardous` boolean.
 const wasteCodes = [
-  { code: '20 03 01', description: 'Mixed municipal waste' },
-  { code: '17 01 01', description: 'Concrete' },
-  { code: '15 01 01', description: 'Paper and cardboard packaging' },
-  { code: '19 12 12', description: 'Other wastes from mechanical treatment of waste' },
-  { code: '17 04 05', description: 'Iron and steel' },
-  { code: '02 01 06', description: 'Animal faeces, urine and manure' },
-  { code: '16 06 01*', description: 'Lead batteries (hazardous)' },
-  { code: '13 02 05*', description: 'Mineral-based engine oils (hazardous)' }
+  { code: '200301', isHazardous: false, description: 'Mixed municipal waste' },
+  { code: '170101', isHazardous: false, description: 'Concrete' },
+  { code: '150101', isHazardous: false, description: 'Paper and cardboard packaging' },
+  { code: '191212', isHazardous: false, description: 'Other wastes from mechanical treatment of waste' },
+  { code: '170405', isHazardous: false, description: 'Iron and steel' },
+  { code: '020106', isHazardous: false, description: 'Animal faeces, urine and manure' },
+  { code: '160601', isHazardous: true, description: 'Lead batteries' },
+  { code: '130205', isHazardous: true, description: 'Mineral-based engine oils' }
 ]
 
 // --- Organisations (exactly 287, all registered on/before today) -----------
@@ -181,6 +183,27 @@ function wasteCodeBreakdown (from, to, orgIds) {
     .sort((a, b) => b.movements - a.movements)
 }
 
+// Org detail: an org's receipts in a period grouped by EWC waste code, with the
+// movement count and summed tonnes per code.
+function orgWasteCodeSummary (orgId, from, to) {
+  const totals = new Map() // code -> { movements, tonnes }
+  for (const r of receiptsForOrg(orgId, from, to)) {
+    const e = totals.get(r.wasteCode) || { movements: 0, tonnes: 0 }
+    e.movements += 1
+    e.tonnes += r.quantityTonnes
+    totals.set(r.wasteCode, e)
+  }
+  return wasteCodes
+    .filter((w) => totals.has(w.code))
+    .map((w) => ({
+      code: w.code,
+      description: w.description,
+      movements: totals.get(w.code).movements,
+      tonnes: Math.round(totals.get(w.code).tonnes * 10) / 10
+    }))
+    .sort((a, b) => b.movements - a.movements)
+}
+
 // Search by org id, permit number, or name (case-insensitive contains).
 function findOrganisations (query) {
   const q = (query || '').trim().toLowerCase()
@@ -209,6 +232,7 @@ module.exports = {
   listNotReporting,
   listReporting,
   wasteCodeBreakdown,
+  orgWasteCodeSummary,
   findOrganisations,
   getOrganisation
 }

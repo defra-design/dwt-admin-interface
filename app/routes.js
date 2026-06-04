@@ -144,24 +144,19 @@ function organisationDetail (req, res) {
 
   const period = getPeriod(req)
 
-  const receipts = period.hasErrors
+  const summary = period.hasErrors
     ? []
-    : reg.receiptsForOrg(org.id, period.from, period.to)
-        .slice()
-        .sort((a, b) => b.date - a.date)
-        .map((r) => ({
-          id: r.id,
-          date: formatDateObj(r.date),
-          wasteCode: r.wasteCode,
-          description: reg.wasteCodeDesc.get(r.wasteCode),
-          quantityTonnes: r.quantityTonnes
-        }))
+    : reg.orgWasteCodeSummary(org.id, period.from, period.to)
+  const totalMovements = summary.reduce((sum, r) => sum + r.movements, 0)
+  const totalTonnes = Math.round(summary.reduce((sum, r) => sum + r.tonnes, 0) * 10) / 10
 
   res.render('regulators/organisation-detail', {
     org: { ...org, registered: formatDateObj(org.registeredDate) },
     period,
     periodLabel: period.hasErrors ? '—' : periodLabel(period),
-    receipts,
+    summary,
+    totalMovements,
+    totalTonnes,
     errorList: period.errorList
   })
 }

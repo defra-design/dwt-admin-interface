@@ -33,33 +33,37 @@
       {{ govukButton({ text: "Show results" }) }}
     </form>
 
-    {# --- Movement receipts table --- #}
-    <h2 class="govuk-heading-m">{{ receipts.length }} movement receipts for {{ periodLabel }}</h2>
-    {% if receipts.length %}
+    {# --- Movement receipts by waste code --- #}
+    <h2 class="govuk-heading-m">{{ totalMovements }} movement receipts ({{ totalTonnes }} tonnes) for {{ periodLabel }}</h2>
+    {% if summary.length %}
       <table class="govuk-table" id="regulators-org-receipts-table">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Receipt ID</th>
-            <th scope="col" class="govuk-table__header">Date</th>
             <th scope="col" class="govuk-table__header">EWC code</th>
             <th scope="col" class="govuk-table__header">Description</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Movements</th>
             <th scope="col" class="govuk-table__header govuk-table__header--numeric">Tonnes</th>
           </tr>
         </thead>
         <tbody class="govuk-table__body">
-          {% for r in receipts %}
+          {% for w in summary %}
             <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header">{{ r.id }}</th>
-              <td class="govuk-table__cell">{{ r.date }}</td>
-              <td class="govuk-table__cell">{{ r.wasteCode }}</td>
-              <td class="govuk-table__cell">{{ r.description }}</td>
-              <td class="govuk-table__cell govuk-table__cell--numeric">{{ r.quantityTonnes }}</td>
+              <th scope="row" class="govuk-table__header">{{ w.code }}</th>
+              <td class="govuk-table__cell">{{ w.description }}</td>
+              <td class="govuk-table__cell govuk-table__cell--numeric">{{ w.movements }}</td>
+              <td class="govuk-table__cell govuk-table__cell--numeric">{{ w.tonnes }}</td>
             </tr>
           {% endfor %}
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Total</th>
+            <td class="govuk-table__cell"></td>
+            <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold">{{ totalMovements }}</td>
+            <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-font-weight-bold">{{ totalTonnes }}</td>
+          </tr>
         </tbody>
       </table>
       {% set target = "#regulators-org-receipts-table" %}
-      {% set filename = "movement-receipts.csv" %}
+      {% set filename = "movement-receipts-by-waste-code.csv" %}
       {% include "regulators/_table-actions.html" %}
     {% else %}
       <p class="govuk-body">No movement receipts in this period.</p>

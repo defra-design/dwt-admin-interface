@@ -84,9 +84,23 @@ Search the codebase for `TODO` to find each of these in context.
 6. **"Error: Invalid Scenario ID"** — no screenshot was provided. Implemented as:
    first submitted row → Error "Scenario ID not recognised", rest pass
    ("11 passed / 1 error"). `TODO` in `application.js` to confirm.
-7. **WT ID format** — free text; the not-found mode flags anything not matching
-   `^WT\d+$`. `TODO` (the `WT_ID_PATTERN` constant) to replace with the canonical
-   format once known.
+7. **WT ID format** — aligned to the Digital Waste Tracking Receipt API
+   `wasteTrackingId` (8-character alphanumeric, e.g. `25HRA0B2`); see
+   `WT_ID_PATTERN` in `application.js`.
+
+## Alignment with the Receipt API
+
+The prototype's fake data shapes mirror the [Digital Waste Tracking Receipt
+API](https://defra.github.io/waste-tracking-service/production/apiSpecifications/)
+where they overlap, but **no live API calls are made**:
+
+- **PAT review** scenarios map to `POST /movements/receive`; the Waste Tracking
+  ID uses the API's `wasteTrackingId` format (`25HRA0B2`).
+- **EWC codes** (`app/data/regulators-data.js`) follow the
+  `GET /reference-data/ewc-codes` shape (6-digit `code`, `isHazardous`).
+- **Regulators reporting** and **Service Metrics** have **no** endpoints in this
+  API (it is a receiver-submission + reference-data API, not a regulator
+  reporting one); they remain mocked prototype-only features.
 
 ## Out of scope (intentionally not built)
 
