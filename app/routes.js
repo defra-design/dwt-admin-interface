@@ -169,7 +169,7 @@ router.get('/waste-organisations', (req, res) => {
   res.render('placeholder', {
     heading: 'Waste Organisations',
     activeSection: 'organisations',
-    tools: ['Look up waste organisation']
+    tools: ['Manage service charge']
   })
 })
 
