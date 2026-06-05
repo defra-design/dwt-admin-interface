@@ -111,6 +111,14 @@ function registeredAsAt (asAt) {
   return organisations.filter((o) => o.registeredDate <= asAt)
 }
 
+// Organisations whose registration date falls within the period.
+function listRegisteredInPeriod (from, to) {
+  return organisations
+    .filter((o) => o.registeredDate >= from && o.registeredDate <= to)
+    .slice()
+    .sort((a, b) => a.id.localeCompare(b.id))
+}
+
 function receiptsForOrg (orgId, from, to) {
   const all = receiptsByOrg.get(orgId) || []
   if (!from || !to) return all
@@ -136,9 +144,7 @@ function reportingOrgIds (from, to) {
 // whose registration date falls within the period (shown as its own metric).
 function metrics (from, to) {
   const registered = registeredAsAt(to)
-  const registeredInPeriod = organisations.filter(
-    (o) => o.registeredDate >= from && o.registeredDate <= to
-  ).length
+  const registeredInPeriod = listRegisteredInPeriod(from, to).length
   const reportingIds = reportingOrgIds(from, to)
   const reporting = registered.filter((o) => reportingIds.has(o.id)).length
   const notReporting = registered.length - reporting
@@ -225,6 +231,7 @@ module.exports = {
   receipts,
   wasteCodeDesc,
   registeredAsAt,
+  listRegisteredInPeriod,
   receiptsForOrg,
   movementsForOrg,
   reportingOrgIds,

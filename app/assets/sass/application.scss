@@ -6,29 +6,20 @@
 // (https://design-system.service.gov.uk/styles/colour/).
 //
 
-// --- Defra brand colours ---------------------------------------------------
-// GOV.UK Frontend's rebrand is driven by CSS custom properties, so overriding
-// them at :root re-themes links, the service-nav active indicator and other
-// brand accents across the whole app in one place. Accessibility-critical
-// colours (focus yellow, error red) and semantic tag colours are left as the
-// GOV.UK defaults on purpose.
-$defra-green: #00a33b; // bright brand green — header, borders, decorative
-$defra-green-text: #00703c; // darker green that meets contrast on white — links, fills
-$defra-green-hover: #005a30; // hover / visited
-
-:root {
-  --govuk-brand-colour: #{$defra-green};
-  --govuk-link-colour: #{$defra-green-text};
-  --govuk-link-hover-colour: #{$defra-green-hover};
-  --govuk-link-visited-colour: #{$defra-green-hover};
+// --- Black masthead --------------------------------------------------------
+// The rebrand makes the GOV.UK header background the brand colour (blue); this
+// overrides just the header to black, keeping the crown and the blue/green
+// accents elsewhere.
+.govuk-header {
+  background: #0b0c0c; // govuk black
 }
 
 // --- Wider page width ------------------------------------------------------
 // GOV.UK Frontend caps content at 960px, which reads as a narrow centred column.
 // This is an internal admin tool with wide tables, so widen the shared
-// container (used by the header, service nav, phase banner and main content,
-// so they all stay aligned). Keep 15px side gutters until there is room to
-// centre. Adjust $app-page-width to taste.
+// container (used by the header, service nav and main content, so they all stay
+// aligned). Keep 15px side gutters until there is room to centre. Adjust
+// $app-page-width to taste.
 $app-page-width: 1200px;
 
 .govuk-width-container {
@@ -44,47 +35,7 @@ $app-page-width: 1200px;
   }
 }
 
-// --- Unbranded service header (brief §3) -----------------------------------
-// A simple service-name bar in place of the GOV.UK crown / black masthead.
-.app-service-header {
-  background-color: $defra-green; // Defra brand green
-  padding: 10px 0;
-}
-
-// Replace the rebrand's light-blue (#8eb8dc) border under the service
-// navigation with a subtle neutral-grey separator that fits the Defra theme.
-.govuk-service-navigation {
-  border-bottom: 1px solid #b1b4b6; // govuk mid-grey
-}
-
-.app-service-header__link {
-  display: inline-block;
-  font-family: "GDS Transport", arial, sans-serif;
-  font-weight: 700;
-  font-size: 1.5rem;
-  line-height: 1.25;
-  color: #ffffff;
-  text-decoration: none;
-}
-
-.app-service-header__link:link,
-.app-service-header__link:visited {
-  color: #ffffff;
-}
-
-.app-service-header__link:hover {
-  text-decoration: underline;
-}
-
-.app-service-header__link:focus {
-  outline: 3px solid transparent;
-  color: #0b0c0c;
-  background-color: #ffdd00; // govuk focus yellow
-  box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
-  text-decoration: none;
-}
-
-// --- Software Providers section layout -------------------------------------
+// --- Section layout (Software Providers / Reporting) -----------------------
 // Flex layout so the side nav is the SAME tight width on every section page
 // (it shrinks to its content) instead of a 1/3 or 1/4 grid column that varies.
 .app-section-layout {
@@ -128,13 +79,13 @@ $app-page-width: 1200px;
 }
 
 .app-side-nav__link--active {
-  border-left-color: $defra-green; // Defra brand green
+  border-left-color: #1d70b8; // govuk blue
   font-weight: 700;
   text-decoration: none;
   color: #0b0c0c;
 }
 
-// --- Regulators period filter ----------------------------------------------
+// --- Reporting period filter -----------------------------------------------
 // Lay the From and To date inputs out side by side on wider screens.
 .app-period-filter {
   display: flex;

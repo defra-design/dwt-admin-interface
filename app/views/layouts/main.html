@@ -1,27 +1,23 @@
 {#
-  Unbranded layout for the Waste Tracking Service prototype.
+  Branded GOV.UK layout.
 
-  - Extends the Prototype Kit's UNBRANDED layout, so there is no GOV.UK crown,
-    no "GOV.UK" wordmark and no black masthead (per the build brief §1/§3).
-  - Adds back a simple, unbranded header showing the service name (links home),
-    a GOV.UK Service navigation bar, and the standard "Prototype" phase banner.
+  - Uses the Prototype Kit's branded layout, so the standard GOV.UK header with
+    the crown is shown.
+  - Overrides the service-navigation block so the service name ("DWT Admin")
+    sits on the same line as the primary navigation.
 
-  Pages set `activeSection` to one of: "organisations", "providers", "metrics"
-  to highlight the current item in the service navigation.
+  Pages set `activeSection` to one of: "organisations", "providers",
+  "regulators" to highlight the current item.
 #}
 
-{% extends "govuk-prototype-kit/layouts/unbranded.njk" %}
+{% extends "govuk-prototype-kit/layouts/govuk-branded.njk" %}
 
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
-{% block header %}
-  <div class="app-service-header">
-    <div class="govuk-width-container">
-      <a href="/" class="app-service-header__link">{{ serviceName }}</a>
-    </div>
-  </div>
-
+{% block govukServiceNavigation %}
   {{ govukServiceNavigation({
+    serviceName: serviceName,
+    serviceUrl: "/",
     navigation: [
       {
         href: "/waste-organisations",
@@ -40,8 +36,4 @@
       }
     ]
   }) }}
-{% endblock %}
-
-{% block beforeContent %}
-  {% block beforeContentInner %}{% endblock %}
 {% endblock %}

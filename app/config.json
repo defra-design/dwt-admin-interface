@@ -1,6 +1,6 @@
 {
-  "serviceName": "Digital Waste Tracking Admin Service",
-  "useServiceNavigation": false,
+  "serviceName": "DWT Admin Service",
+  "useServiceNavigation": true,
   "plugins": {
     "govuk-frontend": {
       "rebrand": true

@@ -1,10 +1,12 @@
 {#
   Regulators sub-navigation (hand-rolled, pure GOV.UK Frontend — see the
   Software Providers side nav for the same pattern).
-  Pages set `activeSubNav` to one of: metrics, not-reporting, reporting, find.
+  Pages set `activeSubNav` to one of: metrics, registered, not-reporting,
+  reporting, find.
 #}
 {% set navItems = [
   { text: "Key metrics", href: "/regulators", key: "metrics" },
+  { text: "Registered organisations", href: "/regulators/registered", key: "registered" },
   { text: "Organisations not reporting", href: "/regulators/not-reporting", key: "not-reporting" },
   { text: "Organisations reporting", href: "/regulators/reporting", key: "reporting" },
   { text: "Find an organisation", href: "/regulators/organisation", key: "find" }

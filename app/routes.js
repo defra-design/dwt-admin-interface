@@ -86,6 +86,23 @@ function regulatorsMetrics (req, res) {
 router.get('/regulators', regulatorsMetrics)
 router.post('/regulators', regulatorsMetrics)
 
+// Registered organisations (registered within the period). POST shows results.
+function regulatorsRegistered (req, res) {
+  const period = getPeriod(req)
+  if (req.method !== 'POST' || period.hasErrors) {
+    return res.render('regulators/registered', { period })
+  }
+  const rows = reg.listRegisteredInPeriod(period.from, period.to).map((o) => ({
+    id: o.id,
+    name: o.name,
+    permitNumber: o.permitNumber,
+    registered: formatDateObj(o.registeredDate)
+  }))
+  res.render('regulators/registered', { period, rows, periodLabel: periodLabel(period) })
+}
+router.get('/regulators/registered', regulatorsRegistered)
+router.post('/regulators/registered', regulatorsRegistered)
+
 // Organisations not reporting. Results only shown after "Show results" (POST).
 function regulatorsNotReporting (req, res) {
   const period = getPeriod(req)
