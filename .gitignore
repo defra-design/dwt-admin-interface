@@ -13,3 +13,6 @@ usage-data-config.json
 
 # Local tooling artifacts (not part of the prototype)
 .claude/
+
+# Generated single-file exports (build output)
+exports/
