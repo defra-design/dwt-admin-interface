@@ -6,6 +6,12 @@
 // (https://design-system.service.gov.uk/styles/colour/).
 //
 
+// No distinct visited link colour anywhere — links keep their colour when
+// visited (as GOV.UK breadcrumbs do). Removes the purple visited state.
+:root {
+  --govuk-link-visited-colour: var(--govuk-link-colour);
+}
+
 // --- Defra "black branding" header -----------------------------------------
 // From DEFRA/waste-organisation-frontend PR #116 (rebrand: false). The header
 // background is the classic GOV.UK black (from $govuk-new-organisation-colours:
