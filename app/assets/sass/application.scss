@@ -6,12 +6,55 @@
 // (https://design-system.service.gov.uk/styles/colour/).
 //
 
-// --- Black masthead --------------------------------------------------------
-// The rebrand makes the GOV.UK header background the brand colour (blue); this
-// overrides just the header to black, keeping the crown and the blue/green
-// accents elsewhere.
+// --- Defra "black branding" header -----------------------------------------
+// From DEFRA/waste-organisation-frontend PR #116 (rebrand: false). The header
+// background is the classic GOV.UK black (from $govuk-new-organisation-colours:
+// false); the department name replaces the crown.
 .govuk-header {
-  background: #0b0c0c; // govuk black
+  background: #0b0c0c; // classic GOV.UK black (6.x header otherwise uses the brand colour)
+
+  .govuk-header__container {
+    padding: 20px 0;
+  }
+
+  .govuk-header__logo {
+    margin-bottom: 0;
+    padding: 0; // remove GOV.UK's crown-alignment padding (not needed for text)
+  }
+
+  a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 24px;
+    word-spacing: normal; // reset GOV.UK's negative word-spacing (logotype kerning)
+  }
+}
+
+// The real service renders in Arial (GDS Transport isn't licensed on CDP, so
+// PR #116 disables its @font-face). The prototype kit loads GDS Transport by
+// default, so force the whole template to Arial to match.
+.govuk-template,
+.govuk-template * {
+  font-family: arial, sans-serif !important;
+}
+
+// Blue band below the black department header, width of the content column.
+.app-header-band {
+  height: 10px;
+  background-color: #1d70b8;
+}
+
+// GOV.UK 6.x tints the service navigation
+// light blue (#f4f8fb) with a light-blue divider — use white + a grey divider.
+.govuk-service-navigation {
+  background-color: #ffffff;
+  border-bottom-color: #b1b4b6;
+}
+
+// Footer: drop the left-hand crown (the Defra crest sits on the right).
+.govuk-footer__crown {
+  display: none;
 }
 
 // --- Wider page width ------------------------------------------------------

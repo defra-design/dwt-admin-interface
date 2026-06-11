@@ -3,7 +3,7 @@
   "useServiceNavigation": true,
   "plugins": {
     "govuk-frontend": {
-      "rebrand": true
+      "rebrand": false
     }
   }
 }

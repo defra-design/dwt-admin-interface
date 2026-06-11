@@ -14,6 +14,21 @@
 
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
+{# Defra "black branding" header — the department name in place of the crown
+   (per DEFRA/waste-organisation-frontend PR #116). #}
+{% block govukHeader %}
+  <div class="govuk-header">
+    <div class="govuk-header__container govuk-width-container">
+      <div class="govuk-header__logo">
+        <a href="/" class="govuk-header__homepage-link">Department for Environment, Food and Rural Affairs</a>
+      </div>
+    </div>
+  </div>
+  <div class="govuk-width-container">
+    <div class="app-header-band"></div>
+  </div>
+{% endblock %}
+
 {% block govukServiceNavigation %}
   {{ govukServiceNavigation({
     serviceName: serviceName,
