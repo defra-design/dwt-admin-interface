@@ -132,7 +132,7 @@ $app-page-width: 1200px;
 
 .app-side-nav__link {
   display: block;
-  padding: 2px 0 2px 6px;
+  padding: 2px 10px; // 10px either side of the text
   font-size: 1rem; // 16px — govuk-font(16)
   line-height: 1.25;
   font-weight: 400; // non-current: normal
