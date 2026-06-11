@@ -13,9 +13,9 @@
 ] %}
 
 <nav class="app-side-nav" aria-label="Reporting sections">
-  <ul class="govuk-list app-side-nav__list">
+  <ul class="app-side-nav__list">
     {% for item in navItems %}
-      <li>
+      <li class="app-side-nav__item{{ ' app-side-nav__item--current' if activeSubNav === item.key }}">
         <a class="app-side-nav__link{{ ' app-side-nav__link--active' if activeSubNav === item.key }}"
           href="{{ item.href }}"
           {{- ' aria-current="location"' | safe if activeSubNav === item.key }}>

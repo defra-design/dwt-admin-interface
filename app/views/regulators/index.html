@@ -11,6 +11,13 @@
   </div>
 
   <div class="app-section-layout__content">
+    {{ govukBreadcrumbs({
+      items: [
+        { text: "Home", href: "/" },
+        { text: "Reporting", href: "/regulators" }
+      ]
+    }) }}
+
     <h1 class="govuk-heading-l">Key metrics</h1>
     <p class="govuk-body">Registration and reporting activity for waste organisations.</p>
 

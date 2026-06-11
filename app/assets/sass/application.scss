@@ -104,28 +104,51 @@ $app-page-width: 1200px;
   }
 }
 
-// --- Hand-rolled side navigation (brief §5) --------------------------------
+// --- Side navigation: matches the GOV.UK Design System .app-subnav ----------
+// 16px (govuk-font(16)), no top/bottom borders, tight spacing; the current item
+// is bold with a 4px blue left indicator (others align via a transparent one).
 .app-side-nav {
   margin-bottom: 30px;
 }
 
 .app-side-nav__list {
-  margin-top: 0;
-  border-top: 1px solid #b1b4b6;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// .app-subnav__section-item: padding govuk-spacing(1) 0, margin-bottom
+// govuk-spacing(1); the 4px blue indicator sits on the item (transparent
+// placeholder on the others so they all align).
+.app-side-nav__item {
+  margin: 0 0 5px 0;
+  padding: 5px 0;
+  border-left: 4px solid transparent;
+}
+
+.app-side-nav__item--current {
+  border-left-color: #1d70b8;
 }
 
 .app-side-nav__link {
   display: block;
-  padding: 10px 15px; // equal left and right padding on each item
-  border-bottom: 1px solid #b1b4b6;
-  border-left: 4px solid transparent;
+  padding: 2px 0 2px 6px;
+  font-size: 1rem; // 16px — govuk-font(16)
+  line-height: 1.25;
+  font-weight: 400; // non-current: normal
 }
 
 .app-side-nav__link--active {
-  border-left-color: #1d70b8; // govuk blue
-  font-weight: 700;
+  font-weight: 700; // current: bold
   text-decoration: none;
   color: #0b0c0c;
+}
+
+// Align the breadcrumb's text baseline with the first side-nav item. Both use
+// Arial 16px / 20px line-height; the item sits 7px down (5px li + 2px link
+// padding), so trim the breadcrumb's default 15px top margin to match.
+.app-section-layout__content .govuk-breadcrumbs {
+  margin-top: 6px;
 }
 
 // --- Reporting period filter -----------------------------------------------
