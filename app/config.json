@@ -1,5 +1,5 @@
 {
-  "serviceName": "DWT Admin Service",
+  "serviceName": "Waste Management Admin Portal",
   "useServiceNavigation": true,
   "plugins": {
     "govuk-frontend": {
