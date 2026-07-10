@@ -150,11 +150,17 @@ $app-page-width: 1200px;
   color: #0b0c0c;
 }
 
-// Align the breadcrumb's text baseline with the first side-nav item. Both use
-// Arial 16px / 20px line-height; the item sits 7px down (5px li + 2px link
-// padding), so trim the breadcrumb's default 15px top margin to match.
-.app-section-layout__content .govuk-breadcrumbs {
-  margin-top: 6px;
+// --- PAT Submission Viewer test data crib sheet -----------------------------
+// Sits below the real GOV.UK footer (build brief: PAT Submission Viewer —
+// prototype demo aid). 25% grey so it reads as background noise rather than
+// service content, but the IDs are still selectable to copy/paste.
+.app-id-cribsheet {
+  padding: 15px 0 30px;
+
+  p {
+    color: rgba(11, 12, 12, 0.25); // #0b0c0c (GOV.UK text colour) at 25%
+    margin: 0 0 5px;
+  }
 }
 
 // --- Reporting period filter -----------------------------------------------
@@ -165,10 +171,4 @@ $app-page-width: 1200px;
   gap: 0 40px;
   align-items: flex-start;
   margin-bottom: 10px;
-}
-
-// --- Tinted report rows for fails / errors (brief §6.4) --------------------
-.app-table__row--tinted td,
-.app-table__row--tinted th {
-  background-color: #fbeaea; // light red tint; the tag text carries the meaning
 }

@@ -35,11 +35,6 @@
     serviceUrl: "/",
     navigation: [
       {
-        href: "/waste-organisations",
-        text: "Waste Organisations",
-        active: activeSection === "organisations"
-      },
-      {
         href: "/software-providers",
         text: "Software Providers",
         active: activeSection === "providers"
@@ -51,4 +46,11 @@
       }
     ]
   }) }}
+{% endblock %}
+
+{# Lets pages render something genuinely below the GOV.UK footer (e.g. a
+   prototype-only test data crib sheet) via {% block afterFooter %}. #}
+{% block bodyEnd %}
+  {{ super() }}
+  {% block afterFooter %}{% endblock %}
 {% endblock %}

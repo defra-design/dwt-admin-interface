@@ -6,7 +6,7 @@
 const govukPrototypeKit = require('govuk-prototype-kit')
 const router = govukPrototypeKit.requests.setupRouter()
 
-const patScenarios = require('./data/pat-scenarios')
+const patSubmissions = require('./data/pat-submissions')
 const reg = require('./data/regulators-data')
 const {
   formatDateObj,
@@ -190,12 +190,49 @@ router.get('/waste-organisations', (req, res) => {
   })
 })
 
-// Renders inside the Software Providers section (side nav retained), even
-// though the feature itself is not built in this prototype.
-router.get('/software-providers/manage-credentials', (req, res) => {
-  res.render('software-providers/manage-credentials')
+// --- PAT Submission Viewer --------------------------------------------------
+
+// Search by Submission ID. Software Providers only has one feature now, so
+// this lives straight on the section's top-level URL rather than a separate
+// landing page. A match redirects straight to the detail page; no match
+// re-renders this page with a "no results" message.
+router.get('/software-providers', (req, res) => {
+  const submissionId = (req.query.submissionId || '').trim()
+  const testData = patSubmissions.listTestData()
+
+  if (submissionId) {
+    const submission = patSubmissions.getSubmission(submissionId)
+    if (submission) {
+      return res.redirect(`/software-providers/pat-viewer/submission/${submission.submissionId}`)
+    }
+    return res.render('software-providers/pat-viewer', { searched: true, query: submissionId, testData })
+  }
+
+  res.render('software-providers/pat-viewer', { testData })
 })
 
-router.get('/software-providers/review-pat', (req, res) => {
-  res.render('software-providers/review-pat', { scenarios: patScenarios })
+// Submission detail: the WTIDs collected under one Submission ID.
+router.get('/software-providers/pat-viewer/submission/:id', (req, res) => {
+  const submission = patSubmissions.getSubmission(req.params.id)
+  if (!submission) {
+    return res.status(404).render('placeholder', {
+      heading: 'Submission not found',
+      activeSection: 'providers'
+    })
+  }
+  const results = patSubmissions.submissionResults(submission)
+  const counts = patSubmissions.statusCounts(results)
+  const failedText = results
+    .filter((r) => r.status === 'Fail')
+    .map((r) => `${r.scenarioId} – FAILED – ${r.message}`)
+    .join('\n')
+
+  res.render('software-providers/pat-viewer-submission', {
+    submission,
+    results,
+    counts,
+    failedText,
+    submittedAtLabel: patSubmissions.formatSubmittedAt(submission.submittedAt),
+    testData: patSubmissions.listTestData()
+  })
 })

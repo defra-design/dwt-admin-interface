@@ -1,0 +1,78 @@
+{% extends "layouts/main.html" %}
+
+{% set pageName = "Submission detail" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-l">Submission detail</h1>
+
+    {% set statusSummaryHtml %}
+      {% if counts.failed === 0 and counts.notSubmitted === 0 %}
+        {{ govukTag({ text: "All passed", classes: "govuk-tag--green" }) }}
+      {% else %}
+        {% if counts.notSubmitted > 0 %}{{ govukTag({ text: counts.notSubmitted + " not submitted", classes: "govuk-tag--grey" }) }}{% endif %}
+        {% if counts.failed > 0 %}{{ govukTag({ text: counts.failed + " failed", classes: "govuk-tag--red" }) }}{% endif %}
+        {% if counts.passed > 0 %}{{ govukTag({ text: counts.passed + " passed", classes: "govuk-tag--green" }) }}{% endif %}
+      {% endif %}
+    {% endset %}
+
+    {{ govukSummaryList({
+      rows: [
+        { key: { text: "Submission ID" }, value: { text: submission.submissionId } },
+        { key: { text: "Client ID" }, value: { text: submission.clientId } },
+        { key: { text: "Submitted" }, value: { text: submittedAtLabel } },
+        { key: { text: "Status" }, value: { html: statusSummaryHtml } }
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Scenario results</h2>
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Scenario</th>
+          <th scope="col" class="govuk-table__header">Waste Tracking ID</th>
+          <th scope="col" class="govuk-table__header">Status</th>
+          <th scope="col" class="govuk-table__header">Message</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for r in results %}
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">{{ r.scenarioId }}</th>
+            <td class="govuk-table__cell">{{ r.wasteTrackingId if r.wasteTrackingId else "—" }}</td>
+            <td class="govuk-table__cell">
+              {% if r.status === "Pass" %}
+                {{ govukTag({ text: "Pass", classes: "govuk-tag--green" }) }}
+              {% elif r.status === "Fail" %}
+                {{ govukTag({ text: "Fail", classes: "govuk-tag--red" }) }}
+              {% else %}
+                {{ govukTag({ text: "Not submitted", classes: "govuk-tag--grey" }) }}
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">{{ r.message if r.status === "Fail" else "—" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if counts.failed > 0 %}
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: "Copy failed scenarios text",
+          classes: "govuk-button--secondary",
+          type: "button",
+          attributes: { "data-copy-failed-text": "failed-scenarios-text" }
+        }) }}
+        <span class="app-copy-status govuk-body" role="status" aria-live="polite"></span>
+      </div>
+      <pre id="failed-scenarios-text" hidden>{{ failedText }}</pre>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block afterFooter %}
+  {% include "software-providers/_id-cribsheet.html" %}
+{% endblock %}

@@ -5,7 +5,7 @@
 
 window.GOVUKPrototypeKit.documentReady(() => {
   initDownloadCsvButtons()
-  initPatReview()
+  initCopyFailedScenarios()
 })
 
 // ---------------------------------------------------------------------------
@@ -57,182 +57,39 @@ function initDownloadCsvButtons () {
 }
 
 // ---------------------------------------------------------------------------
-// Review PAT submission (brief §6).
+// Copy failed PAT scenarios as newline-separated text (PAT Submission Viewer).
 // ---------------------------------------------------------------------------
 
-// Waste Tracking ID format, per the Digital Waste Tracking Receipt API
-// (`wasteTrackingId`, e.g. "25HRA0B2" — 8-character alphanumeric).
-const WT_ID_PATTERN = /^[0-9A-Z]{8}$/
-
-// Fail reasons keyed by scenario ID. The first six are verbatim from the
-// screenshots (brief §6.5); the rest are authored in the same register for the
-// "All fail" mode.
-const FAIL_REASONS = {
-  R01: 'Expected a single waste item but none was recorded.',
-  R02: 'Expected multiple waste items but only one was found.',
-  R03: "Means of transport 'Road' was missing from the receipt.",
-  R04: 'Disposal or Recovery codes were present but should have been omitted.',
-  R05: 'Multiple Disposal or Recovery codes were expected but only one was found.',
-  R07: 'Only a single EWC code was found; dual EWC codes expected.',
-  C02: 'Carrier registration number was absent and no reason was supplied.',
-  B01: 'Broker / Dealer details were absent or incomplete.',
-  P01: 'POPs waste components were missing or incomplete.',
-  H01: 'Hazardous waste components were missing or malformed.',
-  H03: 'Consignment Note Code was missing and no reason was supplied.',
-  X01: 'Hazardous and POPs classification was not correctly applied.'
+function copyText (text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).catch(() => copyTextFallback(text))
+  }
+  return copyTextFallback(text)
 }
 
-// Scenario IDs that PASS in "Partial" mode (strict alternation starting with
-// Pass across the 12 submitted rows). Everything else fails. (brief §6.5)
-const PARTIAL_PASS = ['R01', 'R03', 'R05', 'C02', 'P01', 'H03']
-
-//
-// The integration seam. In production this would be replaced with real calls to
-// the sandbox API for each submitted scenario. Here it is mocked per the active
-// Simulate mode. (brief §6.4 / §6.5)
-//
-// Returns { result: 'Pass'|'Fail'|'Error', reason: string }.
-//
-function assessScenario (scenario, mode, context) {
-  switch (mode) {
-    case 'all-pass':
-      return { result: 'Pass', reason: '—' }
-
-    case 'all-fail':
-      return { result: 'Fail', reason: FAIL_REASONS[scenario.id] || 'Scenario did not pass assessment.' }
-
-    case 'partial':
-      return PARTIAL_PASS.indexOf(scenario.id) !== -1
-        ? { result: 'Pass', reason: '—' }
-        : { result: 'Fail', reason: FAIL_REASONS[scenario.id] || 'Scenario did not pass assessment.' }
-
-    case 'error-wt-not-found':
-      // Any WT ID that does not match the expected format is "not found".
-      // For the demo, if nothing is genuinely malformed, flag the first
-      // submitted row so the response shape is always visible. (brief §6.5)
-      if (!WT_ID_PATTERN.test(scenario.wtId) ||
-          (context.noneInvalid && scenario.id === context.firstId)) {
-        // Matches the API's PUT /movements/{wasteTrackingId}/receive 404.
-        return { result: 'Error', reason: 'Movement not found' }
-      }
-      return { result: 'Pass', reason: '—' }
-
-    case 'error-scenario-id':
-      // OPEN (brief §6.5): no screenshot was provided. Proposed behaviour —
-      // one submitted row returns an error, the rest pass.
-      // TODO: confirm intended behaviour and which row.
-      if (scenario.id === context.firstId) {
-        return { result: 'Error', reason: 'Scenario ID not recognised' }
-      }
-      return { result: 'Pass', reason: '—' }
-
-    default:
-      return { result: 'Pass', reason: '—' }
-  }
+// Fallback for browsers/contexts where the async Clipboard API is blocked —
+// select the text in an off-screen textarea and use the older execCommand.
+function copyTextFallback (text) {
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.focus()
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
 }
 
-function initPatReview () {
-  const form = document.querySelector('[data-module="app-pat-review"]')
-  if (!form) return
-
-  const reportContainer = document.getElementById('review-report')
-
-  // The mocked assessment always runs in "partial" mode. The prototype's
-  // SIMULATE controls (which let a reviewer switch response shapes) have been
-  // removed; assessScenario() still supports the other modes if needed.
-  const mode = 'partial'
-
-  // Collect the in-scope rows: enabled WT ID input with a value. (brief §6.1)
-  function getSubmittedScenarios () {
-    return Array.from(form.querySelectorAll('[data-scenario-row]'))
-      .map((row) => {
-        const input = row.querySelector('[data-wt-input]')
-        return {
-          id: row.getAttribute('data-id'),
-          description: row.children[1].textContent.trim(),
-          wtId: input.value.trim(),
-          disabled: input.disabled
-        }
-      })
-      .filter((s) => !s.disabled && s.wtId !== '')
-  }
-
-  // Run Review
-  form.querySelector('[data-action="run"]').addEventListener('click', () => {
-    const submitted = getSubmittedScenarios()
-    const noneInvalid = submitted.every((s) => WT_ID_PATTERN.test(s.wtId))
-    const context = { noneInvalid, firstId: submitted.length ? submitted[0].id : null }
-
-    const rows = submitted.map((s) => Object.assign({}, s, assessScenario(s, mode, context)))
-    renderReport(reportContainer, rows)
-  })
-
-  // Clear all — reset WT ID inputs and remove the report. (brief §6.3)
-  form.querySelector('[data-action="clear"]').addEventListener('click', () => {
-    form.querySelectorAll('[data-wt-input]').forEach((input) => {
-      if (!input.disabled) input.value = ''
+function initCopyFailedScenarios () {
+  document.querySelectorAll('[data-copy-failed-text]').forEach((button) => {
+    if (button.dataset.copyBound) return
+    button.dataset.copyBound = 'true'
+    button.addEventListener('click', () => {
+      const source = document.getElementById(button.getAttribute('data-copy-failed-text'))
+      if (!source) return
+      Promise.resolve(copyText(source.textContent)).then(() => flashStatus(button, 'Copied'))
     })
-    reportContainer.innerHTML = ''
   })
 }
 
-function tagClass (result) {
-  if (result === 'Pass') return 'govuk-tag--green'
-  if (result === 'Fail') return 'govuk-tag--red'
-  return 'govuk-tag--yellow'
-}
-
-function escapeHtml (value) {
-  const div = document.createElement('div')
-  div.textContent = value
-  return div.innerHTML
-}
-
-function renderReport (container, rows) {
-  const passed = rows.filter((r) => r.result === 'Pass').length
-  const failed = rows.filter((r) => r.result === 'Fail').length
-  const errored = rows.filter((r) => r.result === 'Error').length
-
-  const summaryParts = [`${passed} passed`]
-  if (failed) summaryParts.push(`${failed} failed`)
-  if (errored) summaryParts.push(`${errored} error`)
-  const summaryLine = `${summaryParts.join(' / ')} of ${rows.length} submitted`
-
-  const bodyRows = rows.map((r) => {
-    const tinted = r.result !== 'Pass'
-    return `
-      <tr class="govuk-table__row${tinted ? ' app-table__row--tinted' : ''}">
-        <th scope="row" class="govuk-table__header">${escapeHtml(r.id)}</th>
-        <td class="govuk-table__cell">${escapeHtml(r.description)}</td>
-        <td class="govuk-table__cell">${escapeHtml(r.wtId)}</td>
-        <td class="govuk-table__cell"><strong class="govuk-tag ${tagClass(r.result)}">${r.result}</strong></td>
-        <td class="govuk-table__cell">${escapeHtml(r.reason)}</td>
-      </tr>`
-  }).join('')
-
-  container.innerHTML = `
-    <h2 class="govuk-heading-m">Review Report</h2>
-
-    <div class="govuk-inset-text">
-      Results are mocked. The <code>assessScenario()</code> function in
-      <code>application.js</code> should be replaced with real calls to the
-      sandbox API.
-    </div>
-
-    <p class="govuk-body govuk-!-font-weight-bold">${summaryLine}</p>
-
-    <table class="govuk-table" id="review-report-table">
-      <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-          <th scope="col" class="govuk-table__header">Scenario</th>
-          <th scope="col" class="govuk-table__header">Description</th>
-          <th scope="col" class="govuk-table__header">WT ID submitted</th>
-          <th scope="col" class="govuk-table__header">Result</th>
-          <th scope="col" class="govuk-table__header">Reason</th>
-        </tr>
-      </thead>
-      <tbody class="govuk-table__body">
-        ${bodyRows}
-      </tbody>
-    </table>`
-}

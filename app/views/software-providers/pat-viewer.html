@@ -1,0 +1,35 @@
+{% extends "layouts/main.html" %}
+
+{% set pageName = "PAT Submission Viewer" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">PAT Submission Viewer</h1>
+    <p class="govuk-body">Find a Production Approval Test (PAT) submission by Submission ID.</p>
+
+    <form method="get" action="/software-providers">
+      {{ govukInput({
+        id: "submissionId",
+        name: "submissionId",
+        label: { text: "Find a PAT submission", classes: "govuk-label--s" },
+        hint: { text: "Enter a submission ID provided by a software provider." },
+        classes: "govuk-input--width-20"
+      }) }}
+      {{ govukButton({ text: "Find submission" }) }}
+    </form>
+
+    {% if searched %}
+      <p class="govuk-body">
+        No submission found for “{{ query }}”.
+      </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block afterFooter %}
+  {% include "software-providers/_id-cribsheet.html" %}
+{% endblock %}
+
