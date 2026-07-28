@@ -4,13 +4,8 @@
 //
 
 window.GOVUKPrototypeKit.documentReady(() => {
-  initDownloadCsvButtons()
   initCopyFailedScenarios()
 })
-
-// ---------------------------------------------------------------------------
-// Download a results table as a CSV file.
-// ---------------------------------------------------------------------------
 
 function flashStatus (button, message) {
   const status = button.parentNode.querySelector('.app-copy-status')
@@ -18,42 +13,6 @@ function flashStatus (button, message) {
     status.textContent = message
     window.setTimeout(() => { status.textContent = '' }, 4000)
   }
-}
-
-function tableToCsv (table) {
-  const escape = (value) => {
-    const v = value.replace(/—/g, '-') // em dash -> hyphen for spreadsheets
-    return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v
-  }
-  return Array.from(table.querySelectorAll('tr'))
-    .map((row) =>
-      Array.from(row.querySelectorAll('th, td'))
-        .map((cell) => escape(cell.textContent.trim()))
-        .join(',')
-    )
-    .join('\r\n')
-}
-
-function initDownloadCsvButtons () {
-  document.querySelectorAll('[data-download-csv]').forEach((button) => {
-    if (button.dataset.csvBound) return
-    button.dataset.csvBound = 'true'
-    button.addEventListener('click', () => {
-      const table = document.querySelector(button.getAttribute('data-download-csv'))
-      if (!table) return
-      const filename = button.getAttribute('data-filename') || 'report.csv'
-      const blob = new Blob([tableToCsv(table)], { type: 'text/csv;charset=utf-8;' })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = filename
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-      flashStatus(button, 'Downloaded')
-    })
-  })
 }
 
 // ---------------------------------------------------------------------------

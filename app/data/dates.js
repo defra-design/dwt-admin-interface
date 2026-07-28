@@ -11,6 +11,12 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ]
 
+// GOV.UK abbreviates months in tables (May stays as-is).
+const MONTHS_SHORT = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+]
+
 // "27 March 2026" from numeric parts.
 function formatDate (day, month, year) {
   return `${day} ${MONTHS[month - 1]} ${year}`
@@ -19,6 +25,11 @@ function formatDate (day, month, year) {
 // "27 March 2026" from a Date object.
 function formatDateObj (date) {
   return formatDate(date.getDate(), date.getMonth() + 1, date.getFullYear())
+}
+
+// "27 Mar 2026" from a Date object — compact form for tables.
+function formatDateShortObj (date) {
+  return `${date.getDate()} ${MONTHS_SHORT[date.getMonth()]} ${date.getFullYear()}`
 }
 
 // Validate three day/month/year strings as a real date.
@@ -68,36 +79,6 @@ function parseDateInput (body, prefix) {
   return { error, date, values }
 }
 
-// Read + validate a from/to period (namePrefixes `period-from` / `period-to`).
-// Returns { from, to, values, errors:{from,to,range}, errorList }.
-function parsePeriod (body) {
-  const fromField = parseDateInput(body, 'period-from')
-  const toField = parseDateInput(body, 'period-to')
-
-  const errors = {}
-  if (fromField.error) errors.from = fromField.error
-  if (toField.error) errors.to = toField.error
-
-  // Range check only when both dates are individually valid.
-  if (!errors.from && !errors.to && fromField.date > toField.date) {
-    errors.range = 'The “from” date must be the same as or before the “to” date'
-  }
-
-  const errorList = []
-  if (errors.from) errorList.push({ text: `From date: ${errors.from}`, href: '#period-from-day' })
-  if (errors.to) errorList.push({ text: `To date: ${errors.to}`, href: '#period-to-day' })
-  if (errors.range) errorList.push({ text: errors.range, href: '#period-from-day' })
-
-  return {
-    from: fromField.date,
-    to: toField.date,
-    values: { from: fromField.values, to: toField.values },
-    errors,
-    errorList,
-    hasErrors: errorList.length > 0
-  }
-}
-
 // Default period: the last 12 months ending today.
 function defaultPeriod () {
   const to = new Date()
@@ -116,8 +97,8 @@ module.exports = {
   MONTHS,
   formatDate,
   formatDateObj,
+  formatDateShortObj,
   validateDateParts,
   parseDateInput,
-  parsePeriod,
   defaultPeriod
 }

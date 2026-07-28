@@ -4,6 +4,14 @@
 {% set activeSection = "providers" %}
 
 {% block content %}
+{{ govukBreadcrumbs({
+  items: [
+    { text: "Home", href: "/" },
+    { text: "Software Providers", href: "/software-providers" },
+    { text: "PAT Submission" }
+  ]
+}) }}
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <h1 class="govuk-heading-l">Submission detail</h1>

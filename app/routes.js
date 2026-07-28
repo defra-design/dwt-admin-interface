@@ -10,8 +10,9 @@ const patSubmissions = require('./data/pat-submissions')
 const reg = require('./data/regulators-data')
 const {
   formatDateObj,
+  formatDateShortObj,
   validateDateParts,
-  parsePeriod,
+  parseDateInput,
   defaultPeriod
 } = require('./data/dates')
 
@@ -59,126 +60,55 @@ router.post('/service-metrics', (req, res) => {
 
 // --- Regulators reporting --------------------------------------------------
 
-// Resolve the from/to period: submitted values on POST, last-12-months default
-// on GET. Always returns { from, to, values, errors, errorList, hasErrors }.
-function getPeriod (req) {
-  if (req.method === 'POST') return parsePeriod(req.body)
-  const d = defaultPeriod()
-  return { from: d.from, to: d.to, values: d.values, errors: {}, errorList: [], hasErrors: false }
-}
-
 function periodLabel (period) {
   return `${formatDateObj(period.from)} to ${formatDateObj(period.to)}`
 }
 
-// Key metrics dashboard. Results are only shown after "Show results" (POST).
-function regulatorsMetrics (req, res) {
-  const period = getPeriod(req)
-  if (req.method !== 'POST' || period.hasErrors) {
-    return res.render('regulators/index', { period })
+// Lenient period parse — no validation. Uses whatever dates parse; falls back
+// to the default period for any missing/unparseable part, and swaps a reversed
+// range, so "Show organisations" always produces a figure (never an error).
+function lenientPeriod (query) {
+  const d = defaultPeriod()
+  const f = parseDateInput(query, 'period-from')
+  const t = parseDateInput(query, 'period-to')
+  let from = f.date || d.from
+  let to = t.date || d.to
+  if (from > to) { const tmp = from; from = to; to = tmp }
+  const keep = (v, fallback) => (v.day && v.month && v.year) ? v : fallback
+  return {
+    from,
+    to,
+    values: { from: keep(f.values, d.values.from), to: keep(t.values, d.values.to) }
   }
+}
+
+// Waste organisations registered within the period. Uses GET so the period is
+// in the URL and the results can be bookmarked/shared. No query params = an
+// initial visit (default dates, no results); any params = a submission. No
+// validation.
+router.get('/regulators', (req, res) => {
+  const submitted = Object.prototype.hasOwnProperty.call(req.query, 'period-from-day')
+  if (!submitted) {
+    const d = defaultPeriod()
+    return res.render('regulators/index', { period: { from: d.from, to: d.to, values: d.values, errors: {} } })
+  }
+  const period = lenientPeriod(req.query)
+  const rows = reg.listRegisteredInPeriod(period.from, period.to).map((o) => ({
+    registered: formatDateShortObj(o.registeredDate),
+    id: o.id,
+    idShort: o.id.split('-').slice(0, 2).join('-') + '…', // truncate at 2nd hyphen
+    apiCodeCount: o.apiCodeCount,
+    organisationName: o.organisationName,
+    paymentStatus: o.paymentStatus,
+    paymentPeriod: o.paymentPeriod || ''
+  }))
   res.render('regulators/index', {
     period,
-    metrics: reg.metrics(period.from, period.to),
-    periodLabel: periodLabel(period)
-  })
-}
-router.get('/regulators', regulatorsMetrics)
-router.post('/regulators', regulatorsMetrics)
-
-// Registered organisations (registered within the period). POST shows results.
-function regulatorsRegistered (req, res) {
-  const period = getPeriod(req)
-  if (req.method !== 'POST' || period.hasErrors) {
-    return res.render('regulators/registered', { period })
-  }
-  const rows = reg.listRegisteredInPeriod(period.from, period.to).map((o) => ({
-    id: o.id,
-    name: o.name,
-    permitNumber: o.permitNumber,
-    registered: formatDateObj(o.registeredDate)
-  }))
-  res.render('regulators/registered', { period, rows, periodLabel: periodLabel(period) })
-}
-router.get('/regulators/registered', regulatorsRegistered)
-router.post('/regulators/registered', regulatorsRegistered)
-
-// Organisations not reporting. Results only shown after "Show results" (POST).
-function regulatorsNotReporting (req, res) {
-  const period = getPeriod(req)
-  if (req.method !== 'POST' || period.hasErrors) {
-    return res.render('regulators/not-reporting', { period })
-  }
-  const rows = reg.listNotReporting(period.from, period.to).map((o) => ({
-    id: o.id,
-    name: o.name,
-    permitNumber: o.permitNumber,
-    registered: formatDateObj(o.registeredDate)
-  }))
-  res.render('regulators/not-reporting', { period, rows, periodLabel: periodLabel(period) })
-}
-router.get('/regulators/not-reporting', regulatorsNotReporting)
-router.post('/regulators/not-reporting', regulatorsNotReporting)
-
-// Organisations reporting (+ waste-code breakdown). Results only after POST.
-function regulatorsReporting (req, res) {
-  const period = getPeriod(req)
-  if (req.method !== 'POST' || period.hasErrors) {
-    return res.render('regulators/reporting', { period })
-  }
-  const rows = reg.listReporting(period.from, period.to)
-  res.render('regulators/reporting', {
-    period,
     rows,
-    totalMovements: rows.reduce((sum, o) => sum + o.movements, 0),
-    wasteRows: reg.wasteCodeBreakdown(period.from, period.to),
+    count: rows.length,
     periodLabel: periodLabel(period)
-  })
-}
-router.get('/regulators/reporting', regulatorsReporting)
-router.post('/regulators/reporting', regulatorsReporting)
-
-// Find an organisation (search).
-router.get('/regulators/organisation', (req, res) => {
-  const query = (req.query.q || '').trim()
-  const searched = Object.prototype.hasOwnProperty.call(req.query, 'q')
-  res.render('regulators/organisation', {
-    query,
-    searched,
-    results: searched ? reg.findOrganisations(query) : []
   })
 })
-
-// Organisation detail (movement receipts for a period).
-function organisationDetail (req, res) {
-  const org = reg.getOrganisation(req.params.id)
-  if (!org) {
-    return res.status(404).render('placeholder', {
-      heading: 'Organisation not found',
-      activeSection: 'regulators'
-    })
-  }
-
-  const period = getPeriod(req)
-
-  const summary = period.hasErrors
-    ? []
-    : reg.orgWasteCodeSummary(org.id, period.from, period.to)
-  const totalMovements = summary.reduce((sum, r) => sum + r.movements, 0)
-  const totalTonnes = Math.round(summary.reduce((sum, r) => sum + r.tonnes, 0) * 10) / 10
-
-  res.render('regulators/organisation-detail', {
-    org: { ...org, registered: formatDateObj(org.registeredDate) },
-    period,
-    periodLabel: period.hasErrors ? '—' : periodLabel(period),
-    summary,
-    totalMovements,
-    totalTonnes,
-    errorList: period.errorList
-  })
-}
-router.get('/regulators/organisation/:id', organisationDetail)
-router.post('/regulators/organisation/:id', organisationDetail)
 
 // --- Dead links / not-built placeholders (build brief §8) -------------------
 

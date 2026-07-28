@@ -1,13 +1,9 @@
 //
-// Mocked data for the Regulators reporting section.
+// Mocked data for the Reporting > Waste organisations report.
 //
-// Everything is generated ONCE at module load from a seeded PRNG, so the
-// numbers are deterministic (stable across reloads/restarts) and every report
-// reconciles with every other one. Replace this whole module with real queries
-// against the reporting database when integrating for real.
-//
-// Key invariant: for any period, (orgs reporting) + (orgs not reporting) =
-// (orgs registered as at the period end). % reporting = reporting / registered.
+// Generated ONCE at module load from a seeded PRNG, so the numbers are
+// deterministic (stable across reloads/restarts). Replace this whole module
+// with a real query against the registration database when integrating.
 //
 
 // --- Seeded PRNG (mulberry32) ----------------------------------------------
@@ -21,7 +17,6 @@ function mulberry32 (seed) {
   }
 }
 const rand = mulberry32(20260604)
-const pick = (arr) => arr[Math.floor(rand() * arr.length)]
 
 // "Now", captured once so generation and period filters stay aligned.
 const NOW = new Date()
@@ -29,86 +24,139 @@ function dateDaysAgo (n) {
   return new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate() - n)
 }
 
-// --- EWC waste codes -------------------------------------------------------
-// Shaped to match the Receipt API GET /reference-data/ewc-codes response:
-// a six-digit `code` (no spaces) and an `isHazardous` boolean.
-const wasteCodes = [
-  { code: '200301', isHazardous: false, description: 'Mixed municipal waste' },
-  { code: '170101', isHazardous: false, description: 'Concrete' },
-  { code: '150101', isHazardous: false, description: 'Paper and cardboard packaging' },
-  { code: '191212', isHazardous: false, description: 'Other wastes from mechanical treatment of waste' },
-  { code: '170405', isHazardous: false, description: 'Iron and steel' },
-  { code: '020106', isHazardous: false, description: 'Animal faeces, urine and manure' },
-  { code: '160601', isHazardous: true, description: 'Lead batteries' },
-  { code: '130205', isHazardous: true, description: 'Mineral-based engine oils' }
+// --- Organisation names ----------------------------------------------------
+const NAME_PREFIXES = [
+  'Northfield', 'Riverside', 'Greenacre', 'Oakwood', 'Silverline', 'Ironbridge',
+  'Fenwick', 'Harrowgate', 'Merton', 'Kesteven', 'Bramwell', 'Colston',
+  'Deepdale', 'Elmsworth', 'Foxhollow', 'Grantley', 'Hollis', 'Ivywood',
+  'Juniper', 'Kendrick', 'Larkspur', 'Millbrook', 'Norwood', 'Oldfield',
+  'Pennant', 'Quarrymoor', 'Rushton', 'Stanmore', 'Thornfield', 'Underhill',
+  'Vantage', 'Westgate', 'Yarrow'
 ]
+const NAME_SECTORS = [
+  'Waste', 'Recycling', 'Environmental', 'Resource', 'Materials',
+  'Reclamation', 'Salvage', 'Composting'
+]
+const NAME_SUFFIXES = ['Ltd', 'Group', 'Services Ltd', 'Solutions', 'PLC', '& Co Ltd', 'Partners', 'UK Ltd']
 
-// --- Organisations (exactly 287, all registered on/before today) -----------
-const NAME_PLACES = [
-  'Ashford', 'Barton', 'Calder', 'Denby', 'Eastgate', 'Foxton', 'Garforth',
-  'Hartwell', 'Ingleby', 'Kelsall', 'Langton', 'Marsden', 'Northwood',
-  'Oakfield', 'Pickering', 'Quarrydale', 'Redmoor', 'Sandholme', 'Thornbury',
-  'Upton', 'Vale', 'Westbrook', 'Yardley', 'Brookend', 'Clifton'
-]
-const NAME_TYPES = [
-  'Recycling', 'Waste Services', 'Skips', 'Environmental', 'Salvage',
-  'Aggregates', 'Metals', 'Reclamation', 'Resource Management', 'Haulage'
-]
-const NAME_SUFFIXES = ['Ltd', 'Ltd', 'Ltd', 'plc', 'Group', '& Sons', 'Holdings']
-const PERMIT_LETTERS = 'ABCDEFGHJKLMNPRSTUWXYZ'
+// Excluded combinations that happen to match a real organisation's name.
+const EXCLUDED_NAMES = new Set(['Oldfield Environmental Services Ltd'])
 
-function randomPermit () {
-  const l = () => PERMIT_LETTERS[Math.floor(rand() * PERMIT_LETTERS.length)]
-  const d = () => Math.floor(rand() * 10)
-  return `EPR/${l()}${l()}${d()}${d()}${d()}${d()}${l()}${l()}`
+function generateOrgName () {
+  let name
+  do {
+    const prefix = NAME_PREFIXES[Math.floor(rand() * NAME_PREFIXES.length)]
+    const sector = NAME_SECTORS[Math.floor(rand() * NAME_SECTORS.length)]
+    const suffix = NAME_SUFFIXES[Math.floor(rand() * NAME_SUFFIXES.length)]
+    name = `${prefix} ${sector} ${suffix}`
+  } while (EXCLUDED_NAMES.has(name))
+  return name
 }
 
+// --- Payment status/period ---------------------------------------------------
+// Payment periods always run 1 Oct to 30 Sep the following year.
+
+// The Oct-Sep cycle covering "now" ends in this year (rolls over on 1 Oct).
+const octFirstThisYear = new Date(NOW.getFullYear(), 9, 1)
+const CURRENT_PERIOD_END_YEAR = NOW >= octFirstThisYear ? NOW.getFullYear() + 1 : NOW.getFullYear()
+
+function twoDigitYear (year) {
+  return String(year).slice(-2)
+}
+
+function formatOctPeriod (endYear) {
+  return `Oct ${twoDigitYear(endYear - 1)} – Sep ${twoDigitYear(endYear)}`
+}
+
+// Paid/in-progress orgs are in the current cycle or (occasionally) the next one.
+function currentOrUpcomingPeriod () {
+  const endYear = CURRENT_PERIOD_END_YEAR + (rand() < 0.5 ? 0 : 1)
+  return formatOctPeriod(endYear)
+}
+
+// Unpaid orgs, when a period is shown at all, show a lapsed (past) cycle.
+function pastPeriod () {
+  const endYear = CURRENT_PERIOD_END_YEAR - 1 - Math.floor(rand() * 3)
+  return formatOctPeriod(endYear)
+}
+
+// Deterministic v4-style UUID (e.g. f7bcdd5d-3af0-4a96-8245-4cbf3a11cf09).
+function randomHex (n) {
+  let s = ''
+  for (let i = 0; i < n; i++) s += Math.floor(rand() * 16).toString(16)
+  return s
+}
+function randomUuid () {
+  const variant = '89ab'[Math.floor(rand() * 4)]
+  return `${randomHex(8)}-${randomHex(4)}-4${randomHex(3)}-${variant}${randomHex(3)}-${randomHex(12)}`
+}
+
+// --- Organisations (exactly 287, all registered on/before today) -----------
 const TOTAL_ORGS = 287
 const organisations = []
 for (let i = 1; i <= TOTAL_ORGS; i++) {
-  const id = `ORG-${String(i).padStart(4, '0')}`
-  const name = `${pick(NAME_PLACES)} ${pick(NAME_TYPES)} ${pick(NAME_SUFFIXES)}`
+  const id = randomUuid()
   // Registered some time in the last ~3 years (all in the past).
   const registeredDate = dateDaysAgo(15 + Math.floor(rand() * 1080))
-  organisations.push({ id, name, permitNumber: randomPermit(), registeredDate })
+  const apiCodeCount = 1 + Math.floor(rand() * 3) // 1–3 active API codes
+  // ~65% paid, the rest unpaid — a single org is nudged to "in progress" below.
+  const paymentStatus = rand() < 0.65 ? 'paid' : 'unpaid'
+  organisations.push({ id, registeredDate, apiCodeCount, paymentStatus })
 }
 
-// --- Movement receipts -----------------------------------------------------
-// ~78% of orgs report at least one receipt; the rest report none. Receipt dates
-// fall within the last ~18 months so period filters are meaningful.
-const receipts = []
-let receiptSeq = 0
+// Exactly one org (of the unpaid ones) is "in progress".
+const unpaidOrgs = organisations.filter((o) => o.paymentStatus === 'unpaid')
+unpaidOrgs[Math.floor(rand() * unpaidOrgs.length)].paymentStatus = 'in progress'
+
+// Organisation name and payment period both key off the final payment status:
+// paid/in-progress orgs have a known name and a current (or upcoming) payment
+// period. Unpaid orgs with a lapsed period were known to us when they last
+// paid, so their name is known too; unpaid orgs with no period on record at
+// all mostly have no name on file either.
 for (const org of organisations) {
-  if (rand() >= 0.78) continue // this org reports nothing
-  const count = 1 + Math.floor(rand() * rand() * 40) // skew towards small counts
-  for (let j = 0; j < count; j++) {
-    receiptSeq++
-    receipts.push({
-      id: `RCP-${String(receiptSeq).padStart(6, '0')}`,
-      orgId: org.id,
-      date: dateDaysAgo(Math.floor(rand() * 540)),
-      wasteCode: pick(wasteCodes).code,
-      quantityTonnes: Math.round((0.5 + rand() * 25) * 10) / 10
-    })
+  if (org.paymentStatus === 'paid' || org.paymentStatus === 'in progress') {
+    org.organisationName = generateOrgName()
+    org.paymentPeriod = currentOrUpcomingPeriod()
+  } else if (rand() < 0.25) {
+    org.organisationName = generateOrgName()
+    org.paymentPeriod = pastPeriod()
+  } else {
+    org.organisationName = rand() < 0.25 ? generateOrgName() : null
+    org.paymentPeriod = null
   }
 }
 
-// --- Indexes ---------------------------------------------------------------
-const orgById = new Map(organisations.map((o) => [o.id, o]))
-const receiptsByOrg = new Map()
-for (const r of receipts) {
-  if (!receiptsByOrg.has(r.orgId)) receiptsByOrg.set(r.orgId, [])
-  receiptsByOrg.get(r.orgId).push(r)
-}
-const wasteCodeDesc = new Map(wasteCodes.map((w) => [w.code, w.description]))
-
-// --- Derivation helpers ----------------------------------------------------
-function inPeriod (date, from, to) {
-  return date >= from && date <= to
+// Specific orgs whose name/payment period should never be shown, regardless
+// of what payment status would normally entitle them to.
+const BLANK_OUT_NAMES = new Set(['Kesteven Salvage Group', 'Colston Composting Services Ltd'])
+for (const org of organisations) {
+  if (BLANK_OUT_NAMES.has(org.organisationName)) {
+    org.organisationName = null
+    org.paymentPeriod = null
+  }
 }
 
-function registeredAsAt (asAt) {
-  return organisations.filter((o) => o.registeredDate <= asAt)
+// A handful of extra unpaid orgs, never having had a payment period recorded
+// (so no lapsed period to show), registered within a typical demo date range.
+// IDs are deliberately low-sorting so they surface in the (id-sorted, capped)
+// registrations table used to demo this period.
+const EXTRA_UNPAID_NO_PERIOD = [
+  { id: '00000000-89ab-4000-8000-000000000001', registeredDate: new Date(2025, 8, 5), organisationName: null },
+  { id: '00000000-89ab-4000-8000-000000000002', registeredDate: new Date(2025, 10, 12), organisationName: 'Deepdale Salvage Ltd' },
+  { id: '00000000-89ab-4000-8000-000000000003', registeredDate: new Date(2026, 0, 20), organisationName: null },
+  { id: '00000000-89ab-4000-8000-000000000004', registeredDate: new Date(2026, 2, 3), organisationName: null },
+  { id: '00000000-89ab-4000-8000-000000000005', registeredDate: new Date(2026, 3, 15), organisationName: null },
+  { id: '00000000-89ab-4000-8000-000000000006', registeredDate: new Date(2026, 5, 22), organisationName: null }
+]
+for (const extra of EXTRA_UNPAID_NO_PERIOD) {
+  organisations.push({
+    id: extra.id,
+    registeredDate: extra.registeredDate,
+    apiCodeCount: 1 + Math.floor(rand() * 3),
+    paymentStatus: 'unpaid',
+    paymentPeriod: null,
+    organisationName: extra.organisationName
+  })
 }
 
 // Organisations whose registration date falls within the period.
@@ -119,127 +167,7 @@ function listRegisteredInPeriod (from, to) {
     .sort((a, b) => a.id.localeCompare(b.id))
 }
 
-function receiptsForOrg (orgId, from, to) {
-  const all = receiptsByOrg.get(orgId) || []
-  if (!from || !to) return all
-  return all.filter((r) => inPeriod(r.date, from, to))
-}
-
-function movementsForOrg (orgId, from, to) {
-  return receiptsForOrg(orgId, from, to).length
-}
-
-// Set of org ids with >= 1 receipt in the period.
-function reportingOrgIds (from, to) {
-  const ids = new Set()
-  for (const r of receipts) {
-    if (inPeriod(r.date, from, to)) ids.add(r.orgId)
-  }
-  return ids
-}
-
-// Headline metrics for the dashboard.
-// `registeredBase` (orgs registered as at the period end) is the universe for
-// the reporting / not-reporting / % figures. `registeredInPeriod` counts orgs
-// whose registration date falls within the period (shown as its own metric).
-function metrics (from, to) {
-  const registered = registeredAsAt(to)
-  const registeredInPeriod = listRegisteredInPeriod(from, to).length
-  const reportingIds = reportingOrgIds(from, to)
-  const reporting = registered.filter((o) => reportingIds.has(o.id)).length
-  const notReporting = registered.length - reporting
-  const pct = registered.length ? Math.round((reporting / registered.length) * 1000) / 10 : 0
-  return {
-    registeredBase: registered.length,
-    registeredInPeriod,
-    reporting,
-    notReporting,
-    pctReporting: pct
-  }
-}
-
-// Report 1: registered orgs with no receipt in the period.
-function listNotReporting (from, to) {
-  const reportingIds = reportingOrgIds(from, to)
-  return registeredAsAt(to)
-    .filter((o) => !reportingIds.has(o.id))
-    .sort((a, b) => a.id.localeCompare(b.id))
-}
-
-// Report 2: registered orgs that reported, with their movement count.
-function listReporting (from, to) {
-  const reportingIds = reportingOrgIds(from, to)
-  return registeredAsAt(to)
-    .filter((o) => reportingIds.has(o.id))
-    .map((o) => ({ ...o, movements: movementsForOrg(o.id, from, to) }))
-    .sort((a, b) => b.movements - a.movements || a.id.localeCompare(b.id))
-}
-
-// Movements grouped by EWC waste code (optionally limited to a set of org ids).
-function wasteCodeBreakdown (from, to, orgIds) {
-  const counts = new Map()
-  for (const r of receipts) {
-    if (!inPeriod(r.date, from, to)) continue
-    if (orgIds && !orgIds.has(r.orgId)) continue
-    counts.set(r.wasteCode, (counts.get(r.wasteCode) || 0) + 1)
-  }
-  return wasteCodes
-    .map((w) => ({ code: w.code, description: w.description, movements: counts.get(w.code) || 0 }))
-    .filter((row) => row.movements > 0)
-    .sort((a, b) => b.movements - a.movements)
-}
-
-// Org detail: an org's receipts in a period grouped by EWC waste code, with the
-// movement count and summed tonnes per code.
-function orgWasteCodeSummary (orgId, from, to) {
-  const totals = new Map() // code -> { movements, tonnes }
-  for (const r of receiptsForOrg(orgId, from, to)) {
-    const e = totals.get(r.wasteCode) || { movements: 0, tonnes: 0 }
-    e.movements += 1
-    e.tonnes += r.quantityTonnes
-    totals.set(r.wasteCode, e)
-  }
-  return wasteCodes
-    .filter((w) => totals.has(w.code))
-    .map((w) => ({
-      code: w.code,
-      description: w.description,
-      movements: totals.get(w.code).movements,
-      tonnes: Math.round(totals.get(w.code).tonnes * 10) / 10
-    }))
-    .sort((a, b) => b.movements - a.movements)
-}
-
-// Search by org id, permit number, or name (case-insensitive contains).
-function findOrganisations (query) {
-  const q = (query || '').trim().toLowerCase()
-  if (!q) return []
-  return organisations.filter((o) =>
-    o.id.toLowerCase().includes(q) ||
-    o.permitNumber.toLowerCase().includes(q) ||
-    o.name.toLowerCase().includes(q)
-  )
-}
-
-function getOrganisation (id) {
-  return orgById.get(id)
-}
-
 module.exports = {
-  wasteCodes,
   organisations,
-  receipts,
-  wasteCodeDesc,
-  registeredAsAt,
-  listRegisteredInPeriod,
-  receiptsForOrg,
-  movementsForOrg,
-  reportingOrgIds,
-  metrics,
-  listNotReporting,
-  listReporting,
-  wasteCodeBreakdown,
-  orgWasteCodeSummary,
-  findOrganisations,
-  getOrganisation
+  listRegisteredInPeriod
 }
