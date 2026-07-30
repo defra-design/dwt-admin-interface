@@ -126,16 +126,6 @@ for (const org of organisations) {
   }
 }
 
-// Specific orgs whose name/payment period should never be shown, regardless
-// of what payment status would normally entitle them to.
-const BLANK_OUT_NAMES = new Set(['Kesteven Salvage Group', 'Colston Composting Services Ltd'])
-for (const org of organisations) {
-  if (BLANK_OUT_NAMES.has(org.organisationName)) {
-    org.organisationName = null
-    org.paymentPeriod = null
-  }
-}
-
 // A handful of extra unpaid orgs, never having had a payment period recorded
 // (so no lapsed period to show), registered within a typical demo date range.
 // IDs are deliberately low-sorting so they surface in the (id-sorted, capped)
@@ -159,12 +149,21 @@ for (const extra of EXTRA_UNPAID_NO_PERIOD) {
   })
 }
 
+// Only organisations registered before 27 Apr 2026 may have an unknown name —
+// anything registered on/after that date is backfilled with a name.
+const NAME_UNKNOWN_CUTOFF = new Date(2026, 3, 27)
+for (const org of organisations) {
+  if (!org.organisationName && org.registeredDate >= NAME_UNKNOWN_CUTOFF) {
+    org.organisationName = generateOrgName()
+  }
+}
+
 // Organisations whose registration date falls within the period.
 function listRegisteredInPeriod (from, to) {
   return organisations
     .filter((o) => o.registeredDate >= from && o.registeredDate <= to)
     .slice()
-    .sort((a, b) => a.id.localeCompare(b.id))
+    .sort((a, b) => a.registeredDate - b.registeredDate || a.id.localeCompare(b.id))
 }
 
 module.exports = {
