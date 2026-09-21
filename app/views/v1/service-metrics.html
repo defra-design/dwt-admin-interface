@@ -1,0 +1,68 @@
+{% extends "layouts/main.html" %}
+
+{% set version = "v1" %}
+{% set pageName = "Service metrics" %}
+{% set activeSection = "metrics" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errors %}
+      {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: errorList
+      }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l">Service metrics</h1>
+
+    <form method="post" action="/{{ version }}/service-metrics" novalidate>
+
+      {{ govukDateInput({
+        id: "metrics-date",
+        namePrefix: "metrics-date",
+        fieldset: {
+          legend: {
+            text: "Metrics at date",
+            classes: "govuk-fieldset__legend--m"
+          }
+        },
+        hint: { text: "For example, 27 3 2026" },
+        errorMessage: { text: errors.date } if errors.date else undefined,
+        items: [
+          { name: "day", classes: "govuk-input--width-2" + (" govuk-input--error" if errors.date), value: dateValues.day },
+          { name: "month", classes: "govuk-input--width-2" + (" govuk-input--error" if errors.date), value: dateValues.month },
+          { name: "year", classes: "govuk-input--width-4" + (" govuk-input--error" if errors.date), value: dateValues.year }
+        ]
+      }) }}
+
+      {{ govukButton({ text: "Get metrics" }) }}
+
+    </form>
+
+    {% if metrics %}
+      <h2 class="govuk-heading-m">Metrics as at {{ asAtDate }}</h2>
+
+      <table class="govuk-table" id="metrics-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Metric name</th>
+            <th scope="col" class="govuk-table__header">Value</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for metric in metrics %}
+            <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header">{{ metric.name }}</th>
+              <td class="govuk-table__cell">{{ metric.value }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

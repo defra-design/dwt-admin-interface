@@ -1,5 +1,6 @@
-{% extends "layouts/main.html" %}
+{% extends "layouts/v2.html" %}
 
+{% set version = "v2" %}
 {% set pageName = "Service metrics" %}
 {% set activeSection = "metrics" %}
 
@@ -16,7 +17,7 @@
 
     <h1 class="govuk-heading-l">Service metrics</h1>
 
-    <form method="post" action="/service-metrics" novalidate>
+    <form method="post" action="/{{ version }}/service-metrics" novalidate>
 
       {{ govukDateInput({
         id: "metrics-date",

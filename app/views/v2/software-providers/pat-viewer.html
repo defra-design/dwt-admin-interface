@@ -1,0 +1,70 @@
+{% extends "layouts/v2.html" %}
+
+{% set version = "v2" %}
+{% set pageName = "Software providers" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    <p class="govuk-body">View Production Approval Test (PAT) submissions. Filter by PAT submission ID to find a specific submission.</p>
+  </div>
+</div>
+
+{# Single-field filter above the list. GOV.UK has no published filter
+   component; this follows MOJ's Filter a list / case list pattern using
+   GOV.UK form components only (this prototype has no MOJ Frontend).
+   https://design-patterns.service.justice.gov.uk/patterns/filter-a-list/
+   https://design-patterns.service.justice.gov.uk/pages/case-list/ #}
+<form method="get" action="/{{ version }}/software-providers" novalidate>
+  {{ govukInput({
+    id: "submissionId",
+    name: "submissionId",
+    label: { text: "PAT submission ID", classes: "govuk-label--s" },
+    hint: { text: "You can enter all or part of a PAT submission ID." },
+    classes: "govuk-input--width-20",
+    value: query
+  }) }}
+  <div class="govuk-button-group">
+    {{ govukButton({ text: "Apply filter" }) }}
+    {% if query %}
+      <a class="govuk-link" href="/{{ version }}/software-providers">Clear filter</a>
+    {% endif %}
+  </div>
+</form>
+
+{% if rows.length %}
+  <table class="govuk-table">
+    <caption class="govuk-visually-hidden">PAT submissions</caption>
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">PAT submission ID</th>
+        <th scope="col" class="govuk-table__header">Software provider</th>
+        <th scope="col" class="govuk-table__header">Submitted</th>
+        <th scope="col" class="govuk-table__header govuk-table__header--numeric">Passed</th>
+        <th scope="col" class="govuk-table__header govuk-table__header--numeric">Failed</th>
+        <th scope="col" class="govuk-table__header govuk-table__header--numeric">Not submitted</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      {% for s in rows %}
+        <tr class="govuk-table__row">
+          <th scope="row" class="govuk-table__header">
+            <a class="govuk-link" href="/{{ version }}/software-providers/pat-viewer/submission/{{ s.submissionId }}">{{ s.submissionId }}</a>
+          </th>
+          <td class="govuk-table__cell">{{ s.providerName }}</td>
+          <td class="govuk-table__cell">{{ s.submittedAtLabel }}</td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">{{ s.counts.passed }}</td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">{{ s.counts.failed }}</td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">{{ s.counts.notSubmitted }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {{ mojPagination(pagination) }}
+{% else %}
+  <p class="govuk-body">No submissions match “{{ query }}”.</p>
+{% endif %}
+{% endblock %}

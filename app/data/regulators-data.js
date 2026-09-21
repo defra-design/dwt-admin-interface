@@ -158,15 +158,25 @@ for (const org of organisations) {
   }
 }
 
-// Organisations whose registration date falls within the period.
-function listRegisteredInPeriod (from, to) {
-  return organisations
-    .filter((o) => o.registeredDate >= from && o.registeredDate <= to)
+function sortByRegisteredDate (orgs) {
+  return orgs
     .slice()
     .sort((a, b) => a.registeredDate - b.registeredDate || a.id.localeCompare(b.id))
 }
 
+function listAllOrganisations () {
+  return sortByRegisteredDate(organisations)
+}
+
+// Organisations whose registration date falls within the period.
+function listRegisteredInPeriod (from, to) {
+  return sortByRegisteredDate(
+    organisations.filter((o) => o.registeredDate >= from && o.registeredDate <= to)
+  )
+}
+
 module.exports = {
   organisations,
+  listAllOrganisations,
   listRegisteredInPeriod
 }

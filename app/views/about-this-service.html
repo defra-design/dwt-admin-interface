@@ -1,0 +1,43 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "About this service" %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: { text: "Prototype" },
+    html: 'This is a prototype. It is not a real service.'
+  }) }}
+  {{ govukBackLink({
+    text: "Back",
+    href: "/"
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-xl">About this service</h1>
+
+    <p class="govuk-body">[Add a short description of the service. For example: an internal Defra service for staff who need to check software provider PAT submissions and report on waste organisations.]</p>
+
+    <h2 class="govuk-heading-m">Who it's for</h2>
+
+    <p class="govuk-body">[Add each user group and what they need to do. Include internal staff roles, and anyone they support by phone, email or another offline channel.]</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>[Add user group — what they are trying to do]</li>
+      <li>[Add user group — what they are trying to do]</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">The problem we're solving</h2>
+
+    <p class="govuk-body">[Add why this service exists, what users do today, and the problem that remains. Focus on the outcome users need, not the solution you have built.]</p>
+
+    <h2 class="govuk-heading-m">How it fits with the wider service</h2>
+
+    <p class="govuk-body">[Add how this admin portal relates to Digital Waste Tracking, and any offline or assisted steps. Assessment panels will ask about the whole journey, not only the screens in this prototype.]</p>
+
+  </div>
+</div>
+{% endblock %}

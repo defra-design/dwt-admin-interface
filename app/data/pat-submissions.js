@@ -16,7 +16,7 @@
 // submission to demonstrate a provider mid-testing.
 //
 
-const { formatDateObj } = require('./dates')
+const { formatDate, formatDateObj } = require('./dates')
 
 // Software provider names, keyed by Client ID. No name is available from CDP
 // yet (brief §5 — PoC stage only), so this is prototype-only decoration for
@@ -120,7 +120,28 @@ const submissions = [
 
 // --- Formatting helpers ------------------------------------------------
 
-// "30 June 2026, 14:12" from an ISO submittedAt string.
+// 12-hour time from a UTC Date, following the GOV.UK style guide:
+// 9:15am, 1pm, midday, midnight — not 09:15, 13:00 or 1730hrs.
+// https://www.gov.uk/guidance/style-guide/a-to-z
+function formatTime12hUtc (d) {
+  const hours = d.getUTCHours()
+  const minutes = d.getUTCMinutes()
+  if (hours === 0 && minutes === 0) return 'midnight'
+  if (hours === 12 && minutes === 0) return 'midday'
+  const suffix = hours >= 12 ? 'pm' : 'am'
+  const hour12 = hours % 12 || 12
+  if (minutes === 0) return `${hour12}${suffix}`
+  return `${hour12}:${String(minutes).padStart(2, '0')}${suffix}`
+}
+
+// "10 June 2026 at 9:15am" — date then time, GOV.UK style guide.
+function formatSubmittedAtGds (iso) {
+  const d = new Date(iso)
+  const dateLabel = formatDate(d.getUTCDate(), d.getUTCMonth() + 1, d.getUTCFullYear())
+  return `${dateLabel} at ${formatTime12hUtc(d)}`
+}
+
+// "30 June 2026, 14:12" from an ISO submittedAt string. Kept for v1.
 function formatSubmittedAt (iso) {
   const d = new Date(iso)
   const hours = String(d.getHours()).padStart(2, '0')
@@ -164,6 +185,7 @@ function listTestData () {
     submissions: submissions.map((s) => ({
       submissionId: s.submissionId,
       providerName: providers[s.clientId] || s.clientId,
+      submittedAtLabel: formatSubmittedAtGds(s.submittedAt),
       counts: statusCounts(submissionResults(s))
     }))
   }
@@ -172,6 +194,7 @@ function listTestData () {
 module.exports = {
   submissions,
   formatSubmittedAt,
+  formatSubmittedAtGds,
   getSubmission,
   statusCounts,
   submissionResults,

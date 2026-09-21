@@ -1,30 +1,31 @@
-{% extends "layouts/main.html" %}
+{% extends "layouts/v2.html" %}
 
+{% set version = "v2" %}
 {% set pageName = "Waste organisations" %}
 {% set activeSection = "regulators" %}
 
 {% block content %}
-{{ govukBreadcrumbs({
-  items: [
-    { text: "Home", href: "/" },
-    { text: "Reporting", href: "/regulators" }
-  ]
-}) }}
-
 <h1 class="govuk-heading-l">Waste organisations</h1>
-<p class="govuk-body">Search waste organisations by registration date – the date an
+<p class="govuk-body">View waste organisations. Filter by registration date – the date an
   organisation completed its DefraID registration. Organisations that registered before
   20 June 2026 have no registration date recorded, and are shown without one.</p>
 
-{% set submitLabel = "Show organisations" %}
-{% include "regulators/_period-filter.html" %}
+{# Date range filter above the list. GOV.UK date inputs (not a date picker),
+   following MOJ filter a list: show the unfiltered list first, then submit
+   to refine it. https://design-patterns.service.justice.gov.uk/patterns/filter-a-list/
+   https://design-system.service.gov.uk/patterns/dates/ #}
+{% set submitLabel = "Apply filters" %}
+{% set action = "/" + version + "/regulators" %}
+{% set clearHref = "/" + version + "/regulators" %}
+{% include version + "/regulators/_period-filter.html" %}
 
-{% if rows %}
+{% if filtered and periodLabel %}
   <h2 class="govuk-heading-m">Waste organisations registered from {{ periodLabel }}</h2>
+{% endif %}
 
-  <p class="govuk-body govuk-!-font-weight-bold">Organisations registered (in period): {{ count }}</p>
-
+{% if rows.length %}
   <table class="govuk-table" id="regulators-registered-table">
+    <caption class="govuk-visually-hidden">Waste organisations</caption>
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
         <th scope="col" class="govuk-table__header">Organisation ID</th>
@@ -57,7 +58,11 @@
     </tbody>
   </table>
 
+  {{ mojPagination(pagination) }}
+
   {# Download CSV is a non-functional placeholder for this prototype. #}
   {{ govukButton({ text: "Download CSV", classes: "govuk-button--secondary", attributes: { type: "button" } }) }}
+{% else %}
+  <p class="govuk-body">No organisations match these dates.</p>
 {% endif %}
 {% endblock %}

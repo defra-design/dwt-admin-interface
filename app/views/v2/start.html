@@ -1,0 +1,23 @@
+{% extends "layouts/v2.html" %}
+
+{% set version = "v2" %}
+{% set pageName = "Home" %}
+{% set activeSection = "home" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-xl">Waste management admin portal</h1>
+
+    <p class="govuk-body">Use this service to find Production Approval Test (PAT) submissions and report on waste organisations.</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li><a class="govuk-link" href="/{{ version }}/software-providers">View PAT submissions</a></li>
+      <li><a class="govuk-link" href="/{{ version }}/regulators">Report on waste organisations</a></li>
+      <li><a class="govuk-link" href="/{{ version }}/service-metrics">View service metrics</a></li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

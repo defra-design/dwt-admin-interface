@@ -1,0 +1,64 @@
+{% extends "layouts/main.html" %}
+
+{% set version = "v1" %}
+{% set pageName = "Waste organisations" %}
+{% set activeSection = "regulators" %}
+
+{% block content %}
+{{ govukBreadcrumbs({
+  items: [
+    { text: "Home", href: "/" + version + "/start" },
+    { text: "Reporting", href: "/" + version + "/regulators" }
+  ]
+}) }}
+
+<h1 class="govuk-heading-l">Waste organisations</h1>
+<p class="govuk-body">Search waste organisations by registration date – the date an
+  organisation completed its DefraID registration. Organisations that registered before
+  20 June 2026 have no registration date recorded, and are shown without one.</p>
+
+{% set submitLabel = "Show organisations" %}
+{% include version + "/regulators/_period-filter.html" %}
+
+{% if rows %}
+  <h2 class="govuk-heading-m">Waste organisations registered from {{ periodLabel }}</h2>
+
+  <p class="govuk-body govuk-!-font-weight-bold">Organisations registered (in period): {{ count }}</p>
+
+  <table class="govuk-table" id="regulators-registered-table">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Organisation ID</th>
+        <th scope="col" class="govuk-table__header">Organisation name</th>
+        <th scope="col" class="govuk-table__header">Registered</th>
+        <th scope="col" class="govuk-table__header govuk-table__header--numeric">Active API codes</th>
+        <th scope="col" class="govuk-table__header">Payment status</th>
+        <th scope="col" class="govuk-table__header">Payment period</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      {% for org in rows %}
+        <tr class="govuk-table__row">
+          <th scope="row" class="govuk-table__header govuk-!-font-weight-regular"><span aria-hidden="true" title="{{ org.id }}">{{ org.idShort }}</span><span class="govuk-visually-hidden">{{ org.id }}</span></th>
+          <td class="govuk-table__cell govuk-!-font-weight-bold">{% if org.organisationName %}{{ org.organisationName }}{% else %}<em>(Not known)</em>{% endif %}</td>
+          <td class="govuk-table__cell">{{ org.registered }}</td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">{{ org.apiCodeCount }}</td>
+          <td class="govuk-table__cell">
+            {% if org.paymentStatus === "paid" %}
+              {{ govukTag({ text: "Paid", classes: "govuk-tag--green" }) }}
+            {% elif org.paymentStatus === "in progress" %}
+              {{ govukTag({ text: "In progress", classes: "govuk-tag--blue" }) }}
+            {% else %}
+              {{ govukTag({ text: "Unpaid", classes: "govuk-tag--red" }) }}
+            {% endif %}
+          </td>
+          <td class="govuk-table__cell">{{ org.paymentPeriod }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {# Download CSV is a non-functional placeholder for this prototype. #}
+  {{ govukButton({ text: "Download CSV", classes: "govuk-button--secondary", attributes: { type: "button" } }) }}
+{% endif %}
+{% endblock %}

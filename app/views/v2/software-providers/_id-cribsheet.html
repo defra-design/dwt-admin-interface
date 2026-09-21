@@ -1,0 +1,13 @@
+{#
+  Prototype-only crib sheet of test Submission IDs, tucked below the real
+  GOV.UK footer so it doesn't read as part of the service — there for
+  copy/paste during a demo, not for an end user to notice. Included on every
+  PAT Submission Viewer screen. Expects `testData` (see
+  patSubmissions.listTestData()).
+#}
+<div class="govuk-width-container app-id-cribsheet">
+  <p class="govuk-body-s">Test Submission IDs:</p>
+  {% for s in testData.submissions %}
+    <p class="govuk-body-s">{{ s.submissionId }} ({{ s.providerName }}) — {{ s.counts.passed }} Pass · {{ s.counts.failed }} Fail · {{ s.counts.notSubmitted }} Not submitted</p>
+  {% endfor %}
+</div>

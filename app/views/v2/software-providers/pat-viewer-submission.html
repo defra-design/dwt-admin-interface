@@ -1,17 +1,10 @@
-{% extends "layouts/main.html" %}
+{% extends "layouts/v2.html" %}
 
+{% set version = "v2" %}
 {% set pageName = "Submission detail" %}
 {% set activeSection = "providers" %}
 
 {% block content %}
-{{ govukBreadcrumbs({
-  items: [
-    { text: "Home", href: "/" },
-    { text: "Software Providers", href: "/software-providers" },
-    { text: "PAT Submission" }
-  ]
-}) }}
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <h1 class="govuk-heading-l">Submission detail</h1>
@@ -82,5 +75,5 @@
 {% endblock %}
 
 {% block afterFooter %}
-  {% include "software-providers/_id-cribsheet.html" %}
+  {% include version + "/software-providers/_id-cribsheet.html" %}
 {% endblock %}

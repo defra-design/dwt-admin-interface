@@ -9,6 +9,6 @@
 {% endif %}
 
 <form method="get" action="{{ action }}" novalidate>
-  {% include "regulators/_period-fields.html" %}
+  {% include version + "/regulators/_period-fields.html" %}
   {{ govukButton({ text: submitLabel | default("Show results") }) }}
 </form>

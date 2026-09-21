@@ -6,7 +6,7 @@ DEFRA/waste-organisation-frontend PR #116). All backend behaviour is mocked
 client-side. **Not production code.**
 
 Built on the [GOV.UK Prototype Kit](https://prototype-kit.service.gov.uk/docs/)
-(v13) wrapping GOV.UK Frontend v6. Pure GOV.UK Frontend — no MOJ Frontend.
+(v13) wrapping GOV.UK Frontend v6. Version 2 also uses MOJ Frontend for pagination.
 
 ## Run it
 
@@ -35,12 +35,15 @@ prototype being publicly accessible, set these environment variables on the host
 
 | Path | What it is |
 |---|---|
-| `/` | Homepage (service name + placeholder copy) |
-| `/service-metrics` | Date input → metrics table |
-| `/software-providers` | PAT Submission Viewer: search by Submission ID |
-| `/software-providers/pat-viewer/submission/:id` | Submission detail: per-scenario Pass/Fail/Not submitted results |
-| `/regulators` | Waste organisations report: period filter → table (name, registered date, active API codes, payment status, payment period) |
-| `/waste-organisations` | Dead link → "Not built in this prototype" |
+| `/` | Prototype index (version cards) |
+| `/about-this-service` | About this service (hub) |
+| `/v2/start` | In-service start page (current working version) |
+| `/v2/service-metrics` | Date input → metrics table |
+| `/v2/software-providers` | PAT Submission Viewer: search by Submission ID |
+| `/v2/software-providers/pat-viewer/submission/:id` | Submission detail: per-scenario Pass/Fail/Not submitted results |
+| `/v2/regulators` | Waste organisations report: period filter → table (name, registered date, active API codes, payment status, payment period) |
+| `/v2/waste-organisations` | Dead link → "Not built in this prototype" |
+| `/v1/…` | Frozen copy of the same journeys |
 
 ## Architecture notes
 

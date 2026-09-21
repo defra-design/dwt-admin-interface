@@ -29,18 +29,20 @@
   </div>
 {% endblock %}
 
+{# `version` is set on each in-service page (v1 or v2) so nav stays inside
+   that prototype version. Hub pages use layouts/prototype-hub.html instead. #}
 {% block govukServiceNavigation %}
   {{ govukServiceNavigation({
     serviceName: serviceName,
-    serviceUrl: "/",
+    serviceUrl: "/" + version + "/start",
     navigation: [
       {
-        href: "/software-providers",
+        href: "/" + version + "/software-providers",
         text: "Software Providers",
         active: activeSection === "providers"
       },
       {
-        href: "/regulators",
+        href: "/" + version + "/regulators",
         text: "Reporting",
         active: activeSection === "regulators"
       }

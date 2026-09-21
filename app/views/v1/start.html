@@ -1,0 +1,22 @@
+{% extends "layouts/main.html" %}
+
+{% set version = "v1" %}
+{% set pageName = "Home" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-xl">{{ serviceName }}</h1>
+
+    <p class="govuk-body">Use this service to find Production Approval Test (PAT) submissions and report on waste organisations.</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li><a class="govuk-link" href="/{{ version }}/software-providers">Find a PAT submission</a></li>
+      <li><a class="govuk-link" href="/{{ version }}/regulators">Report on waste organisations</a></li>
+      <li><a class="govuk-link" href="/{{ version }}/service-metrics">View service metrics</a></li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

@@ -51,6 +51,216 @@
   background-color: #1d70b8;
 }
 
+// --- Defra white header (prototype hub pages only) -------------------------
+// GOV.UK header classes cannot produce a white Defra logo header. Internal
+// Defra sites not on GOV.UK must use the Defra header and logo, not the
+// GOV.UK crown: https://digital.defra.gov.uk/design/branding
+// Visual reference: https://digital.defra.gov.uk/design/prototyping
+.app-defra-header {
+  background-color: #ffffff;
+  border-bottom: 10px solid #00a33b; // Defra Green
+}
+
+.app-defra-header__link {
+  display: inline-block;
+  text-decoration: none;
+
+  // GOV.UK focus style — required because this is not a govuk-link
+  // (a link class would underline the logo).
+  &:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background-color: #ffdd00;
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+  }
+}
+
+.app-defra-header__logo {
+  display: block;
+  height: 45px;
+  width: auto;
+}
+
+// --- Version 2 in-service header -------------------------------------------
+// Adds the green service name (as on digital.defra.gov.uk) and a green
+// navigation bar. GOV.UK header/nav classes cannot produce this. The green
+// nav replaces the 10px band used on hub pages.
+.app-defra-header--service {
+  border-bottom: 0;
+}
+
+.app-defra-header__inner {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.app-defra-header__service-name {
+  grid-column: 2;
+  color: #00a33b; // Defra Green
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+
+  &:link,
+  &:visited {
+    color: #00a33b;
+  }
+
+  &:hover {
+    color: #00a33b;
+    text-decoration: underline;
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+    text-decoration-skip-ink: none;
+  }
+
+  &:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    color: #0b0c0c;
+    background-color: #ffdd00;
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    text-decoration: none;
+  }
+}
+
+.app-defra-service-nav {
+  background-color: #00a33b; // Defra Green
+}
+
+.app-defra-service-nav__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-defra-service-nav__item {
+  display: inline-block;
+  margin: 0;
+}
+
+.app-defra-service-nav__link {
+  display: inline-block;
+  padding: 10px 20px 10px 0;
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:link,
+  &:visited {
+    color: #ffffff;
+  }
+
+  &:hover {
+    color: #ffffff;
+    text-decoration: underline;
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+    text-decoration-skip-ink: none;
+  }
+
+  &:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    color: #0b0c0c;
+    background-color: #ffdd00;
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    text-decoration: none;
+  }
+}
+
+.app-defra-service-nav__link--active {
+  text-decoration: underline;
+  text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+}
+
+@media (max-width: 40.0625em) {
+  .app-defra-header__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .app-defra-header__service-name {
+    text-align: left;
+  }
+}
+
+// --- Defra footer (prototype hub pages only) -------------------------------
+// GOV.UK footer cannot be used on sites not hosted on GOV.UK.
+// Visual and colour match: https://digital.defra.gov.uk/design/branding
+.app-defra-footer {
+  padding-top: 25px;
+  padding-bottom: 25px;
+  border-top: 10px solid #008531; // Defra footer green on digital.defra.gov.uk
+  background-color: #f3f2f1; // GOV.UK light grey
+}
+
+.app-defra-footer__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.app-defra-footer__meta-item {
+  width: 100%;
+}
+
+.app-defra-footer__inline-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-defra-footer__inline-list-item {
+  display: inline-block;
+  margin-right: 20px;
+  margin-bottom: 0;
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.app-defra-footer__link {
+  display: inline-block;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  color: #0b0c0c;
+
+  &:link,
+  &:visited {
+    color: #0b0c0c;
+  }
+
+  &:hover {
+    color: #0b0c0c;
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+    text-decoration-skip-ink: none;
+  }
+
+  &:focus {
+    outline: 3px solid transparent;
+    color: #0b0c0c;
+    background-color: #ffdd00;
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    text-decoration: none;
+  }
+}
+
+.app-defra-footer__licence {
+  margin: 0;
+  color: #0b0c0c;
+}
+
+// Table inside a summary card — GDS cards normally wrap a summary list.
+// Requested so each prototype version can show a changes table.
+.govuk-summary-card__content .govuk-table {
+  margin-bottom: 0;
+}
+
 // GOV.UK 6.x tints the service navigation
 // light blue (#f4f8fb) with a light-blue divider — use white + a grey divider.
 .govuk-service-navigation {

@@ -1,13 +1,14 @@
 {% extends "layouts/main.html" %}
 
+{% set version = "v1" %}
 {% set pageName = "PAT Submission Viewer" %}
 {% set activeSection = "providers" %}
 
 {% block content %}
 {{ govukBreadcrumbs({
   items: [
-    { text: "Home", href: "/" },
-    { text: "Software Providers", href: "/software-providers" }
+    { text: "Home", href: "/" + version + "/start" },
+    { text: "Software Providers", href: "/" + version + "/software-providers" }
   ]
 }) }}
 
@@ -16,7 +17,7 @@
     <h1 class="govuk-heading-l">PAT Submission Viewer</h1>
     <p class="govuk-body">Find a Production Approval Test (PAT) submission by Submission ID.</p>
 
-    <form method="get" action="/software-providers">
+    <form method="get" action="/{{ version }}/software-providers">
       {{ govukInput({
         id: "submissionId",
         name: "submissionId",
@@ -37,6 +38,5 @@
 {% endblock %}
 
 {% block afterFooter %}
-  {% include "software-providers/_id-cribsheet.html" %}
+  {% include version + "/software-providers/_id-cribsheet.html" %}
 {% endblock %}
-
