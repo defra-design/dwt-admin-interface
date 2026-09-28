@@ -8,6 +8,7 @@ const router = govukPrototypeKit.requests.setupRouter()
 
 const patSubmissions = require('./data/pat-submissions')
 const reg = require('./data/regulators-data')
+const sp = require('./data/software-providers')
 const { paginate } = require('./data/pagination')
 const {
   formatDateObj,
@@ -247,6 +248,214 @@ function registerVersionRoutes (version) {
 
 registerVersionRoutes('v1')
 registerVersionRoutes('v2')
+
+// --- Version 3 -------------------------------------------------------------
+// A partial copy of version 2: the start page and reporting as they were, no
+// Service metrics, and a rebuilt Software providers section (list plus an "add"
+// form). It has its own function so version 2 stays frozen.
+function registerV3Routes () {
+  const base = '/v3'
+  const view = (page) => `v3/${page}`
+
+  router.use(base, (req, res, next) => {
+    res.locals.version = 'v3'
+    next()
+  })
+
+  // Providers are held in session data — no backend. See data/software-providers.js.
+  function providerList (req) {
+    if (!Array.isArray(req.session.data.softwareProviders)) {
+      req.session.data.softwareProviders = []
+    }
+    return req.session.data.softwareProviders
+  }
+
+  function emptyForm () {
+    return { companyName: '', emails: [''], notes: '' }
+  }
+
+  function renderAdd (res, options) {
+    res.render(view('software-providers/add'), Object.assign({
+      maxEmails: sp.MAX_EMAILS,
+      errors: {},
+      errorList: [],
+      focus: null
+    }, options))
+  }
+
+  // --- Reporting (unchanged from version 2) --------------------------------
+
+  router.get(`${base}/regulators`, (req, res) => {
+    const filtered = hasDateFilter(req.query)
+    const period = filtered ? lenientPeriod(req.query) : emptyPeriod
+    const orgs = filtered
+      ? reg.listRegisteredInPeriod(period.from, period.to)
+      : reg.listAllOrganisations()
+    const { rows, pagination, total } = paginate(mapOrgRows(orgs), req.query.page, {
+      path: `${base}/regulators`,
+      query: req.query,
+      itemName: 'organisations'
+    })
+    res.render(view('regulators/index'), {
+      period,
+      rows,
+      count: total,
+      filtered,
+      periodLabel: filtered ? periodLabel(period) : null,
+      pagination
+    })
+  })
+
+  // --- Software providers --------------------------------------------------
+
+  function requireProvider (req, res) {
+    const provider = sp.findProvider(providerList(req), req.params.id)
+    if (!provider) {
+      res.redirect(`${base}/software-providers`)
+      return null
+    }
+    return provider
+  }
+
+  router.get(`${base}/software-providers`, (req, res) => {
+    res.render(view('software-providers/index'), {
+      providers: sp.toRows(providerList(req))
+    })
+  })
+
+  // Filled-state version of the list, for showing the design to delivery teams.
+  // Reached only from the prototype index, never from the journey, so the
+  // journey still starts on the empty state. Renders the same view as the real
+  // page with fixed example data, so the two cannot drift apart.
+  router.get(`${base}/software-providers/example`, (req, res) => {
+    res.render(view('software-providers/index'), {
+      providers: sp.toRows(sp.exampleProviders)
+    })
+  })
+
+  router.get(`${base}/software-providers/add`, (req, res) => {
+    renderAdd(res, { values: emptyForm() })
+  })
+
+  // One form, three submit buttons: add an email field, remove one, or save.
+  // "Add another" and "Remove" are handled here rather than in the browser so
+  // the 5-address maximum produces a real error summary.
+  router.post(`${base}/software-providers/add`, (req, res) => {
+    const values = {
+      companyName: (req.body.companyName || '').trim(),
+      emails: sp.toArray(req.body.email),
+      notes: req.body.notes || ''
+    }
+    if (!values.emails.length) values.emails = ['']
+
+    const emailAction = sp.applyEmailActions(values, req.body)
+    if (emailAction.action === 'remove' || emailAction.action === 'add') {
+      return renderAdd(res, { values, focus: emailAction.focus })
+    }
+    if (emailAction.action === 'tooMany') {
+      return renderAdd(res, {
+        values,
+        errors: emailAction.errors,
+        errorList: sp.errorList(emailAction.errors)
+      })
+    }
+
+    const errors = sp.validate(values)
+    if (Object.keys(errors).length) {
+      return renderAdd(res, { values, errors, errorList: sp.errorList(errors) })
+    }
+
+    providerList(req).push(sp.newProvider(values))
+    res.redirect(`${base}/software-providers`)
+  })
+
+  // --- Company detail and change pages -------------------------------------
+
+  router.get(`${base}/software-providers/:id`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    res.render(view('software-providers/detail'), sp.toDetail(provider))
+  })
+
+  router.get(`${base}/software-providers/:id/change-name`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    res.render(view('software-providers/change-name'), {
+      provider: sp.toDetail(provider),
+      values: { companyName: provider.companyName },
+      errors: {},
+      errorList: []
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/change-name`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const values = { companyName: (req.body.companyName || '').trim() }
+    const errors = sp.validate(values, { fields: ['companyName'] })
+    if (Object.keys(errors).length) {
+      return res.render(view('software-providers/change-name'), {
+        provider: sp.toDetail(provider),
+        values,
+        errors,
+        errorList: sp.errorList(errors)
+      })
+    }
+    sp.updateCompanyName(provider, values.companyName)
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+
+  function renderChangeEmails (res, provider, options) {
+    res.render(view('software-providers/change-emails'), Object.assign({
+      provider: sp.toDetail(provider),
+      maxEmails: sp.MAX_EMAILS,
+      errors: {},
+      errorList: [],
+      focus: null
+    }, options))
+  }
+
+  router.get(`${base}/software-providers/:id/change-emails`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    renderChangeEmails(res, provider, {
+      values: { emails: (provider.emails || []).slice() }
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/change-emails`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const values = { emails: sp.toArray(req.body.email) }
+    if (!values.emails.length) values.emails = ['']
+
+    const emailAction = sp.applyEmailActions(values, req.body)
+    if (emailAction.action === 'remove' || emailAction.action === 'add') {
+      return renderChangeEmails(res, provider, { values, focus: emailAction.focus })
+    }
+    if (emailAction.action === 'tooMany') {
+      return renderChangeEmails(res, provider, {
+        values,
+        errors: emailAction.errors,
+        errorList: sp.errorList(emailAction.errors)
+      })
+    }
+
+    const errors = sp.validate(values, { fields: ['emails'] })
+    if (Object.keys(errors).length) {
+      return renderChangeEmails(res, provider, {
+        values,
+        errors,
+        errorList: sp.errorList(errors)
+      })
+    }
+
+    sp.updateEmails(provider, values.emails)
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+}
+
+registerV3Routes()
 
 function redirectToV1 (req, res) {
   const qs = new URLSearchParams(req.query).toString()

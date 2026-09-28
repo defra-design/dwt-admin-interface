@@ -1,0 +1,315 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 3" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 3
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 23 September 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 3</span>',
+        href: "/v3/start",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">Pages for demos</h2>
+    <p class="govuk-body">These pages are not part of the journey. Use them to show a
+      state that a participant would have to create for themselves.</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>
+        <a class="govuk-link" href="/v3/software-providers/example">Software providers with example data</a>
+        — the list with 4 fictional software providers already added, newest first. The journey from
+        “View prototype” still starts on the empty state. Company names link through to the detail page.
+      </li>
+    </ul>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "Partial copy of version 2: start page and reporting kept as they were, PAT submission viewer and service metrics dropped" },
+          { text: "This version is about managing software providers. Keeping only the journeys in scope stops participants wandering into pages we are not researching." },
+          { html: '<a class="govuk-link" href="/v3/start">/v3/start</a>' }
+        ],
+        [
+          { text: "Navigation" },
+          { text: "Removed Service metrics from the header navigation and the start page" },
+          { text: "Not in scope for this version, and an unused nav item adds a decision for no benefit." },
+          { html: '<a class="govuk-link" href="/v3/start">/v3/start</a>' }
+        ],
+        [
+          { text: "Software providers" },
+          { text: "Replaced the PAT submission viewer with a list of software providers (company name, test client ID, production client ID, created date) and an “Add a software provider” button" },
+          { text: "Admins need to see which providers exist and the client IDs they connect with. A secondary button keeps the emphasis on the list, which is what most visits are for." },
+          { html: '<a class="govuk-link" href="/v3/software-providers">/v3/software-providers</a>' }
+        ],
+        [
+          { text: "Software providers" },
+          { text: "Empty state on first visit: “No software providers have been added yet”, plus a line saying what will appear here" },
+          { text: "GOV.UK has no empty state pattern yet. This follows ONS guidance to replace an empty table with plain text, and the Design System backlog advice to also say what the user will see once there is data — rather than leaving a bare table header." },
+          { html: '<a class="govuk-link" href="/v3/software-providers">/v3/software-providers</a>' }
+        ],
+        [
+          { text: "Add a software provider" },
+          { text: "New page with company name, email addresses and notes" },
+          { text: "One page for a short, related set of details, following GOV.UK guidance on grouping questions that belong together." },
+          { html: '<a class="govuk-link" href="/v3/software-providers/add">/v3/software-providers/add</a>' }
+        ],
+        [
+          { text: "Add a software provider" },
+          { text: "Email addresses use the MOJ “Add another” component, with a maximum of 5 stated in the hint and an error if the user tries to add a sixth" },
+          { text: "Providers have more than one contact. MOJ guidance is to tell users the limit before they reach it, and GOV.UK validation guidance is to explain the rule in an error message and error summary when they hit it." },
+          { html: '<a class="govuk-link" href="/v3/software-providers/add">/v3/software-providers/add</a>' }
+        ],
+        [
+          { text: "Add a software provider" },
+          { text: "Email address errors sit beside the field at fault and name it — “Enter email address 2 or remove the empty field” — with “Enter at least one email address” when nothing has been entered at all" },
+          { text: "MOJ’s add another guidance is to name the item in the message and show it next to that field as well as in the error summary. Naming the field is what makes each message make sense out of context in the error summary, which GOV.UK requires. See the design rationale below." },
+          { html: '<a class="govuk-link" href="/v3/software-providers/add">/v3/software-providers/add</a>' }
+        ],
+        [
+          { text: "Add a software provider" },
+          { text: "Format error reads “Enter the email address in the correct format, for example name@example.com”" },
+          { text: "Uses “for example” rather than the Design System’s “like”, which reads more naturally when spoken. example.com is an RFC 2606 reserved domain, so it can never belong to a real organisation." },
+          { html: '<a class="govuk-link" href="/v3/software-providers/add">/v3/software-providers/add</a>' }
+        ],
+        [
+          { text: "Add a software provider" },
+          { text: "Notes are date and time stamped when saved and cannot be edited" },
+          { text: "Notes are an audit record, so they need to show who added what and when. The hint says so before the user types, not after." },
+          { html: '<a class="govuk-link" href="/v3/software-providers/add">/v3/software-providers/add</a>' }
+        ],
+            [
+              { text: "Add a software provider" },
+              { text: "Save and a Cancel link. After save, the new company appears at the top of the list with today’s date. There is no success banner" },
+              { text: "A confirmation page would be the wrong pattern — the user has not finished a transaction, they have added one item to a working list. The list itself is the confirmation. See the design rationale below." },
+              { html: '<a class="govuk-link" href="/v3/software-providers">/v3/software-providers</a>' }
+            ],
+            [
+              { text: "Software providers" },
+              { text: "Default sort is most recently created first, on both the live list and the example page" },
+              { text: "MOJ’s case list guidance says research should set the default order, and names “most recently updated” as one of the options. Newest first also puts a just-added company where the user is looking for it." },
+              { html: '<a class="govuk-link" href="/v3/software-providers">/v3/software-providers</a><br><a class="govuk-link" href="/v3/software-providers/example">/v3/software-providers/example</a>' }
+            ],
+            [
+              { text: "Company detail" },
+              { text: "Company name in the list links to a detail page showing company name and email addresses in a summary list (both editable) and notes in a timeline (not editable)" },
+              { text: "MOJ case list: put the link in the first column using the name, not “View”, and keep further actions on the details page. GOV.UK summary list is the pattern for viewing and changing a record. MOJ timeline is the caseworking pattern for dated, append-only history." },
+              { html: '<a class="govuk-link" href="/v3/software-providers/example-greenlane">/v3/software-providers/example-greenlane</a>' }
+            ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">Kept here as a reference for later, so the reasoning behind
+      these decisions is not lost between rounds of research.</p>
+
+    <h3 class="govuk-heading-s">Error messages in the “add another” pattern</h3>
+
+    <h4 class="govuk-heading-s govuk-!-font-size-16">Where the error sits: beside each field, naming that field</h4>
+
+    <p class="govuk-body">The error sits next to the individual email address field, not
+      on the group as a whole.
+      <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/add-another/">MOJ’s Add another component</a>
+      says to put the message beside the field and to name the item in it — their worked
+      example is “Enter a first name for person 2”, shown next to that field and repeated
+      in the error summary. Their
+      <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/add-another/examples/errors/">errors example</a>
+      shows two fields in the same item each carrying their own message.</p>
+
+    <p class="govuk-body">Naming the field is not decoration. The
+      <a class="govuk-link" href="https://design-system.service.gov.uk/components/error-summary/">GOV.UK error summary</a>
+      requires messages to make sense out of context and to use identical wording to the
+      inline message. With 5 fields, 4 identical lines saying “Enter an email address or
+      remove the empty field” would be unusable. Numbered, each line is distinct and links
+      to its own field.</p>
+
+    <h4 class="govuk-heading-s govuk-!-font-size-16">Showing several errors at once, rather than one at a time</h4>
+
+    <p class="govuk-body">This is a deliberate divergence. MOJ says to “show errors for
+      1 item at a time using the GOV.UK error summary”, and
+      <a class="govuk-link" href="https://design-system.dwp.gov.uk/patterns/add-another-thing">DWP’s Add another thing</a>
+      says the same — validate items one by one.</p>
+
+    <p class="govuk-body">That rule exists because an MOJ “item” contains several fields:
+      a person is a first name, a last name and a date of birth, so 5 people could produce
+      15 messages. Here each item is a single field, capped at 5, so the worst case is 4
+      short messages mapping one-to-one onto 4 visible fields. Fixing them in one pass
+      beats several rounds of submit-and-retry, and showing all errors together is what the
+      <a class="govuk-link" href="https://design-system.service.gov.uk/patterns/validation/">GOV.UK validation pattern</a>
+      asks for generally. If research shows it is too much, switching to one at a time is a
+      small change.</p>
+
+    <h4 class="govuk-heading-s govuk-!-font-size-16">What the research does and does not cover</h4>
+
+    <p class="govuk-body">The
+      <a class="govuk-link" href="https://design-system.service.gov.uk/components/error-message/">GOV.UK error message</a>
+      and error summary components are well tested — users understood what went wrong and
+      were able to recover — but that research is on single fields, not repeatable groups.
+      MOJ’s Add another has been usability tested and externally accessibility audited,
+      and MOJ,
+      <a class="govuk-link" href="https://design.homeoffice.gov.uk/design-system/patterns/help-users-to/add-multiple-things">Home Office</a>
+      and DWP all say more research is needed. All three specifically flag research with
+      users who have access needs on the “add another” step as the gap.</p>
+
+    <p class="govuk-body">One finding is directly relevant: MOJ research found that cloning
+      fields on a single screen can cause performance and validation problems, and makes it
+      harder for users to fix errors as they go. That is why longer lists are steered
+      towards
+      <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/patterns/add-to-a-list/">MOJ’s Add to a list</a>
+      instead — one item per page, then a summary list. At a maximum of 5 we are well inside
+      what Add another is for, but this is the reason not to raise the cap much.</p>
+
+    <h4 class="govuk-heading-s govuk-!-font-size-16">Wording of the format error</h4>
+
+    <p class="govuk-body">The
+      <a class="govuk-link" href="https://design-system.service.gov.uk/patterns/email-addresses/">GOV.UK email addresses pattern</a>
+      gives “Enter an email address in the correct format, like name@example.com”. We use
+      “for example” instead of “like”, which reads more naturally when spoken —
+      <a class="govuk-link" href="https://github.com/alphagov/govuk-design-system-backlog/issues/47">backlog issue 47</a>
+      is a team making the same argument, noting that the rest of the Design System site
+      uses “for example”.</p>
+
+    <p class="govuk-body">The example domain stays as <code>example.com</code> because
+      <a class="govuk-link" href="https://www.rfc-editor.org/rfc/rfc2606.html">RFC 2606</a>
+      reserves it, so it can never belong to a real organisation or receive mail. This is why
+      GDS and GOV.UK Notify use it — see
+      <a class="govuk-link" href="https://github.com/alphagov/govuk-design-system-backlog/issues/45">backlog issue 45</a>.
+      Realistic-looking alternatives are usually real: <code>company.co.uk</code> and
+      <code>example.co.uk</code> are both registered, and <code>company.co.uk</code> has
+      live mail servers.</p>
+
+    <h3 class="govuk-heading-s">Confirming that a software provider has been added</h3>
+
+    <p class="govuk-body">There is no departmental pattern that says “when a civil servant
+      adds a record to an internal list, always show a green banner”. The published
+      guidance is about when <em>not</em> to use a confirmation page, and when a banner is
+      an option.</p>
+
+    <p class="govuk-body">The
+      <a class="govuk-link" href="https://design-system.service.gov.uk/patterns/confirmation-pages/">GOV.UK confirmation page</a>
+      is for the end of a transaction — “Application complete”, a reference number, what
+      happens next. The
+      <a class="govuk-link" href="https://github.com/alphagov/govuk-design-system-backlog/issues/40">confirmation pages backlog</a>
+      is explicit that a green confirmation screen is for when the user has successfully
+      finished. Using one here would tell someone they are done, when they have only added
+      one item to a list they may keep working on.</p>
+
+    <p class="govuk-body">The
+      <a class="govuk-link" href="https://design-system.service.gov.uk/components/notification-banner/">GOV.UK notification banner</a>
+      (success variant) is the component GDS offers for “the outcome of something they’ve
+      just done on a previous page” when they have not finished the current journey. The
+      <a class="govuk-link" href="https://service-manual.nhs.uk/design-system/components/notification-banners">NHS service manual</a>
+      is more specific: use a success banner for steps in a long journey or small repeated
+      tasks, and remove it when the user moves on. MOJ’s experimental
+      <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/patterns/confirm-an-action/">confirm an action</a>
+      pattern says that if the action does not need a confirmation screen, a notification
+      is shown immediately after. None of this is research with civil servants adding
+      records to an admin list — it is guidance written for transactional public services
+      and then reused.</p>
+
+    <p class="govuk-body">The
+      <a class="govuk-link" href="https://github.com/alphagov/govuk-design-system-backlog/issues/21">“Edit a list” backlog item</a>
+      (also known as add to a list) describes the expected outcome as: the newly added
+      item appears in the list, with Change and Remove. HMRC research on that pattern
+      with internal users was about adding many organisations quickly and returning to
+      the list, not about needing a banner to confirm each add.</p>
+
+    <p class="govuk-body">We have gone with the list itself as the confirmation: newest
+      first, today’s date on the new row. That matches what you expected and what the
+      add-to-a-list research describes. A banner is still the published GDS/NHS/MOJ
+      option if research shows people miss the new row — it is easy to put back. A
+      confirmation page would be the wrong pattern either way.</p>
+
+    <h3 class="govuk-heading-s">The company detail page</h3>
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/pages/case-list/">MOJ’s case list</a>
+      says: put the link in the first column, use the name (not “View”), and keep further
+      actions off the list and on the details page.
+      <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/identity-bar/">MOJ’s identity bar</a>
+      is for a case with several subsections. We have one details page, so the heading is
+      the company name with “Software providers” as the caption, and a back link.</p>
+
+    <p class="govuk-body">
+      <a class="govuk-link" href="https://design-system.service.gov.uk/components/summary-list/">GOV.UK’s summary list</a>
+      is the pattern for showing a record as key facts, including in caseworking systems
+      (summary cards are for several lists of the same type on one page — we only have
+      one). Each editable row has a Change link that goes to that question, which is also
+      how
+      <a class="govuk-link" href="https://design-system.dwp.gov.uk/patterns/add-another-thing/how-it-works">DWP’s add another thing</a>
+      and MOJ’s add another tell you to let users edit after submit. Notes have no Change
+      link: they are an audit record. They sit in
+      <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/timeline/">MOJ’s timeline</a>,
+      newest first, which is the caseworking pattern for dated events. There is no
+      published Home Office “case details” page — their
+      <a class="govuk-link" href="https://design.homeoffice.gov.uk/design-system/patterns/help-users-to/add-multiple-things">add multiple things</a>
+      pattern is a loop onto a summary list, which is the same idea at a smaller scale.</p>
+
+    <h3 class="govuk-heading-s">The empty state on the Software providers list</h3>
+
+    <p class="govuk-body">GOV.UK has no empty state pattern — it is still an
+      <a class="govuk-link" href="https://github.com/alphagov/govuk-design-system-backlog/issues/264">open item in the Design System backlog</a>.
+      The nearest published guidance is the
+      <a class="govuk-link" href="https://service-manual.ons.gov.uk/design-system/components/table">ONS table component</a>:
+      replace an empty table with a line of plain text, “No [what the table shows]”. The
+      backlog discussion adds that an empty state should also say what will be there, so
+      the page says both. The table header row is hidden when there is nothing in it,
+      because a bare header with no rows reads as broken.</p>
+
+    <h3 class="govuk-heading-s">Server-side “add another”, not the MOJ JavaScript</h3>
+
+    <p class="govuk-body">The component is built as HTML rather than with the
+      <code>mojAddAnother</code> macro, and without <code>data-module="moj-add-another"</code>,
+      so adding and removing fields happens on the server. This is the no-JavaScript
+      baseline MOJ describes. It matters because MOJ’s JavaScript adds fields in the
+      browser, which would happily add a sixth address and the maximum-of-5 error would
+      never fire.</p>
+
+    <p class="govuk-body">One quirk this inherits from the real MOJ component: pressing
+      Enter inside a text field triggers the first submit button in the form, which is
+      “Add another email address” rather than “Save”. The result is a spare blank field
+      the user can remove, so it is recoverable — but worth watching for in research.</p>
+
+  </div>
+</div>
+{% endblock %}

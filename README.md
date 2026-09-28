@@ -35,15 +35,68 @@ prototype being publicly accessible, set these environment variables on the host
 
 | Path | What it is |
 |---|---|
-| `/` | Prototype index (version cards) |
+| `/` | Prototype index — one short card per version, for navigation only |
 | `/about-this-service` | About this service (hub) |
-| `/v2/start` | In-service start page (current working version) |
+| `/versions/v1`, `/versions/v2`, `/versions/v3` | Per-version detail: what changed and why. Version 3 also has a "Design rationale" section |
+| `/v3/start` | In-service start page (current working version) |
+| `/v3/software-providers` | Software providers list (newest first), or an empty state on first visit |
+| `/v3/software-providers/example` | Orphan page: the same list with 4 fictional providers, newest first |
+| `/v3/software-providers/add` | Add a software provider: company name, up to 5 email addresses, notes |
+| `/v3/software-providers/:id` | Company detail: name and emails (editable), notes (not editable) |
+| `/v3/software-providers/:id/change-name` | Change company name |
+| `/v3/software-providers/:id/change-emails` | Change email addresses |
+| `/v3/regulators` | Waste organisations report (unchanged from version 2) |
+| `/v2/start` | In-service start page (previous version) |
 | `/v2/service-metrics` | Date input → metrics table |
 | `/v2/software-providers` | PAT Submission Viewer: search by Submission ID |
 | `/v2/software-providers/pat-viewer/submission/:id` | Submission detail: per-scenario Pass/Fail/Not submitted results |
 | `/v2/regulators` | Waste organisations report: period filter → table (name, registered date, active API codes, payment status, payment period) |
 | `/v2/waste-organisations` | Dead link → "Not built in this prototype" |
 | `/v1/…` | Frozen copy of the same journeys |
+
+## Version 3
+
+Version 3 is a partial copy of version 2: the start page and the waste
+organisations report are unchanged, Service metrics and the PAT Submission
+Viewer are gone, and Software providers is a new list-plus-add journey
+(`app/views/v3/`, `layouts/v3.html`, `registerV3Routes()` in `app/routes.js`).
+
+- **Software providers are session data**, not seed data
+  (`app/data/software-providers.js`, stored on
+  `req.session.data.softwareProviders`). Every participant starts with an empty
+  list, and "Clear data" in the footer resets it between sessions. Test and
+  production client IDs are UUIDs generated on save.
+- **`/v3/software-providers/example`** is an orphan page for demos: nothing in
+  the service links to it, only the prototype index and `/versions/v3`. It
+  renders the *same view* as the real list with the fixed `exampleProviders`
+  data, so the two cannot drift apart. The journey from "View prototype" still
+  starts on the empty state. The 4 company names are fictional. Company names
+  link to the same detail page as the live list (`/v3/software-providers/:id`).
+- **The list is newest first.** After a save there is no success banner — the new
+  row at the top with today's date is the confirmation. See `/versions/v3`
+  (Design rationale) for the GDS / departmental evidence.
+- **Company detail** is a summary list plus an MOJ timeline for notes. Change
+  links go to one-question pages. Notes have no Change link.
+- **Email addresses use the MOJ "Add another" component**, built as HTML rather
+  than via `mojAddAnother` and *without* `data-module="moj-add-another"`. Adding
+  and removing fields happens on the server — the no-JavaScript baseline MOJ
+  describes — so the maximum of 5 can be enforced with the standard GOV.UK error
+  summary and error message instead of silently in the browser. The newly added
+  field is given focus on re-render; after a removal, focus goes to the "Add
+  another email address" button.
+- **Email validation messages** live in `validate()` in
+  `app/data/software-providers.js`. Errors sit on the individual field, not the
+  group, and name it ("Enter email address 2 or remove the empty field") so each
+  message still makes sense in the error summary. The exception is the
+  5-address maximum, which has no single field at fault and so sits on the group
+  with the summary linking to the "Add another email address" button.
+- **Notes are append-only.** Each note is stored with the date and time it was
+  added and is never edited. Nothing displays them yet — a software provider
+  detail page would be the place for that.
+- Caveat of the server-side add/remove: pressing Enter inside a text field
+  triggers the first submit button in the form, which is "Add another email
+  address" rather than "Save". The real MOJ component behaves the same way; the
+  result is a spare blank field, which the user can remove.
 
 ## Architecture notes
 

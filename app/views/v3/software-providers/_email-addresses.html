@@ -1,0 +1,72 @@
+{#
+  Email addresses as a MOJ "Add another" group. Shared by the add and edit pages,
+  so both behave identically. Expects `values.emails`, `maxEmails`, `errors` and
+  `focus`; the surrounding <form> belongs to the page including this, so each page
+  can post to its own URL.
+
+  Built as HTML rather than with the mojAddAnother macro, and without
+  data-module="moj-add-another", so adding and removing fields happens on the
+  server. That is the no-JavaScript baseline MOJ describes, and it lets the
+  maximum be enforced with the standard GOV.UK error summary and error message
+  rather than silently in the browser.
+  https://design-patterns.service.justice.gov.uk/components/add-another/
+#}
+<div class="govuk-form-group{% if errors.emailGroup %} govuk-form-group--error{% endif %}">
+  <fieldset class="govuk-fieldset" role="group" aria-describedby="email-addresses-hint{% if errors.emailGroup %} email-addresses-error{% endif %}">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+      Email addresses
+    </legend>
+    <div id="email-addresses-hint" class="govuk-hint">
+      You can add up to {{ maxEmails }} email addresses.
+    </div>
+    {% if errors.emailGroup %}
+      <p id="email-addresses-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ errors.emailGroup }}
+      </p>
+    {% endif %}
+
+    <div class="moj-add-another app-email-addresses">
+      <div class="moj-add-another__items">
+        {% for email in values.emails %}
+          <div class="moj-add-another__item moj-add-another__item--inline">
+            <div class="moj-add-another__item-container">
+              <div class="moj-add-another__item-row">
+                {{ govukInput({
+                  id: "email-" + loop.index,
+                  name: "email",
+                  type: "email",
+                  spellcheck: false,
+                  autocomplete: "email",
+                  label: { text: "Email address " + loop.index },
+                  value: email,
+                  errorMessage: { text: errors.emails[loop.index0] } if errors.emails and errors.emails[loop.index0] else undefined,
+                  attributes: { autofocus: true } if focus === ("email-" + loop.index) else {}
+                }) }}
+              </div>
+              <div class="moj-add-another__remove-button-container">
+                {% if values.emails.length > 1 %}
+                  {{ govukButton({
+                    html: 'Remove<span class="govuk-visually-hidden"> email address ' + loop.index + '</span>',
+                    name: "remove",
+                    value: loop.index0,
+                    classes: "govuk-button--secondary moj-add-another__remove-button"
+                  }) }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="moj-add-another__add-button-container">
+        {{ govukButton({
+          id: "add-another-email",
+          text: "Add another email address",
+          name: "addAnother",
+          value: "add",
+          classes: "govuk-button--secondary moj-add-another__add-button",
+          attributes: { autofocus: true } if focus === "add-another-email" else {}
+        }) }}
+      </div>
+    </div>
+  </fieldset>
+</div>

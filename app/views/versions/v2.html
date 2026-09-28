@@ -1,0 +1,99 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 2" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">Version 2</h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 21 September 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 2</span>',
+        href: "/v2/start",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Header and footer" },
+          { text: "Replaced the GOV.UK header and footer with the Defra header and footer, and added a green service name" },
+          { text: "Services not hosted on GOV.UK must not look exactly like GOV.UK. The green title follows the Defra digital service manual header." },
+          { html: '<a class="govuk-link" href="/v2/start">/v2/start</a>' }
+        ],
+        [
+          { text: "Navigation" },
+          { text: "Removed breadcrumbs from in-service pages" },
+          { text: "Breadcrumbs duplicated the header navigation." },
+          { html: '<a class="govuk-link" href="/v2/software-providers">/v2/software-providers</a><br><a class="govuk-link" href="/v2/regulators">/v2/regulators</a>' }
+        ],
+        [
+          { text: "PAT submissions" },
+          { text: "Show all submissions in a table from the start, with a Submission ID filter above the table" },
+          { text: "Follows the MOJ case list and filter a list pattern for internal tools: show the unfiltered list first, then let users refine it." },
+          { html: '<a class="govuk-link" href="/v2/software-providers">/v2/software-providers</a>' }
+        ],
+        [
+          { text: "Reporting" },
+          { text: "Show all organisations in a table from the start, with from and to date filters above the table" },
+          { text: "Same list-first pattern as PAT submissions. Date filters use the GOV.UK date input, which is the pattern for asking users for dates." },
+          { html: '<a class="govuk-link" href="/v2/regulators">/v2/regulators</a>' }
+        ],
+        [
+          { text: "PAT submissions and Reporting" },
+          { text: "Paginate tables at 25 rows using the MOJ pagination component" },
+          { text: "Long case lists need a results count and page controls. Infinite scroll makes the footer hard to reach." },
+          { html: '<a class="govuk-link" href="/v2/software-providers">/v2/software-providers</a><br><a class="govuk-link" href="/v2/regulators">/v2/regulators</a>' }
+        ],
+        [
+          { text: "Navigation" },
+          { text: "Linked the Defra logo to the prototype index, added Home, and renamed items to Software providers and Waste organisations" },
+          { text: "Added Home as the in-service landing page. Sentence case on navigation items follows the GOV.UK style guide. Waste organisations names the records, not the activity of reporting." },
+          { html: '<a class="govuk-link" href="/v2/start">/v2/start</a>' }
+        ],
+        [
+          { text: "PAT submissions" },
+          { text: "Matched the page heading to the nav, relabelled the filter, and showed submitted date and time in GOV.UK style (for example 10 June 2026 at 9:15am)" },
+          { text: "The heading should match the section name. One filter uses a singular button. Dates and times follow the GOV.UK style guide: day month year, 12-hour clock, am/pm." },
+          { html: '<a class="govuk-link" href="/v2/software-providers">/v2/software-providers</a>' }
+        ],
+        [
+          { text: "Navigation" },
+          { text: "Added Service metrics after Waste organisations" },
+          { text: "The section was already in the service and on the start page, but missing from the header navigation." },
+          { html: '<a class="govuk-link" href="/v2/service-metrics">/v2/service-metrics</a>' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+{% endblock %}

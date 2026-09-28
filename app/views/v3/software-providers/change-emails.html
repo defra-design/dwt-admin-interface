@@ -1,0 +1,35 @@
+{% extends "layouts/v3.html" %}
+
+{% set version = "v3" %}
+{% set pageName = "Change email addresses" %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/" + version + "/software-providers/" + provider.id }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <span class="govuk-caption-l">{{ provider.companyName }}</span>
+    <h1 class="govuk-heading-l">Change email addresses</h1>
+
+    <form method="post" action="/{{ version }}/software-providers/{{ provider.id }}/change-emails" novalidate>
+
+      {% include version + "/software-providers/_email-addresses.html" %}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Save", name: "save", value: "save" }) }}
+        <a class="govuk-link" href="/{{ version }}/software-providers/{{ provider.id }}">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

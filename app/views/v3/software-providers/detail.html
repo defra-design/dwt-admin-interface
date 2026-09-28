@@ -1,0 +1,96 @@
+{% extends "layouts/v3.html" %}
+
+{% set version = "v3" %}
+{% set pageName = companyName %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Software providers", href: listHref }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Software providers</span>
+    <h1 class="govuk-heading-l">{{ companyName }}</h1>
+
+    {#
+      Case details start as a summary of what is already known. MOJ's case list
+      guidance says to keep actions off the list and put them on the details
+      page; GOV.UK's summary list (and its "Change" links) is the pattern for
+      showing and editing a record. We do not use MOJ's identity bar: that is
+      for a case with several subsections, not a single details page.
+      https://design-patterns.service.justice.gov.uk/pages/case-list/
+      https://design-system.service.gov.uk/components/summary-list/
+      https://design-patterns.service.justice.gov.uk/components/identity-bar/
+    #}
+
+    {% set emailHtml %}
+      {% if emails.length == 1 %}
+        {{ emails[0] }}
+      {% elif emails.length %}
+        <ul class="govuk-list govuk-list--bullet">
+          {% for email in emails %}
+            <li>{{ email }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endset %}
+
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { text: "Company name" },
+          value: { text: companyName },
+          actions: {
+            items: [{
+              href: "/" + version + "/software-providers/" + id + "/change-name",
+              text: "Change",
+              visuallyHiddenText: "company name"
+            }]
+          }
+        },
+        {
+          key: { text: "Email addresses" },
+          value: { html: emailHtml },
+          actions: {
+            items: [{
+              href: "/" + version + "/software-providers/" + id + "/change-emails",
+              text: "Change",
+              visuallyHiddenText: "email addresses"
+            }]
+          }
+        }
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Notes</h2>
+    <p class="govuk-hint">Notes cannot be changed or deleted after they are saved.</p>
+
+    {% if notes.length %}
+      {# Dated, append-only history. MOJ's timeline is the caseworking pattern
+         for events in date order, newest first.
+         https://design-patterns.service.justice.gov.uk/components/timeline/ #}
+      <div class="moj-timeline">
+        {% for note in notes %}
+          <div class="moj-timeline__item">
+            <div class="moj-timeline__header">
+              <h3 class="moj-timeline__title">Note added</h3>
+            </div>
+            <p class="moj-timeline__date">
+              <time>{{ note.addedLabel }}</time>
+            </p>
+            <div class="moj-timeline__description">
+              <p class="govuk-body">{{ note.text }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="govuk-body">No notes have been added.</p>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

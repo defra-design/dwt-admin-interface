@@ -32,6 +32,25 @@ function formatDateShortObj (date) {
   return `${date.getDate()} ${MONTHS_SHORT[date.getMonth()]} ${date.getFullYear()}`
 }
 
+// 12-hour local time, following the GOV.UK style guide: 9:15am, 1pm, midday,
+// midnight — not 09:15, 13:00 or 1730hrs.
+// https://www.gov.uk/guidance/style-guide/a-to-z
+function formatTime12h (date) {
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  if (hours === 0 && minutes === 0) return 'midnight'
+  if (hours === 12 && minutes === 0) return 'midday'
+  const suffix = hours >= 12 ? 'pm' : 'am'
+  const hour12 = hours % 12 || 12
+  if (minutes === 0) return `${hour12}${suffix}`
+  return `${hour12}:${String(minutes).padStart(2, '0')}${suffix}`
+}
+
+// "22 September 2026 at 10:15am" — date then time, GOV.UK style guide.
+function formatDateTimeObj (date) {
+  return `${formatDateObj(date)} at ${formatTime12h(date)}`
+}
+
 // Validate three day/month/year strings as a real date.
 // Returns { error: string|null, date: Date|null }.
 function validateDateParts (day, month, year) {
@@ -98,6 +117,8 @@ module.exports = {
   formatDate,
   formatDateObj,
   formatDateShortObj,
+  formatTime12h,
+  formatDateTimeObj,
   validateDateParts,
   parseDateInput,
   defaultPeriod

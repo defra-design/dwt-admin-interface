@@ -1,0 +1,49 @@
+{% extends "layouts/v3.html" %}
+
+{% set version = "v3" %}
+{% set pageName = "Add a software provider" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <span class="govuk-caption-l">Software providers</span>
+    <h1 class="govuk-heading-l">Add a software provider</h1>
+
+    <form method="post" action="/{{ version }}/software-providers/add" novalidate>
+
+      {{ govukInput({
+        id: "companyName",
+        name: "companyName",
+        label: { text: "Company name", classes: "govuk-label--s" },
+        value: values.companyName,
+        errorMessage: { text: errors.companyName } if errors.companyName else undefined,
+        autocomplete: "organization"
+      }) }}
+
+      {% include version + "/software-providers/_email-addresses.html" %}
+
+      {{ govukTextarea({
+        id: "notes",
+        name: "notes",
+        rows: 5,
+        label: { text: "Notes (optional)", classes: "govuk-label--s" },
+        hint: { text: "A note is saved with the date and time you add it. You cannot change or delete a note after it is saved." },
+        value: values.notes
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Save", name: "save", value: "save" }) }}
+        <a class="govuk-link" href="/{{ version }}/software-providers">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

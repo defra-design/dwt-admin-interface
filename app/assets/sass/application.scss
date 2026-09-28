@@ -314,6 +314,34 @@ $app-page-width: 1200px;
   white-space: nowrap;
 }
 
+// --- Add a software provider: email address fields ---------------------------
+// MOJ's inline "add another" layout sizes each row to its content
+// (`.moj-add-another__item-row { flex: 1 1 auto }`), which is right for rows of
+// several fields but means a long error message widens that row — and the input
+// inside it — past its neighbours. Each row here holds one field, so fix the row
+// width to keep the inputs and Remove buttons in line whatever the error says.
+// 24em is wide enough for a long email address and keeps error messages to two
+// lines, while leaving Remove next to the field it removes.
+@media (min-width: 48.0625em) {
+  .app-email-addresses .moj-add-another__item-row {
+    flex: 0 0 auto;
+    width: 24em;
+  }
+}
+
+// A bullet list inside a summary list value inherits the list's bottom margin,
+// which adds a gap under the last address. Keep the row tight.
+.govuk-summary-list__value > .govuk-list:last-child {
+  margin-bottom: 0;
+}
+
+// --- Software providers: client ID columns -----------------------------------
+// Client IDs are UUIDs, which browsers will break at a hyphen. Admins copy them
+// whole, so keep each one on a single line.
+.app-client-id {
+  white-space: nowrap;
+}
+
 // --- Reporting period filter -----------------------------------------------
 // Lay the From and To date inputs out side by side on wider screens.
 .app-period-filter {
