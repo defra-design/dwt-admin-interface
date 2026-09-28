@@ -5,6 +5,7 @@
 
 window.GOVUKPrototypeKit.documentReady(() => {
   initCopyFailedScenarios()
+  initCopyButtons()
 })
 
 function flashStatus (button, message) {
@@ -46,6 +47,25 @@ function initCopyFailedScenarios () {
     button.dataset.copyBound = 'true'
     button.addEventListener('click', () => {
       const source = document.getElementById(button.getAttribute('data-copy-failed-text'))
+      if (!source) return
+      Promise.resolve(copyText(source.textContent)).then(() => flashStatus(button, 'Copied'))
+    })
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Generic "copy to clipboard" button (Software providers: API key reveal
+// page, version 3). Left separate from initCopyFailedScenarios above rather
+// than reusing its attribute name, so v1/v2's "copy failed scenarios" button
+// is untouched.
+// ---------------------------------------------------------------------------
+
+function initCopyButtons () {
+  document.querySelectorAll('[data-copy-target]').forEach((button) => {
+    if (button.dataset.copyBound) return
+    button.dataset.copyBound = 'true'
+    button.addEventListener('click', () => {
+      const source = document.getElementById(button.getAttribute('data-copy-target'))
       if (!source) return
       Promise.resolve(copyText(source.textContent)).then(() => flashStatus(button, 'Copied'))
     })

@@ -8,7 +8,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l">Software providers</h1>
-    <p class="govuk-body">Add software providers and view the client IDs they use to connect to the Digital Waste Tracking service.</p>
+    <p class="govuk-body">Add software providers and manage the API keys they use to connect to the Digital Waste Tracking service.</p>
   </div>
 </div>
 
@@ -24,8 +24,6 @@
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
         <th scope="col" class="govuk-table__header">Company name</th>
-        <th scope="col" class="govuk-table__header">Test client ID</th>
-        <th scope="col" class="govuk-table__header">Production client ID</th>
         <th scope="col" class="govuk-table__header">Created date</th>
       </tr>
     </thead>
@@ -35,8 +33,6 @@
           <th scope="row" class="govuk-table__header">
             <a class="govuk-link" href="/{{ version }}/software-providers/{{ provider.id }}">{{ provider.companyName }}</a>
           </th>
-          <td class="govuk-table__cell app-client-id">{{ provider.testClientId }}</td>
-          <td class="govuk-table__cell app-client-id">{{ provider.productionClientId }}</td>
           <td class="govuk-table__cell">{{ provider.createdDate }}</td>
         </tr>
       {% endfor %}
@@ -51,6 +47,6 @@
      https://github.com/alphagov/govuk-design-system-backlog/issues/264 #}
   <h2 class="govuk-heading-m">Software providers</h2>
   <p class="govuk-body">No software providers have been added yet.</p>
-  <p class="govuk-body">Software providers you add will be listed here with their test and production client IDs.</p>
+  <p class="govuk-body">Software providers you add will be listed here.</p>
 {% endif %}
 {% endblock %}

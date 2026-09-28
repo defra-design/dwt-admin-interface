@@ -65,6 +65,71 @@
       ]
     }) }}
 
+    <h2 class="govuk-heading-m">API keys</h2>
+    <p class="govuk-hint">A Test and a Production API key can be created for this software provider. Each key is only ever shown once, when it is created or rotated.</p>
+
+    {#
+      A GOV.UK table rather than another summary list: this is genuinely
+      tabular data (one row per environment, the same three facts about
+      each), and a table lets those facts line up in columns so they are
+      easy to compare at a glance — unlike the summary list above, where
+      "Company name" and "Email addresses" have nothing in common to
+      compare. Each action sits in the column it changes ("Change" beside
+      the application name, "Rotate" beside the key), the same "act where
+      the value is" logic as GOV.UK's summary list Change links, each on
+      its own line below the value so a link never runs on directly from
+      text. The Actions column holds whichever single action applies to
+      the whole row: "Create" before a key exists, "Delete API key" once
+      one does. This whole "generate once, show once" flow is modelled on
+      GOV.UK Notify's API keys page.
+      https://design-system.service.gov.uk/components/table/
+      https://design-system.service.gov.uk/components/summary-list/
+      https://docs.notifications.service.gov.uk/rest-api.html#authorisation
+    #}
+    <table class="govuk-table">
+      <caption class="govuk-visually-hidden">API keys</caption>
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Environment</th>
+          <th scope="col" class="govuk-table__header">Application name</th>
+          <th scope="col" class="govuk-table__header">API key</th>
+          <th scope="col" class="govuk-table__header">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for row in apiKeyRows %}
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">{{ row.environment }}</th>
+            <td class="govuk-table__cell">
+              {{ row.applicationName }}
+              {% if row.changeApplicationNameAction %}
+                <br>
+                <a class="govuk-link" href="{{ row.changeApplicationNameAction.href }}">{{ row.changeApplicationNameAction.text }}<span class="govuk-visually-hidden"> {{ row.changeApplicationNameAction.visuallyHiddenText }}</span></a>
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              {% if row.created %}
+                <span class="app-api-key-masked" aria-hidden="true">••••{{ row.apiKeyLast4 }}</span>
+                <span class="govuk-visually-hidden">API key ending in {{ row.apiKeyLast4 }}</span>
+              {% endif %}
+              {% if row.rotateApiKeyAction %}
+                <br>
+                <a class="govuk-link" href="{{ row.rotateApiKeyAction.href }}">{{ row.rotateApiKeyAction.text }}<span class="govuk-visually-hidden"> {{ row.rotateApiKeyAction.visuallyHiddenText }}</span></a>
+              {% endif %}
+            </td>
+            <td class="govuk-table__cell">
+              {% if row.createAction %}
+                <a class="govuk-link" href="{{ row.createAction.href }}">{{ row.createAction.text }}<span class="govuk-visually-hidden"> {{ row.createAction.visuallyHiddenText }}</span></a>
+              {% endif %}
+              {% if row.deleteApiKeyAction %}
+                <a class="govuk-link" href="{{ row.deleteApiKeyAction.href }}">{{ row.deleteApiKeyAction.text }}<span class="govuk-visually-hidden"> {{ row.deleteApiKeyAction.visuallyHiddenText }}</span></a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
     <h2 class="govuk-heading-m">Notes</h2>
     <p class="govuk-hint">Notes cannot be changed or deleted after they are saved.</p>
 

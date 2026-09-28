@@ -42,9 +42,13 @@ prototype being publicly accessible, set these environment variables on the host
 | `/v3/software-providers` | Software providers list (newest first), or an empty state on first visit |
 | `/v3/software-providers/example` | Orphan page: the same list with 4 fictional providers, newest first |
 | `/v3/software-providers/add` | Add a software provider: company name, up to 5 email addresses, notes |
-| `/v3/software-providers/:id` | Company detail: name and emails (editable), notes (not editable) |
+| `/v3/software-providers/:id` | Company detail: name and emails (editable), notes (not editable), and the API keys table |
 | `/v3/software-providers/:id/change-name` | Change company name |
 | `/v3/software-providers/:id/change-emails` | Change email addresses |
+| `/v3/software-providers/:id/api-keys/:environment/generate` | Create a Test/Production API key (asks for an application name), or delete-and-regenerate an existing one (no application name field, just a warning and a button naming the consequence) |
+| `/v3/software-providers/:id/api-keys/:environment` | The one-time API key reveal, as a confirmation page: the key and a copy button sit inside the green panel, then a checkbox that must be ticked before "Close" returns to the detail page |
+| `/v3/software-providers/:id/api-keys/:environment/change-application-name` | Change the application name recorded against a key, without changing the secret |
+| `/v3/software-providers/:id/api-keys/:environment/delete` | Confirm and delete an API key, resetting that environment back to empty |
 | `/v3/regulators` | Waste organisations report (unchanged from version 2) |
 | `/v2/start` | In-service start page (previous version) |
 | `/v2/service-metrics` | Date input → metrics table |
@@ -93,6 +97,46 @@ Viewer are gone, and Software providers is a new list-plus-add journey
 - **Notes are append-only.** Each note is stored with the date and time it was
   added and is never edited. Nothing displays them yet — a software provider
   detail page would be the place for that.
+- **API keys** (`app/data/software-providers.js`, "API keys" section) are a
+  Test and a Production secret per provider, kept apart from the existing
+  client IDs: client IDs are generated at provider creation but no longer
+  shown anywhere (the list page's two ID columns were removed once the API
+  keys table replaced them as the operationally useful view); API keys
+  authenticate requests, are secret, and are generated on demand from the
+  detail page's "API keys" table — modelled on how GOV.UK Notify's own API
+  keys work.
+  - **Each table action sits in the column it changes**, on its own line
+    below the value — "Change" under the application name, "Rotate" under
+    the key — rather than in a shared "Actions" column, the same "act where
+    the value is" logic as GOV.UK's summary list Change links. The Actions
+    column holds whichever single action applies to the row as a whole:
+    "Create" before a key exists, "Delete API key" (with its own
+    confirmation page) once one does.
+  - **"Create" and the key-regenerating half of "Rotate"/"Delete" share one
+    route** (`/api-keys/:environment/generate`), but are two different
+    pages: creating asks for an application name (there isn't one yet);
+    regenerating does not (the name isn't changing) and instead shows a
+    warning and a button naming the consequence — "Delete current key and
+    generate new API key" — rather than a generic "Continue".
+  - **The generated key is shown exactly once**, on `/api-keys/:environment`,
+    built as a GOV.UK confirmation page: the key and its copy button sit
+    inside the green panel (the one thing to walk away with, in place of a
+    reference number), a `govukWarningText` below it says it won't be shown
+    again, and a single checkbox — "I confirm that I have copied or saved
+    this API key" — must be ticked before "Close" is accepted. This is the
+    WCAG technique for a one-time, unrecoverable value (G155). A `revealed`
+    flag is set once closed, so a bookmark or back-button press on that URL
+    cannot show the secret again — it redirects to the detail page instead.
+  - **The table only ever shows the last 4 characters** of a created key.
+    The full value exists only in session data and on the one-time reveal
+    page.
+  - **Checkbox gotcha**: the kit's own `auto-store-data.js` (loaded on every
+    page, for its session-data feature) appends a hidden `_unchecked` input
+    with the same `name` to every form on submit, so a ticked checkbox
+    arrives in `req.body` as an array (`['true', '_unchecked']`), not the
+    string `'true'`. `sp.isCheckboxTicked()` handles both shapes — a plain
+    `=== 'true'` check will always fail. Anywhere else a lone checkbox
+    gates a submit button, use the same helper.
 - Caveat of the server-side add/remove: pressing Enter inside a text field
   triggers the first submit button in the form, which is "Add another email
   address" rather than "Save". The real MOJ component behaves the same way; the

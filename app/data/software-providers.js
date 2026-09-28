@@ -6,7 +6,7 @@
 // empty list and "Clear data" in the footer resets it between sessions.
 //
 
-const { randomUUID } = require('crypto')
+const { randomUUID, randomBytes } = require('crypto')
 const { formatDateObj, formatDateTimeObj } = require('./dates')
 
 // The service rule the "add another" pattern enforces. Stated up front in the
@@ -39,7 +39,10 @@ function newProvider (values, now = new Date()) {
     createdAt: now.toISOString(),
     // Notes are append-only: each one keeps the date and time it was added and
     // is never edited or removed.
-    notes: noteText ? [{ text: noteText, addedAt: now.toISOString() }] : []
+    notes: noteText ? [{ text: noteText, addedAt: now.toISOString() }] : [],
+    // API keys start empty — see "API keys" below. Generated on demand from
+    // the provider detail page, not at creation.
+    apiKeys: emptyApiKeys()
   }
 }
 
@@ -57,7 +60,19 @@ const exampleProviders = [
     notes: [
       { text: 'Production access granted after PAT sign-off on 10 April 2026.', addedAt: '2026-04-14T09:22:00.000Z' },
       { text: 'Asked to be contacted through the integrations mailbox, not support.', addedAt: '2026-05-06T15:40:00.000Z' }
-    ]
+    ],
+    // Fixed, not generated — this is the one example that shows the API keys
+    // table in its "populated" state (Test created, Production still empty),
+    // so a demo can show both row states without running the journey first.
+    apiKeys: {
+      test: {
+        applicationName: 'Kerbside integration (test)',
+        apiKey: 'dwt_test_9f21c6e4a08b3d7f5c2e9a1b6d4f8032',
+        revealed: true,
+        createdAt: '2026-04-14T09:25:00.000Z'
+      },
+      production: {}
+    }
   },
   {
     id: 'example-skipflow',
@@ -68,7 +83,8 @@ const exampleProviders = [
     createdAt: '2026-06-02T14:45:00.000Z',
     notes: [
       { text: 'Single developer. Expect slower responses during August.', addedAt: '2026-06-02T14:47:00.000Z' }
-    ]
+    ],
+    apiKeys: emptyApiKeys()
   },
   {
     id: 'example-wastebase',
@@ -77,7 +93,8 @@ const exampleProviders = [
     testClientId: '4a0e91c7-3f28-4d65-bc19-7e53a8d20f96',
     productionClientId: '9b62f44a-8d51-4e37-92c6-0fb85d1a4e73',
     createdAt: '2026-07-28T11:05:00.000Z',
-    notes: []
+    notes: [],
+    apiKeys: emptyApiKeys()
   },
   {
     id: 'example-greenlane',
@@ -88,7 +105,8 @@ const exampleProviders = [
     createdAt: '2026-09-09T16:30:00.000Z',
     notes: [
       { text: 'Onboarded as part of the September cohort. Two mailboxes on request.', addedAt: '2026-09-09T16:33:00.000Z' }
-    ]
+    ],
+    apiKeys: emptyApiKeys()
   }
 ]
 
@@ -128,12 +146,13 @@ function toRows (providers) {
 }
 
 // Notes are append-only and shown newest first, like a case history.
-function toDetail (provider) {
+function toDetail (provider, version) {
   return {
     id: provider.id,
     companyName: provider.companyName,
     emails: provider.emails || [],
     notes: toNotes(provider),
+    apiKeyRows: toApiKeyRows(provider, version),
     listHref: listPath(provider)
   }
 }
@@ -146,6 +165,137 @@ function toNotes (provider) {
       text: note.text,
       addedLabel: formatDateTimeObj(new Date(note.addedAt))
     }))
+}
+
+// --- API keys ----------------------------------------------------------
+//
+// A provider connects with a separate key per environment, kept apart from
+// the client IDs above: client IDs identify the provider and are visible on
+// the list page, API keys authenticate requests and are secret. Each starts
+// empty and is generated on demand from the detail page — not at provider
+// creation — so the record only exists once someone has actually asked for
+// it. GOV.UK Notify uses the same "generated on demand, shown once" model for
+// its own API keys.
+// https://docs.notifications.service.gov.uk/rest-api.html#authorisation
+
+const ENVIRONMENTS = [
+  { key: 'test', label: 'Test' },
+  { key: 'production', label: 'Production' }
+]
+
+function emptyApiKeys () {
+  return { test: {}, production: {} }
+}
+
+function findEnvironment (key) {
+  return ENVIRONMENTS.find((e) => e.key === key) || null
+}
+
+// A dummy secret, not a real credential: prefixed by environment (the same
+// signal Stripe-style keys give) followed by 32 random hex characters.
+function generateApiKey (environmentKey) {
+  const prefix = environmentKey === 'production' ? 'dwt_live_' : 'dwt_test_'
+  return prefix + randomBytes(16).toString('hex')
+}
+
+// Lazily creates the record so providers saved before this feature existed
+// (already in someone's session) still work.
+function apiKeyFor (provider, environmentKey) {
+  if (!provider.apiKeys) provider.apiKeys = emptyApiKeys()
+  if (!provider.apiKeys[environmentKey]) provider.apiKeys[environmentKey] = {}
+  return provider.apiKeys[environmentKey]
+}
+
+function hasApiKey (provider, environmentKey) {
+  return !!apiKeyFor(provider, environmentKey).apiKey
+}
+
+// Used for both the first "Create" and a later "Rotate" — both generate a
+// new secret and both must be shown once, so they share one route and one
+// record shape. `revealed` starts false so the reveal page (`/api-keys/:env`)
+// shows the value; closing it (ticking the checkbox) sets it true so a
+// bookmark or back-button press cannot show the secret a second time.
+function createOrRotateApiKey (provider, environmentKey, applicationName, now = new Date()) {
+  if (!provider.apiKeys) provider.apiKeys = emptyApiKeys()
+  provider.apiKeys[environmentKey] = {
+    applicationName,
+    apiKey: generateApiKey(environmentKey),
+    revealed: false,
+    createdAt: now.toISOString()
+  }
+}
+
+function updateApiKeyApplicationName (provider, environmentKey, applicationName) {
+  apiKeyFor(provider, environmentKey).applicationName = applicationName
+}
+
+function revealApiKey (provider, environmentKey) {
+  apiKeyFor(provider, environmentKey).revealed = true
+}
+
+// Deleting resets the environment back to its empty default state, ready
+// for "Create" again — there is nothing left to rotate or rename.
+function deleteApiKey (provider, environmentKey) {
+  provider.apiKeys[environmentKey] = {}
+}
+
+// Only the last 4 characters are ever shown again after the one-time reveal.
+function maskedApiKey (apiKey) {
+  return apiKey.slice(-4)
+}
+
+// Rows for the "API keys" table on the detail page: one per environment,
+// always in the same order, so the table always has a Test and a Production
+// row even before either key has been created.
+//
+// Each row action sits in the column it changes, not in a separate Actions
+// column — "Change" next to the application name, "Rotate" next to the key
+// — following the same "act where the value is" logic as GOV.UK's summary
+// list Change links, just applied within a table. The Actions column holds
+// whichever single action applies to the whole row rather than one value:
+// "Create" before a key exists, "Delete API key" once one does.
+function toApiKeyRows (provider, version) {
+  return ENVIRONMENTS.map((env) => {
+    const record = apiKeyFor(provider, env.key)
+    const created = !!record.apiKey
+    const base = `/${version}/software-providers/${provider.id}/api-keys/${env.key}`
+    return {
+      environment: env.label,
+      applicationName: record.applicationName || '',
+      apiKeyLast4: created ? maskedApiKey(record.apiKey) : '',
+      created,
+      changeApplicationNameAction: created
+        ? { text: 'Change', href: `${base}/change-application-name`, visuallyHiddenText: `application name for the ${env.label} API key` }
+        : null,
+      rotateApiKeyAction: created
+        ? { text: 'Rotate', href: `${base}/generate`, visuallyHiddenText: `the ${env.label} API key` }
+        : null,
+      createAction: created
+        ? null
+        : { text: 'Create', href: `${base}/generate`, visuallyHiddenText: `API key for ${env.label}` },
+      deleteApiKeyAction: created
+        ? { text: 'Delete API key', href: `${base}/delete`, visuallyHiddenText: `for the ${env.label} environment` }
+        : null
+    }
+  })
+}
+
+// The Prototype Kit's own auto-store-data.js appends a hidden "_unchecked"
+// input with the same name to every form on submit (so its session-data
+// feature can tell "never answered" apart from "unchecked"). That means a
+// ticked checkbox arrives as an array — ['true', '_unchecked'], not just
+// 'true' — so a plain equality check against 'true' fails even when the box
+// was ticked. Handle both shapes.
+function isCheckboxTicked (value) {
+  return Array.isArray(value) ? value.includes('true') : value === 'true'
+}
+
+function validateApplicationName (values) {
+  const errors = {}
+  if (!values.applicationName) {
+    errors.applicationName = 'Enter an application name'
+  }
+  return errors
 }
 
 // Errors are keyed so the view can mark the right field:
@@ -277,5 +427,16 @@ module.exports = {
   applyEmailActions,
   validate,
   maxEmailsError,
-  errorList
+  errorList,
+  // API keys
+  findEnvironment,
+  apiKeyFor,
+  hasApiKey,
+  createOrRotateApiKey,
+  updateApiKeyApplicationName,
+  revealApiKey,
+  deleteApiKey,
+  toApiKeyRows,
+  validateApplicationName,
+  isCheckboxTicked
 }

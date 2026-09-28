@@ -335,11 +335,38 @@ $app-page-width: 1200px;
   margin-bottom: 0;
 }
 
-// --- Software providers: client ID columns -----------------------------------
-// Client IDs are UUIDs, which browsers will break at a hyphen. Admins copy them
-// whole, so keep each one on a single line.
-.app-client-id {
-  white-space: nowrap;
+// --- Software providers: API keys ------------------------------------------
+// The full key (reveal page, shown once) is long and must stay copyable as a
+// single value — wrap by character rather than truncating, and set it apart
+// visually so it reads as a value to copy, not body text.
+.app-api-key {
+  display: inline-block;
+  font-family: monospace;
+  word-break: break-all;
+  background-color: #f3f2f1; // GOV.UK light grey
+  padding: 10px 15px;
+  border-radius: 4px;
+}
+
+// Inside the confirmation panel (api-key-reveal.html), the panel's own
+// styles turn all its text white — fine on the green background, but this
+// box has its own light grey background, so the key needs its normal dark
+// text colour reinstated to stay readable.
+.app-api-key--panel {
+  color: #0b0c0c; // GOV.UK text colour
+  margin-bottom: 15px;
+}
+
+.app-api-key-panel__actions {
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+// The masked form on the provider detail table (last 4 characters only).
+// Monospace keeps the bullet characters and digits aligned with the
+// full key above, so the two look like the same kind of value.
+.app-api-key-masked {
+  font-family: monospace;
 }
 
 // --- Reporting period filter -----------------------------------------------

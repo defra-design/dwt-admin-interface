@@ -374,14 +374,14 @@ function registerV3Routes () {
   router.get(`${base}/software-providers/:id`, (req, res) => {
     const provider = requireProvider(req, res)
     if (!provider) return
-    res.render(view('software-providers/detail'), sp.toDetail(provider))
+    res.render(view('software-providers/detail'), sp.toDetail(provider, 'v3'))
   })
 
   router.get(`${base}/software-providers/:id/change-name`, (req, res) => {
     const provider = requireProvider(req, res)
     if (!provider) return
     res.render(view('software-providers/change-name'), {
-      provider: sp.toDetail(provider),
+      provider: sp.toDetail(provider, 'v3'),
       values: { companyName: provider.companyName },
       errors: {},
       errorList: []
@@ -395,7 +395,7 @@ function registerV3Routes () {
     const errors = sp.validate(values, { fields: ['companyName'] })
     if (Object.keys(errors).length) {
       return res.render(view('software-providers/change-name'), {
-        provider: sp.toDetail(provider),
+        provider: sp.toDetail(provider, 'v3'),
         values,
         errors,
         errorList: sp.errorList(errors)
@@ -407,7 +407,7 @@ function registerV3Routes () {
 
   function renderChangeEmails (res, provider, options) {
     res.render(view('software-providers/change-emails'), Object.assign({
-      provider: sp.toDetail(provider),
+      provider: sp.toDetail(provider, 'v3'),
       maxEmails: sp.MAX_EMAILS,
       errors: {},
       errorList: [],
@@ -451,6 +451,193 @@ function registerV3Routes () {
     }
 
     sp.updateEmails(provider, values.emails)
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+
+  // --- API keys -------------------------------------------------------------
+  //
+  // One route generates a key and doubles as both "Create" (no key yet) and
+  // "Rotate API key" (one already exists) — both actions do the same thing:
+  // make a new secret and show it once. A second route is the one-time
+  // reveal page itself; a third lets the application name be changed without
+  // touching the secret.
+
+  function requireApiKeyEnvironment (req, res, provider) {
+    const environment = sp.findEnvironment(req.params.environment)
+    if (!environment) {
+      res.redirect(`${base}/software-providers/${provider.id}`)
+      return null
+    }
+    return environment
+  }
+
+  function renderGenerate (res, provider, environment, options) {
+    res.render(view('software-providers/api-key-generate'), Object.assign({
+      provider: sp.toDetail(provider, 'v3'),
+      environment,
+      rotating: sp.hasApiKey(provider, environment.key),
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  router.get(`${base}/software-providers/:id/api-keys/:environment/generate`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    renderGenerate(res, provider, environment, {
+      values: { applicationName: sp.apiKeyFor(provider, environment.key).applicationName || '' }
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/api-keys/:environment/generate`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+
+    // Rotating: the page has no application name field (the name is not
+    // changing, only the secret), so there is nothing to validate — keep
+    // the name already on record and generate a new key straight away.
+    if (sp.hasApiKey(provider, environment.key)) {
+      const applicationName = sp.apiKeyFor(provider, environment.key).applicationName
+      sp.createOrRotateApiKey(provider, environment.key, applicationName)
+      return res.redirect(`${base}/software-providers/${provider.id}/api-keys/${environment.key}`)
+    }
+
+    const values = { applicationName: (req.body.applicationName || '').trim() }
+    const errors = sp.validateApplicationName(values)
+    if (Object.keys(errors).length) {
+      return renderGenerate(res, provider, environment, {
+        values,
+        errors,
+        errorList: [{ text: errors.applicationName, href: '#applicationName' }]
+      })
+    }
+
+    sp.createOrRotateApiKey(provider, environment.key, values.applicationName)
+    res.redirect(`${base}/software-providers/${provider.id}/api-keys/${environment.key}`)
+  })
+
+  // The one-time reveal. If there is nothing unrevealed to show — no key yet,
+  // or this key has already been closed once — there is nothing for this
+  // page to do, so it sends the user back to the record rather than erroring.
+  router.get(`${base}/software-providers/:id/api-keys/:environment`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    const record = sp.apiKeyFor(provider, environment.key)
+    if (!record.apiKey || record.revealed) {
+      return res.redirect(`${base}/software-providers/${provider.id}`)
+    }
+    res.render(view('software-providers/api-key-reveal'), {
+      provider: sp.toDetail(provider, 'v3'),
+      environment,
+      apiKey: record.apiKey,
+      errors: {},
+      errorList: []
+    })
+  })
+
+  // "Close": only proceeds once the checkbox confirms the key has been
+  // copied or saved, per the GOV.UK/WCAG pattern for a one-time secret.
+  router.post(`${base}/software-providers/:id/api-keys/:environment`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    const record = sp.apiKeyFor(provider, environment.key)
+    if (!record.apiKey || record.revealed) {
+      return res.redirect(`${base}/software-providers/${provider.id}`)
+    }
+
+    if (!sp.isCheckboxTicked(req.body.confirmSaved)) {
+      const message = 'Select the checkbox to confirm you have copied or saved this API key'
+      return res.render(view('software-providers/api-key-reveal'), {
+        provider: sp.toDetail(provider, 'v3'),
+        environment,
+        apiKey: record.apiKey,
+        errors: { confirmSaved: message },
+        errorList: [{ text: message, href: '#confirmSaved' }]
+      })
+    }
+
+    sp.revealApiKey(provider, environment.key)
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+
+  function renderChangeApplicationName (res, provider, environment, options) {
+    res.render(view('software-providers/api-key-change-application-name'), Object.assign({
+      provider: sp.toDetail(provider, 'v3'),
+      environment,
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  router.get(`${base}/software-providers/:id/api-keys/:environment/change-application-name`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    if (!sp.hasApiKey(provider, environment.key)) {
+      return res.redirect(`${base}/software-providers/${provider.id}`)
+    }
+    renderChangeApplicationName(res, provider, environment, {
+      values: { applicationName: sp.apiKeyFor(provider, environment.key).applicationName }
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/api-keys/:environment/change-application-name`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    if (!sp.hasApiKey(provider, environment.key)) {
+      return res.redirect(`${base}/software-providers/${provider.id}`)
+    }
+
+    const values = { applicationName: (req.body.applicationName || '').trim() }
+    const errors = sp.validateApplicationName(values)
+    if (Object.keys(errors).length) {
+      return renderChangeApplicationName(res, provider, environment, {
+        values,
+        errors,
+        errorList: [{ text: errors.applicationName, href: '#applicationName' }]
+      })
+    }
+
+    sp.updateApiKeyApplicationName(provider, environment.key, values.applicationName)
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+
+  // A confirmation step, not an immediate action from the table: deleting is
+  // destructive (any application using the key stops working, and there is
+  // no undo) and a stray click should not be able to trigger it.
+  router.get(`${base}/software-providers/:id/api-keys/:environment/delete`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    if (!sp.hasApiKey(provider, environment.key)) {
+      return res.redirect(`${base}/software-providers/${provider.id}`)
+    }
+    res.render(view('software-providers/api-key-delete'), {
+      provider: sp.toDetail(provider, 'v3'),
+      environment
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/api-keys/:environment/delete`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    if (sp.hasApiKey(provider, environment.key)) {
+      sp.deleteApiKey(provider, environment.key)
+    }
     res.redirect(`${base}/software-providers/${provider.id}`)
   })
 }
