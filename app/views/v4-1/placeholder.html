@@ -1,0 +1,22 @@
+{% extends "layouts/v4-1.html" %}
+
+{% set version = "v4-1" %}
+{% set pageName = "Not built in this prototype" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/" + version + "/software-providers" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">{{ heading | default("Not built in this prototype") }}</h1>
+
+    {{ govukInsetText({
+      text: "This part of the service has not been built in this prototype yet."
+    }) }}
+
+  </div>
+</div>
+{% endblock %}

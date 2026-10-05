@@ -1,0 +1,80 @@
+{#
+  The one-time reveal of a new client secret. Not a confirmation page: the
+  important things here are two values to copy and a warning that the secret
+  will not be shown again, so there is no "success" panel. No back link: the
+  credentials are already created and the secret cannot be shown a second time.
+
+  The Client ID and Client secret sit outside the summary list, each under its
+  own heading with its own Copy button. The warning is the MoJ information
+  alert, directly under the secret and above "Close and save", so it is
+  read at the point it matters. (GOV.UK inset text has no coloured border or
+  icon; MoJ's guidance points to it for plain body copy.) Auto focus is
+  switched off, otherwise the alert would take focus when the page loads.
+  https://design-patterns.service.justice.gov.uk/components/alert/
+
+  The Copy buttons are hidden until JavaScript runs (see application.js), so
+  without JavaScript both values are still on the page to select and copy by hand.
+#}
+{% extends "layouts/v4-1.html" %}
+
+{% set version = "v4-1" %}
+{% set pageName = "Credentials created" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Software providers</span>
+    <h1 class="govuk-heading-l">Credentials created</h1>
+
+    {{ govukSummaryList({
+      rows: [
+        { key: { text: "Software provider" }, value: { text: credential.softwareProvider } },
+        { key: { text: "Client name" }, value: { text: credential.clientName } },
+        { key: { text: "Environment" }, value: { text: credential.environment } }
+      ]
+    }) }}
+
+    <div class="govuk-!-margin-bottom-6">
+      <h2 class="govuk-heading-m">Client ID</h2>
+      <p class="govuk-body"><span id="client-id" class="app-api-key">{{ credential.clientId }}</span></p>
+      <div class="app-copy" hidden>
+        {{ govukButton({
+          html: 'Copy<span class="govuk-visually-hidden"> client ID</span>',
+          classes: "govuk-button--secondary govuk-!-margin-bottom-0",
+          type: "button",
+          attributes: { "data-copy-target": "client-id", "data-copy-message": "Client ID copied" }
+        }) }}
+        <span class="app-copy-status govuk-body govuk-!-margin-bottom-0" role="status" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="govuk-!-margin-bottom-6">
+      <h2 class="govuk-heading-m">Client secret</h2>
+      <p class="govuk-body"><span id="client-secret" class="app-api-key">{{ credential.pendingSecret }}</span></p>
+      <div class="app-copy" hidden>
+        {{ govukButton({
+          html: 'Copy<span class="govuk-visually-hidden"> client secret</span>',
+          classes: "govuk-button--secondary govuk-!-margin-bottom-0",
+          type: "button",
+          attributes: { "data-copy-target": "client-secret", "data-copy-message": "Client secret copied" }
+        }) }}
+        <span class="app-copy-status govuk-body govuk-!-margin-bottom-0" role="status" aria-live="polite"></span>
+      </div>
+    </div>
+
+    {{ mojAlert({
+      variant: "information",
+      title: "You can only see the client secret once",
+      html: "You can only see the client secret once. Copy it now and store it somewhere secure. If you lose it, you will need to rotate the client secret to get a new one.",
+      disableAutoFocus: true
+    }) }}
+
+    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/created" novalidate>
+      {{ govukButton({ text: "Close and save" }) }}
+    </form>
+
+  </div>
+</div>
+{% endblock %}

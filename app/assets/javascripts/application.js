@@ -64,11 +64,39 @@ function initCopyButtons () {
   document.querySelectorAll('[data-copy-target]').forEach((button) => {
     if (button.dataset.copyBound) return
     button.dataset.copyBound = 'true'
+    // A copy button can sit inside a wrapper that is `hidden` in the HTML, so
+    // it only appears when JavaScript is available to make it work.
+    const hiddenWrapper = button.closest('[hidden]')
+    if (hiddenWrapper) hiddenWrapper.hidden = false
     button.addEventListener('click', () => {
       const source = document.getElementById(button.getAttribute('data-copy-target'))
       if (!source) return
-      Promise.resolve(copyText(source.textContent)).then(() => flashStatus(button, 'Copied'))
+      // A button with `data-copy-message` (Credentials created page) keeps its
+      // message on screen and names what was copied. Without it, the older
+      // "Copied" message that disappears after a few seconds is used, so
+      // earlier versions behave as before.
+      const message = button.getAttribute('data-copy-message')
+      Promise.resolve(copyText(source.textContent)).then(() => {
+        if (message) {
+          showCopyStatus(button, message)
+        } else {
+          flashStatus(button, 'Copied')
+        }
+      })
     })
   })
+}
+
+// Persistent copy feedback. Only one value is on the clipboard at a time, so
+// copying clears the message next to any other copy button. The message is
+// cleared and then set again, after a short pause, so a screen reader announces
+// it even when the same button is pressed twice.
+function showCopyStatus (button, message) {
+  document.querySelectorAll('[data-copy-message]').forEach((other) => {
+    const otherStatus = other.parentNode.querySelector('.app-copy-status')
+    if (otherStatus) otherStatus.textContent = ''
+  })
+  const status = button.parentNode.querySelector('.app-copy-status')
+  if (status) window.setTimeout(() => { status.textContent = message }, 100)
 }
 

@@ -1,0 +1,66 @@
+{% extends "layouts/v4.html" %}
+
+{% set version = "v4" %}
+{% set pageName = "Create new credentials" %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/" + version + "/software-providers" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <span class="govuk-caption-l">Software providers</span>
+    <h1 class="govuk-heading-l">Create new credentials</h1>
+
+    <form method="post" action="/{{ version }}/client-credentials/create" novalidate>
+
+      {{ govukInput({
+        id: "softwareProvider",
+        name: "softwareProvider",
+        label: { text: "Software provider name", classes: "govuk-label--s" },
+        hint: { text: "If the provider has more than one piece of software, add the software name in brackets. For example, Example Software Ltd (Example Collect)." },
+        value: values.softwareProvider,
+        errorMessage: { text: errors.softwareProvider } if errors.softwareProvider else undefined,
+        autocomplete: "off"
+      }) }}
+
+      {{ govukInput({
+        id: "clientName",
+        name: "clientName",
+        label: { text: "Client name", classes: "govuk-label--s" },
+        hint: { text: "Use upper and lower case letters and underscores only. For example, Example_Collect_Test." },
+        classes: "govuk-!-width-two-thirds",
+        value: values.clientName,
+        errorMessage: { text: errors.clientName } if errors.clientName else undefined,
+        autocomplete: "off",
+        spellcheck: false
+      }) }}
+
+      {{ govukRadios({
+        idPrefix: "environment",
+        name: "environment",
+        fieldset: { legend: { text: "Environment", classes: "govuk-fieldset__legend--s" } },
+        items: [
+          { value: "Test", text: "Test", checked: values.environment === "Test" },
+          { value: "Production", text: "Production", checked: values.environment === "Production" }
+        ],
+        errorMessage: { text: errors.environment } if errors.environment else undefined
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Save and generate credentials" }) }}
+        <a class="govuk-link" href="/{{ version }}/software-providers">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,9 +1,12 @@
 //
-// Software provider records for version 3.
+// Software provider records — shared helpers for the versions that have this
+// feature (currently v3 and v4).
 //
-// There is no backend. Providers live in the kit's session data
-// (`req.session.data.softwareProviders`), so every participant starts with an
-// empty list and "Clear data" in the footer resets it between sessions.
+// There is no backend. Each version keeps its own list in the kit's session
+// data (a separate `req.session.data` key per version — see routes.js), so
+// adding a provider in one version never shows up in another, and every
+// participant starts with an empty list; "Clear data" in the footer resets
+// it between sessions.
 //
 
 const { randomUUID, randomBytes } = require('crypto')
@@ -46,7 +49,8 @@ function newProvider (values, now = new Date()) {
   }
 }
 
-// Fixed example data for the filled-state page (/v3/software-providers/example).
+// Fixed example data for each version's filled-state page
+// (e.g. /v3/software-providers/example, /v4/software-providers/example).
 // Deliberately hard-coded rather than generated, so screenshots and demos look
 // the same every time. The company names are fictional.
 const exampleProviders = [
@@ -120,8 +124,8 @@ function isExample (provider) {
   return exampleProviders.some((p) => p.id === provider.id)
 }
 
-function listPath (provider) {
-  return isExample(provider) ? '/v3/software-providers/example' : '/v3/software-providers'
+function listPath (provider, version) {
+  return isExample(provider) ? `/${version}/software-providers/example` : `/${version}/software-providers`
 }
 
 function toRow (provider) {
@@ -153,7 +157,7 @@ function toDetail (provider, version) {
     emails: provider.emails || [],
     notes: toNotes(provider),
     apiKeyRows: toApiKeyRows(provider, version),
-    listHref: listPath(provider)
+    listHref: listPath(provider, version)
   }
 }
 

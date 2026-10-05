@@ -9,6 +9,7 @@ const router = govukPrototypeKit.requests.setupRouter()
 const patSubmissions = require('./data/pat-submissions')
 const reg = require('./data/regulators-data')
 const sp = require('./data/software-providers')
+const cc = require('./data/client-credentials')
 const { paginate } = require('./data/pagination')
 const {
   formatDateObj,
@@ -643,6 +644,606 @@ function registerV3Routes () {
 }
 
 registerV3Routes()
+
+// --- Version 4 -------------------------------------------------------------
+// An identical copy of version 3, as the starting point for the next round of
+// changes. It has its own function, and its own session data key for
+// software providers, so version 3 stays frozen while version 4 is edited.
+function registerV4Routes () {
+  const base = '/v4'
+  const view = (page) => `v4/${page}`
+
+  router.use(base, (req, res, next) => {
+    res.locals.version = 'v4'
+    next()
+  })
+
+  // Providers are held in session data — no backend. See data/software-providers.js.
+  function providerList (req) {
+    if (!Array.isArray(req.session.data.softwareProvidersV4)) {
+      req.session.data.softwareProvidersV4 = []
+    }
+    return req.session.data.softwareProvidersV4
+  }
+
+  // Client credentials created in this session (newest last). Shown above the
+  // fixed dummy rows. See data/client-credentials.js.
+  function credentialList (req) {
+    if (!Array.isArray(req.session.data.clientCredentialsV4)) {
+      req.session.data.clientCredentialsV4 = []
+    }
+    return req.session.data.clientCredentialsV4
+  }
+
+  function emptyForm () {
+    return { companyName: '', emails: [''], notes: '' }
+  }
+
+  function renderAdd (res, options) {
+    res.render(view('software-providers/add'), Object.assign({
+      maxEmails: sp.MAX_EMAILS,
+      errors: {},
+      errorList: [],
+      focus: null
+    }, options))
+  }
+
+  // --- Reporting (unchanged from version 2) --------------------------------
+
+  router.get(`${base}/regulators`, (req, res) => {
+    const filtered = hasDateFilter(req.query)
+    const period = filtered ? lenientPeriod(req.query) : emptyPeriod
+    const orgs = filtered
+      ? reg.listRegisteredInPeriod(period.from, period.to)
+      : reg.listAllOrganisations()
+    const { rows, pagination, total } = paginate(mapOrgRows(orgs), req.query.page, {
+      path: `${base}/regulators`,
+      query: req.query,
+      itemName: 'organisations'
+    })
+    res.render(view('regulators/index'), {
+      period,
+      rows,
+      count: total,
+      filtered,
+      periodLabel: filtered ? periodLabel(period) : null,
+      pagination
+    })
+  })
+
+  // --- Software providers --------------------------------------------------
+
+  function requireProvider (req, res) {
+    const provider = sp.findProvider(providerList(req), req.params.id)
+    if (!provider) {
+      res.redirect(`${base}/software-providers`)
+      return null
+    }
+    return provider
+  }
+
+  // The list is a single table of client credentials: any created in this
+  // session, then the fixed dummy rows (data/client-credentials.js).
+  router.get(`${base}/software-providers`, (req, res) => {
+    res.render(view('software-providers/index'), {
+      credentials: cc.allCredentials(credentialList(req))
+    })
+  })
+
+  // Kept so old links still work. The list always shows example data now, so
+  // this renders exactly the same page as the real list.
+  router.get(`${base}/software-providers/example`, (req, res) => {
+    res.render(view('software-providers/index'), {
+      credentials: cc.allCredentials(credentialList(req))
+    })
+  })
+
+  // --- Client credentials ---------------------------------------------------
+  //
+  // "Create new credentials": one form, then a page that shows the generated
+  // client secret once. The credential is saved when the form is submitted;
+  // the secret is only kept until the user closes the second page. These sit
+  // before the `/software-providers/:id` routes below.
+
+  function renderCreateCredentials (res, options) {
+    res.render(view('client-credentials/create'), Object.assign({
+      environments: cc.ENVIRONMENTS,
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  router.get(`${base}/client-credentials/create`, (req, res) => {
+    renderCreateCredentials(res, {
+      values: { softwareProvider: '', clientName: '', environment: '' }
+    })
+  })
+
+  router.post(`${base}/client-credentials/create`, (req, res) => {
+    const values = {
+      softwareProvider: (req.body.softwareProvider || '').trim(),
+      clientName: (req.body.clientName || '').trim(),
+      environment: req.body.environment || ''
+    }
+    const errors = cc.validate(values, credentialList(req))
+    if (Object.keys(errors).length) {
+      return renderCreateCredentials(res, { values, errors, errorList: cc.errorList(errors) })
+    }
+
+    const credential = cc.newCredential(values)
+    credentialList(req).push(credential)
+    res.redirect(`${base}/client-credentials/${credential.id}/created`)
+  })
+
+  // The one-time reveal. Once closed there is nothing left to show, so this
+  // sends the user back to the table rather than showing the secret again.
+  router.get(`${base}/client-credentials/:id/created`, (req, res) => {
+    const credential = cc.findCredential(credentialList(req), req.params.id)
+    if (!credential || !credential.pendingSecret) {
+      return res.redirect(`${base}/software-providers`)
+    }
+    res.render(view('client-credentials/created'), { credential })
+  })
+
+  router.post(`${base}/client-credentials/:id/created`, (req, res) => {
+    const credential = cc.findCredential(credentialList(req), req.params.id)
+    if (credential) delete credential.pendingSecret
+    res.redirect(`${base}/software-providers`)
+  })
+
+  // Not designed yet — goes to the placeholder page.
+  router.get(`${base}/client-credentials/:id/rotate`, (req, res) => {
+    res.render(view('placeholder'), {
+      heading: 'Rotate client secret',
+      activeSection: 'providers'
+    })
+  })
+
+  router.get(`${base}/software-providers/add`, (req, res) => {
+    renderAdd(res, { values: emptyForm() })
+  })
+
+  // One form, three submit buttons: add an email field, remove one, or save.
+  // "Add another" and "Remove" are handled here rather than in the browser so
+  // the 5-address maximum produces a real error summary.
+  router.post(`${base}/software-providers/add`, (req, res) => {
+    const values = {
+      companyName: (req.body.companyName || '').trim(),
+      emails: sp.toArray(req.body.email),
+      notes: req.body.notes || ''
+    }
+    if (!values.emails.length) values.emails = ['']
+
+    const emailAction = sp.applyEmailActions(values, req.body)
+    if (emailAction.action === 'remove' || emailAction.action === 'add') {
+      return renderAdd(res, { values, focus: emailAction.focus })
+    }
+    if (emailAction.action === 'tooMany') {
+      return renderAdd(res, {
+        values,
+        errors: emailAction.errors,
+        errorList: sp.errorList(emailAction.errors)
+      })
+    }
+
+    const errors = sp.validate(values)
+    if (Object.keys(errors).length) {
+      return renderAdd(res, { values, errors, errorList: sp.errorList(errors) })
+    }
+
+    providerList(req).push(sp.newProvider(values))
+    res.redirect(`${base}/software-providers`)
+  })
+
+  // --- Company detail and change pages -------------------------------------
+
+  router.get(`${base}/software-providers/:id`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    res.render(view('software-providers/detail'), sp.toDetail(provider, 'v4'))
+  })
+
+  router.get(`${base}/software-providers/:id/change-name`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    res.render(view('software-providers/change-name'), {
+      provider: sp.toDetail(provider, 'v4'),
+      values: { companyName: provider.companyName },
+      errors: {},
+      errorList: []
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/change-name`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const values = { companyName: (req.body.companyName || '').trim() }
+    const errors = sp.validate(values, { fields: ['companyName'] })
+    if (Object.keys(errors).length) {
+      return res.render(view('software-providers/change-name'), {
+        provider: sp.toDetail(provider, 'v4'),
+        values,
+        errors,
+        errorList: sp.errorList(errors)
+      })
+    }
+    sp.updateCompanyName(provider, values.companyName)
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+
+  function renderChangeEmails (res, provider, options) {
+    res.render(view('software-providers/change-emails'), Object.assign({
+      provider: sp.toDetail(provider, 'v4'),
+      maxEmails: sp.MAX_EMAILS,
+      errors: {},
+      errorList: [],
+      focus: null
+    }, options))
+  }
+
+  router.get(`${base}/software-providers/:id/change-emails`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    renderChangeEmails(res, provider, {
+      values: { emails: (provider.emails || []).slice() }
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/change-emails`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const values = { emails: sp.toArray(req.body.email) }
+    if (!values.emails.length) values.emails = ['']
+
+    const emailAction = sp.applyEmailActions(values, req.body)
+    if (emailAction.action === 'remove' || emailAction.action === 'add') {
+      return renderChangeEmails(res, provider, { values, focus: emailAction.focus })
+    }
+    if (emailAction.action === 'tooMany') {
+      return renderChangeEmails(res, provider, {
+        values,
+        errors: emailAction.errors,
+        errorList: sp.errorList(emailAction.errors)
+      })
+    }
+
+    const errors = sp.validate(values, { fields: ['emails'] })
+    if (Object.keys(errors).length) {
+      return renderChangeEmails(res, provider, {
+        values,
+        errors,
+        errorList: sp.errorList(errors)
+      })
+    }
+
+    sp.updateEmails(provider, values.emails)
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+
+  // --- API keys -------------------------------------------------------------
+  //
+  // One route generates a key and doubles as both "Create" (no key yet) and
+  // "Rotate API key" (one already exists) — both actions do the same thing:
+  // make a new secret and show it once. A second route is the one-time
+  // reveal page itself; a third lets the application name be changed without
+  // touching the secret.
+
+  function requireApiKeyEnvironment (req, res, provider) {
+    const environment = sp.findEnvironment(req.params.environment)
+    if (!environment) {
+      res.redirect(`${base}/software-providers/${provider.id}`)
+      return null
+    }
+    return environment
+  }
+
+  function renderGenerate (res, provider, environment, options) {
+    res.render(view('software-providers/api-key-generate'), Object.assign({
+      provider: sp.toDetail(provider, 'v4'),
+      environment,
+      rotating: sp.hasApiKey(provider, environment.key),
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  router.get(`${base}/software-providers/:id/api-keys/:environment/generate`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    renderGenerate(res, provider, environment, {
+      values: { applicationName: sp.apiKeyFor(provider, environment.key).applicationName || '' }
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/api-keys/:environment/generate`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+
+    // Rotating: the page has no application name field (the name is not
+    // changing, only the secret), so there is nothing to validate — keep
+    // the name already on record and generate a new key straight away.
+    if (sp.hasApiKey(provider, environment.key)) {
+      const applicationName = sp.apiKeyFor(provider, environment.key).applicationName
+      sp.createOrRotateApiKey(provider, environment.key, applicationName)
+      return res.redirect(`${base}/software-providers/${provider.id}/api-keys/${environment.key}`)
+    }
+
+    const values = { applicationName: (req.body.applicationName || '').trim() }
+    const errors = sp.validateApplicationName(values)
+    if (Object.keys(errors).length) {
+      return renderGenerate(res, provider, environment, {
+        values,
+        errors,
+        errorList: [{ text: errors.applicationName, href: '#applicationName' }]
+      })
+    }
+
+    sp.createOrRotateApiKey(provider, environment.key, values.applicationName)
+    res.redirect(`${base}/software-providers/${provider.id}/api-keys/${environment.key}`)
+  })
+
+  // The one-time reveal. If there is nothing unrevealed to show — no key yet,
+  // or this key has already been closed once — there is nothing for this
+  // page to do, so it sends the user back to the record rather than erroring.
+  router.get(`${base}/software-providers/:id/api-keys/:environment`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    const record = sp.apiKeyFor(provider, environment.key)
+    if (!record.apiKey || record.revealed) {
+      return res.redirect(`${base}/software-providers/${provider.id}`)
+    }
+    res.render(view('software-providers/api-key-reveal'), {
+      provider: sp.toDetail(provider, 'v4'),
+      environment,
+      apiKey: record.apiKey,
+      errors: {},
+      errorList: []
+    })
+  })
+
+  // "Close": only proceeds once the checkbox confirms the key has been
+  // copied or saved, per the GOV.UK/WCAG pattern for a one-time secret.
+  router.post(`${base}/software-providers/:id/api-keys/:environment`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    const record = sp.apiKeyFor(provider, environment.key)
+    if (!record.apiKey || record.revealed) {
+      return res.redirect(`${base}/software-providers/${provider.id}`)
+    }
+
+    if (!sp.isCheckboxTicked(req.body.confirmSaved)) {
+      const message = 'Select the checkbox to confirm you have copied or saved this API key'
+      return res.render(view('software-providers/api-key-reveal'), {
+        provider: sp.toDetail(provider, 'v4'),
+        environment,
+        apiKey: record.apiKey,
+        errors: { confirmSaved: message },
+        errorList: [{ text: message, href: '#confirmSaved' }]
+      })
+    }
+
+    sp.revealApiKey(provider, environment.key)
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+
+  function renderChangeApplicationName (res, provider, environment, options) {
+    res.render(view('software-providers/api-key-change-application-name'), Object.assign({
+      provider: sp.toDetail(provider, 'v4'),
+      environment,
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  router.get(`${base}/software-providers/:id/api-keys/:environment/change-application-name`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    if (!sp.hasApiKey(provider, environment.key)) {
+      return res.redirect(`${base}/software-providers/${provider.id}`)
+    }
+    renderChangeApplicationName(res, provider, environment, {
+      values: { applicationName: sp.apiKeyFor(provider, environment.key).applicationName }
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/api-keys/:environment/change-application-name`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    if (!sp.hasApiKey(provider, environment.key)) {
+      return res.redirect(`${base}/software-providers/${provider.id}`)
+    }
+
+    const values = { applicationName: (req.body.applicationName || '').trim() }
+    const errors = sp.validateApplicationName(values)
+    if (Object.keys(errors).length) {
+      return renderChangeApplicationName(res, provider, environment, {
+        values,
+        errors,
+        errorList: [{ text: errors.applicationName, href: '#applicationName' }]
+      })
+    }
+
+    sp.updateApiKeyApplicationName(provider, environment.key, values.applicationName)
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+
+  // A confirmation step, not an immediate action from the table: deleting is
+  // destructive (any application using the key stops working, and there is
+  // no undo) and a stray click should not be able to trigger it.
+  router.get(`${base}/software-providers/:id/api-keys/:environment/delete`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    if (!sp.hasApiKey(provider, environment.key)) {
+      return res.redirect(`${base}/software-providers/${provider.id}`)
+    }
+    res.render(view('software-providers/api-key-delete'), {
+      provider: sp.toDetail(provider, 'v4'),
+      environment
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/api-keys/:environment/delete`, (req, res) => {
+    const provider = requireProvider(req, res)
+    if (!provider) return
+    const environment = requireApiKeyEnvironment(req, res, provider)
+    if (!environment) return
+    if (sp.hasApiKey(provider, environment.key)) {
+      sp.deleteApiKey(provider, environment.key)
+    }
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+}
+
+registerV4Routes()
+
+// --- Version 4.1 -----------------------------------------------------------
+// A sub-version of version 4. Test and Production credentials are on separate
+// pages, and "Create new credentials" starts from the page the user is on, so
+// the create form does not ask for the environment. It has its own function
+// and its own session data key, so version 4 stays frozen while this is edited.
+// Only the pages a user can reach are included (no add, detail or API key pages).
+function registerV41Routes () {
+  const base = '/v4-1'
+  const view = (page) => `v4-1/${page}`
+
+  router.use(base, (req, res, next) => {
+    res.locals.version = 'v4-1'
+    next()
+  })
+
+  // Credentials created in this session (newest last). See data/client-credentials.js.
+  function credentialList (req) {
+    if (!Array.isArray(req.session.data.clientCredentialsV41)) {
+      req.session.data.clientCredentialsV41 = []
+    }
+    return req.session.data.clientCredentialsV41
+  }
+
+  // The environment comes from the URL: /test or /production.
+  function environmentFor (key) {
+    const match = cc.ENVIRONMENTS.find((e) => e.value.toLowerCase() === key)
+    return match ? { key: match.value.toLowerCase(), label: match.value } : null
+  }
+
+  // --- Reporting (same as version 4) -----------------------------------------
+
+  router.get(`${base}/regulators`, (req, res) => {
+    const filtered = hasDateFilter(req.query)
+    const period = filtered ? lenientPeriod(req.query) : emptyPeriod
+    const orgs = filtered
+      ? reg.listRegisteredInPeriod(period.from, period.to)
+      : reg.listAllOrganisations()
+    const { rows, pagination, total } = paginate(mapOrgRows(orgs), req.query.page, {
+      path: `${base}/regulators`,
+      query: req.query,
+      itemName: 'organisations'
+    })
+    res.render(view('regulators/index'), {
+      period,
+      rows,
+      count: total,
+      filtered,
+      periodLabel: filtered ? periodLabel(period) : null,
+      pagination
+    })
+  })
+
+  // --- Software providers --------------------------------------------------
+
+  // The navigation links here, so it goes to the Test page.
+  router.get(`${base}/software-providers`, (req, res) => {
+    res.redirect(`${base}/software-providers/test`)
+  })
+
+  router.get(`${base}/software-providers/:environment`, (req, res) => {
+    const environment = environmentFor(req.params.environment)
+    if (!environment) return res.redirect(`${base}/software-providers/test`)
+    res.render(view('software-providers/index'), {
+      environment,
+      credentials: cc.allCredentials(credentialList(req))
+        .filter((c) => c.environment === environment.label)
+    })
+  })
+
+  // --- Client credentials ---------------------------------------------------
+
+  function renderCreateCredentials (res, environment, options) {
+    res.render(view('client-credentials/create'), Object.assign({
+      environment,
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  router.get(`${base}/client-credentials/:environment/create`, (req, res) => {
+    const environment = environmentFor(req.params.environment)
+    if (!environment) return res.redirect(`${base}/software-providers/test`)
+    renderCreateCredentials(res, environment, {
+      values: { softwareProvider: '', clientName: '' }
+    })
+  })
+
+  router.post(`${base}/client-credentials/:environment/create`, (req, res) => {
+    const environment = environmentFor(req.params.environment)
+    if (!environment) return res.redirect(`${base}/software-providers/test`)
+    const values = {
+      softwareProvider: (req.body.softwareProvider || '').trim(),
+      clientName: (req.body.clientName || '').trim()
+    }
+    // The environment is set from the page the user started on, not the form.
+    const errors = cc.validate(Object.assign({ environment: environment.label }, values), credentialList(req))
+    if (Object.keys(errors).length) {
+      return renderCreateCredentials(res, environment, { values, errors, errorList: cc.errorList(errors) })
+    }
+
+    const credential = cc.newCredential(Object.assign({ environment: environment.label }, values))
+    credentialList(req).push(credential)
+    res.redirect(`${base}/client-credentials/${credential.id}/created`)
+  })
+
+  // The one-time reveal. Once closed there is nothing left to show, so this
+  // sends the user back to the list rather than showing the secret again.
+  router.get(`${base}/client-credentials/:id/created`, (req, res) => {
+    const credential = cc.findCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers/test`)
+    if (!credential.pendingSecret) {
+      return res.redirect(`${base}/software-providers/${credential.environment.toLowerCase()}`)
+    }
+    res.render(view('client-credentials/created'), { credential })
+  })
+
+  // Closing returns to the page for the environment the credentials were created in.
+  router.post(`${base}/client-credentials/:id/created`, (req, res) => {
+    const credential = cc.findCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers/test`)
+    delete credential.pendingSecret
+    res.redirect(`${base}/software-providers/${credential.environment.toLowerCase()}`)
+  })
+
+  // Not designed yet — goes to the placeholder page.
+  router.get(`${base}/client-credentials/:id/rotate`, (req, res) => {
+    res.render(view('placeholder'), {
+      heading: 'Rotate client secret',
+      activeSection: 'providers'
+    })
+  })
+}
+
+registerV41Routes()
 
 function redirectToV1 (req, res) {
   const qs = new URLSearchParams(req.query).toString()

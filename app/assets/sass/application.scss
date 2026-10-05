@@ -357,6 +357,21 @@ $app-page-width: 1200px;
   margin-bottom: 15px;
 }
 
+// A Copy button with its "copied" message beside it (Credentials created page).
+// Flex with centred items keeps the message level with the middle of the button
+// whatever the text size. Flex would override the `hidden` attribute (used to
+// hide the button until JavaScript runs), so hidden is restated.
+.app-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 15px;
+}
+
+.app-copy[hidden] {
+  display: none;
+}
+
 .app-api-key-panel__actions {
   justify-content: center;
   margin-bottom: 0;

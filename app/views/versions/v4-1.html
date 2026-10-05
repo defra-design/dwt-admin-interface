@@ -1,0 +1,90 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 4.1" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 4.1
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 5 October 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 4.1</span>',
+        href: "/v4-1/start",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A sub-version of version 4. It has the same start page, waste organisations report and “Create new credentials” journey, except for the changes below. The pages from version 3 that nothing links to (add a software provider, provider detail and API keys) are not included." },
+          { text: "Tests a different way of organising credentials without changing version 4." },
+          { html: '<a class="govuk-link" href="/v4-1/start">/v4-1/start</a>' }
+        ],
+        [
+          { text: "Software providers" },
+          { text: "Test and Production credentials are on separate pages, switched with the MoJ sub navigation. Each page has its own “Create new credentials” button and a table of that environment’s clients. The Environment column is removed from the table, because every row on a page has the same value. The “Software providers” link in the navigation goes to the Test page." },
+          { text: "Decision to separate the environments, so that users work in one environment at a time and cannot mix up Test and Production credentials." },
+          { html: '<a class="govuk-link" href="/v4-1/software-providers/test">/v4-1/software-providers/test</a><br><a class="govuk-link" href="/v4-1/software-providers/production">/v4-1/software-providers/production</a>' }
+        ],
+        [
+          { text: "Create new credentials" },
+          { text: "The Environment question is removed from the form. The environment is set from the page the user started on, and named in the heading (“Create new test credentials” or “Create new production credentials”). “Close and save” returns to the page for that environment." },
+          { text: "The user has already chosen the environment by starting from its page, so asking again is repeating a question." },
+          { html: '<a class="govuk-link" href="/v4-1/client-credentials/test/create">/v4-1/client-credentials/test/create</a><br><a class="govuk-link" href="/v4-1/client-credentials/production/create">/v4-1/client-credentials/production/create</a>' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">Apart from the changes above, design decisions are the same as in
+      <a class="govuk-link" href="/versions/v4#design-rationale">version 4</a>.</p>
+
+    <p class="govuk-body">Separating the environments makes the environment part of where the user is, not a
+      question to answer or a column to read. The MoJ sub navigation shows which environment is selected and
+      lets the user switch. It is a link list, so it works without JavaScript.</p>
+
+    <p class="govuk-body">This version has its own session data. Credentials created in this version are not
+      shown in version 4, and the other way round.</p>
+
+  </div>
+</div>
+{% endblock %}

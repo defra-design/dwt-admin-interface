@@ -1,0 +1,78 @@
+{#
+  The one-time reveal, as a GOV.UK confirmation page: this is the end of the
+  "Create"/"Rotate" journey (routes.js) and, like a confirmation page, there
+  is a single important thing to walk away with — here the key itself,
+  rather than a reference number, so it sits inside the panel with its copy
+  button. No back link: there is nothing to go back to, and a fresh secret
+  has already been generated.
+  https://design-system.service.gov.uk/patterns/confirmation-pages/
+
+  Below the panel, the checkbox still forces the user to explicitly confirm
+  they've copied or saved the key before "Close" will work — the WCAG
+  pattern for a one-time, unrecoverable value (G155), and the same
+  declaration-checkbox wording approach as the Home Office design system's
+  guidance on confirmations ("I confirm that...").
+  https://www.w3.org/WAI/WCAG22/Techniques/general/G155.html
+  https://design.homeoffice.gov.uk/design-system/patterns/ask-users-for/declarations
+#}
+{% extends "layouts/v4.html" %}
+
+{% set version = "v4" %}
+{% set pageName = (environment.label + " API key created") %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <span class="govuk-caption-l">{{ provider.companyName }}</span>
+
+    {% set panelHtml %}
+      <span id="generated-api-key" class="app-api-key app-api-key--panel">{{ apiKey }}</span>
+      <div class="govuk-button-group app-api-key-panel__actions">
+        {{ govukButton({
+          text: "Copy API key",
+          classes: "govuk-button--secondary",
+          type: "button",
+          attributes: { "data-copy-target": "generated-api-key" }
+        }) }}
+      </div>
+    {% endset %}
+
+    {{ govukPanel({
+      titleText: environment.label + " API key created",
+      html: panelHtml
+    }) }}
+
+    <span class="app-copy-status govuk-body" role="status" aria-live="polite"></span>
+
+    {{ govukWarningText({
+      text: "You can only see this API key once. Copy it now and store it somewhere secure. If you lose it, you'll need to generate a new one.",
+      iconFallbackText: "Warning"
+    }) }}
+
+    <form method="post" action="/{{ version }}/software-providers/{{ provider.id }}/api-keys/{{ environment.key }}" novalidate>
+
+      {{ govukCheckboxes({
+        name: "confirmSaved",
+        items: [
+          {
+            id: "confirmSaved",
+            value: "true",
+            text: "I confirm that I have copied or saved this API key"
+          }
+        ],
+        errorMessage: { text: errors.confirmSaved } if errors.confirmSaved else undefined
+      }) }}
+
+      {{ govukButton({ text: "Close" }) }}
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

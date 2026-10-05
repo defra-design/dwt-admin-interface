@@ -1,0 +1,73 @@
+{#
+  Two rather different pages sharing one route: "Create" (no key exists yet
+  for this environment) asks for an application name, because none has been
+  set before. "Rotate API key" (one already does) does not — the name is
+  kept as it is, only the secret changes — so it goes straight to a warning
+  and a single, explicitly-worded button, following GOV.UK content guidance
+  to name the consequence in a destructive button rather than a generic
+  "Continue". `rotating` (see routes.js) switches between the two.
+  https://design-system.service.gov.uk/styles/writing-well/
+#}
+{% extends "layouts/v4.html" %}
+
+{% set version = "v4" %}
+{% set pageName = (environment.label + " API key") %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/" + version + "/software-providers/" + provider.id }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <span class="govuk-caption-l">{{ provider.companyName }}</span>
+
+    {% if rotating %}
+
+      <h1 class="govuk-heading-l">Generate a new {{ environment.label | lower }} API key</h1>
+
+      {{ govukWarningText({
+        text: "If you continue, the current " + (environment.label | lower) + " API key will be deleted and will stop working immediately. Any application still using it will need the new key.",
+        iconFallbackText: "Warning"
+      }) }}
+
+      <form method="post" action="/{{ version }}/software-providers/{{ provider.id }}/api-keys/{{ environment.key }}/generate" novalidate>
+        <div class="govuk-button-group">
+          {{ govukButton({ text: "Delete current key and generate new API key", classes: "govuk-button--warning" }) }}
+          <a class="govuk-link" href="/{{ version }}/software-providers/{{ provider.id }}">Cancel</a>
+        </div>
+      </form>
+
+    {% else %}
+
+      <h1 class="govuk-heading-l">Create a {{ environment.label | lower }} API key</h1>
+
+      <form method="post" action="/{{ version }}/software-providers/{{ provider.id }}/api-keys/{{ environment.key }}/generate" novalidate>
+
+        {{ govukInput({
+          id: "applicationName",
+          name: "applicationName",
+          label: { text: "Application name", classes: "govuk-label--s" },
+          hint: { text: "The name of the application that will use this key, so it can be recognised later." },
+          value: values.applicationName,
+          errorMessage: { text: errors.applicationName } if errors.applicationName else undefined
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({ text: "Save and generate API key" }) }}
+          <a class="govuk-link" href="/{{ version }}/software-providers/{{ provider.id }}">Cancel</a>
+        </div>
+
+      </form>
+
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

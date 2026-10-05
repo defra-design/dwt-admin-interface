@@ -1,0 +1,40 @@
+{#
+  A confirmation step rather than deleting straight from the table: this is
+  destructive (any application using the key stops working immediately, and
+  there is no undo — someone would need to create a new key and update the
+  application with it), so it follows the same pattern as the "Rotate" page:
+  state the consequence, then a button that names the action rather than a
+  generic "Continue" or "Confirm".
+#}
+{% extends "layouts/v4.html" %}
+
+{% set version = "v4" %}
+{% set pageName = ("Delete " + environment.label + " API key") %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/" + version + "/software-providers/" + provider.id }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">{{ provider.companyName }}</span>
+    <h1 class="govuk-heading-l">Delete the {{ environment.label | lower }} API key?</h1>
+
+    {{ govukWarningText({
+      text: "This API key will stop working immediately. Any application still using it will need a new key.",
+      iconFallbackText: "Warning"
+    }) }}
+
+    <form method="post" action="/{{ version }}/software-providers/{{ provider.id }}/api-keys/{{ environment.key }}/delete" novalidate>
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Delete API key", classes: "govuk-button--warning" }) }}
+        <a class="govuk-link" href="/{{ version }}/software-providers/{{ provider.id }}">Cancel</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}
