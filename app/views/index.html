@@ -1,6 +1,6 @@
 {% extends "layouts/prototype-hub.html" %}
 
-{% set pageName = "Prototypes of the Waste Management Admin Portal" %}
+{% set pageName = "Waste Management Admin Portal" %}
 
 {% block beforeContent %}
   {{ govukPhaseBanner({
@@ -13,7 +13,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <h1 class="govuk-heading-xl">Prototypes of the Waste Management Admin Portal</h1>
+    <h1 class="govuk-heading-xl">Waste Management Admin Portal</h1>
 
     <p class="govuk-body">This page is the index for different versions of the prototype for the Waste Management Admin Portal.</p>
 
@@ -30,8 +30,34 @@
     <div class="govuk-summary-card">
       <div class="govuk-summary-card__title-wrapper">
         <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 4.1
+          Version 4.2
           {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+        </h3>
+      </div>
+      <div class="govuk-summary-card__content">
+        <div>
+          {{ govukButton({
+            html: 'View prototype<span class="govuk-visually-hidden"> for version 4.2</span>',
+            href: "/v4-2/start",
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+
+        <p class="govuk-body-s">
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 6 October 2026<br>
+          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-body-s">
+          <li><a class="govuk-link" href="/versions/v4-2">Changes and design rationale for version 4.2</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
+          Version 4.1
         </h3>
       </div>
       <div class="govuk-summary-card__content">

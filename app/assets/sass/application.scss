@@ -372,6 +372,20 @@ $app-page-width: 1200px;
   display: none;
 }
 
+// Client ID and client secret together in one grey block (Credentials created,
+// version 4.2). Nothing in GOV.UK Frontend shows a block of text to copy.
+// Each value is on its own line, which `white-space: pre-wrap` keeps, so the
+// text copied to the clipboard has the same line break when pasted into an email.
+.app-credentials-block {
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background-color: #f3f2f1; // GOV.UK light grey
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+}
+
 .app-api-key-panel__actions {
   justify-content: center;
   margin-bottom: 0;

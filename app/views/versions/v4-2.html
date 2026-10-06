@@ -1,0 +1,111 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 4.2" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 4.2
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 6 October 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 4.2</span>',
+        href: "/v4-2/start",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A sub-version of version 4.1. It has the same start page, waste organisations report and Test and Production pages, except for the changes below." },
+          { text: "Builds on the version 4.1 design without changing it." },
+          { html: '<a class="govuk-link" href="/v4-2/start">/v4-2/start</a>' }
+        ],
+        [
+          { text: "Software providers" },
+          { text: "The Software provider column is removed from the Test and Production tables. A “Last changed” column is added as the last column. It shows the date and time the credentials were created, or last changed (client name edited or client secret rotated), for example “6 October 2026 at 2:47pm”. Each client name has an “Edit” link." },
+          { text: "The software provider is no longer a separate field. The client name now holds the software provider and software name. The date and time follow the GOV.UK style guide (day month year, 12-hour clock with am and pm). A last changed date helps admins see which credentials are recent or stale. Editing a name has to be possible from the table because names are typed by hand." },
+          { html: '<a class="govuk-link" href="/v4-2/software-providers/test">/v4-2/software-providers/test</a><br><a class="govuk-link" href="/v4-2/software-providers/production">/v4-2/software-providers/production</a>' }
+        ],
+        [
+          { text: "Generate credentials" },
+          { text: "The Software provider name field is removed. The client name is now the only question and the page heading: “What is the client name?”. The hint asks for the software provider name and the software name, with the example Waste_Technologies_Software. The caption is “Generate test credentials” or “Generate production credentials”." },
+          { text: "The software provider name no longer exists as a field. The caption names the task and the environment the user chose on the previous page. With one question on the page, the label is the page heading (GOV.UK Design System, question pages)." },
+          { html: '<a class="govuk-link" href="/v4-2/client-credentials/test/create">/v4-2/client-credentials/test/create</a><br><a class="govuk-link" href="/v4-2/client-credentials/production/create">/v4-2/client-credentials/production/create</a>' }
+        ],
+        [
+          { text: "Copy the client credentials" },
+          { text: "The Client ID and Client secret, with their labels, are in one grey block with one Copy button. The heading is “Copy the client credentials” (was “Credentials created”) and the caption is “Generate test credentials” or “Generate production credentials”. The Software provider row is removed from the summary." },
+          { text: "Users copy both values into one email, so one block and one button copies them in one step. The heading says what the user needs to do. The caption matches the previous page." },
+          { text: "Shown after “Save and generate credentials”." }
+        ],
+        [
+          { text: "Rotate client secret" },
+          { text: "“Rotate” gives a new client secret straight away and opens a page like “Copy the client credentials”, with the caption “Rotate test client secret” or “Rotate production client secret”. The Client ID does not change. “Close and save” returns to the table." },
+          { text: "Replaces the placeholder page, so the rotate journey can be tried." },
+          { text: "Shown after selecting “Rotate” in the table." }
+        ],
+        [
+          { text: "Edit client name" },
+          { text: "“Edit” opens the same page as Generate credentials, with the current client name filled in and the caption “Edit test credentials” or “Edit production credentials”. The button says “Save” and returns to the table. Saving a changed name updates “Last changed”. The Client ID does not change." },
+          { text: "Editing uses the same form as creating, so the two journeys are consistent." },
+          { text: "Shown after selecting “Edit” in the table." }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">Apart from the changes above, design decisions are the same as in
+      <a class="govuk-link" href="/versions/v4-1#design-rationale">version 4.1</a>.</p>
+
+    <p class="govuk-body">Create and edit use one page, so the journeys feel the same. The user is asked for
+      only the client name, with the software provider name and software name in the hint.</p>
+
+    <p class="govuk-body">The Client ID and Client secret are one block of text, so the user can copy it in one
+      step and paste it into an email. Without JavaScript the Copy button is hidden and the text can be selected
+      by hand.</p>
+
+    <p class="govuk-body">This version has its own session data. Credentials created in this version are not
+      shown in version 4, and the other way round.</p>
+
+  </div>
+</div>
+{% endblock %}
