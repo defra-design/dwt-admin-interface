@@ -1,0 +1,25 @@
+---
+description: WCAG 2.2 AA accessibility checklist for GOV.UK pages
+globs: **/*.html,**/*.njk
+alwaysApply: false
+---
+
+# Accessibility
+
+- [ ] Single `<h1>`, headings in sequential order, no skipped levels.
+- [ ] Every input has a real associated `<label>` — never placeholder text as a substitute.
+- [ ] Grouped inputs (radios, checkboxes, date parts) use a `fieldset`/`legend`.
+- [ ] Error summary at the top of the page, linking to each field; individual errors use the macro's `errorMessage`.
+- [ ] Link text describes the destination; use `visuallyHiddenText` where visual context won't reach a screen reader.
+- [ ] Focus styles are never removed or overridden.
+- [ ] Custom dynamic content that updates without a reload is wrapped in `aria-live="polite"`.
+- [ ] Images have appropriate `alt` text; decorative images use `alt=""`.
+- [ ] Buttons for actions, links for navigation (start button is the documented exception).
+
+```nunjucks
+{{ govukRadios({
+  name: "contact",
+  fieldset: { legend: { text: "How would you prefer to be contacted?", isPageHeading: true } },
+  items: [...]
+}) }}
+```

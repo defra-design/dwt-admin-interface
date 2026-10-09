@@ -1,0 +1,51 @@
+{#
+  Used to create credentials and to edit a client name (see routes.js), so the
+  two journeys look and behave the same. Only one question is asked, so the
+  label is the page heading. The caption names the task and the environment,
+  which the user already chose on the Test or Production page.
+  There is no software provider field: the client name holds the software
+  provider and software name.
+#}
+{% extends "layouts/v4-4.html" %}
+
+{% set version = "v4-4" %}
+{% set editing = (mode === "edit") %}
+{% set pageName = ("Edit " if editing else "Generate ") + (environment.label | lower) + " credentials" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <span class="govuk-caption-l">{{ environment.label }} credentials</span>
+
+    <h1 class="govuk-heading-l">What is the name of the software provider and application?</h1>
+
+    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id + '/edit' if editing else environment.key + '/create' }}" novalidate>
+
+      {{ govukInput({
+        id: "clientName",
+        name: "clientName",
+        label: { text: "Client name", classes: "govuk-label--s" },
+        hint: { text: "Enter the software provider name and the software name, using letters and underscores only. For example, Waste_Technologies_Software." },
+        classes: "govuk-!-width-two-thirds",
+        value: values.clientName,
+        errorMessage: { text: errors.clientName } if errors.clientName else undefined,
+        autocomplete: "off",
+        spellcheck: false
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Save" if editing else "Save and generate credentials" }) }}
+        <a class="govuk-link" href="/{{ version }}/software-providers/{{ environment.key }}">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

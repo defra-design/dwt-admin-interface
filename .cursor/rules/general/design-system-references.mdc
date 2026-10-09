@@ -1,0 +1,17 @@
+---
+description: Canonical GOV.UK and cross-government design system references
+alwaysApply: true
+---
+
+# Design system references
+
+Check the live documentation for component syntax, classes, spacing, typography, colours — don't rely on memory. If live browsing isn't available and something isn't covered in these rules, say so rather than stating a class name or hex value with false confidence.
+
+- Components: <https://design-system.service.gov.uk/components/>
+- Patterns: <https://design-system.service.gov.uk/patterns/>
+- Styles: <https://design-system.service.gov.uk/styles/>
+- GOV.UK style guide: <https://www.gov.uk/guidance/style-guide/a-to-z>
+- WCAG 2.2: <https://www.w3.org/TR/WCAG22/>
+- Prototype Kit docs: <https://prototype-kit.service.gov.uk/docs>
+
+Other departments maintain their own design systems — relevant if this prototype needs to be consistent with another department's service. Full list: <https://github.com/ctdesign/gov-design-systems-list>. Includes HMRC, Home Office, DWP, Ministry of Justice, NHS, among others. Defra's own resources are in the `defra` rules.

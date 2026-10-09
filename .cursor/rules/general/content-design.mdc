@@ -1,0 +1,30 @@
+---
+description: GOV.UK plain English and content style conventions
+globs: **/*.html,**/*.njk
+alwaysApply: false
+---
+
+# Content design
+
+Plain English is mandatory, including for specialist content.
+
+| Instead of | Use |
+| --- | --- |
+| purchase, assist, commence, utilise, terminate, facilitate | buy, help, start, use, end, help |
+| approximately, prior to, in order to, subsequently, regarding | about, before, to, then, about |
+| persons | people |
+
+Avoid: **Please**, **Please note**, "Thank you for…", **Click** (use "select"), "As part of our commitment to…", **Ensure** (use "make sure"), **Via** (use "through"/"by"), **i.e./e.g.** (use "that is"/"for example").
+
+Address the user as "you", the service as "we". Sentence case except proper nouns. Front-load headings/labels with the key word. Numbers 1–9 as words, 10+ as digits. Dates as "6 September 2024" (no ordinals). Money as "£50" (no ".00"). Percentages as "50%".
+
+Error messages: say what went wrong, how to fix it, reuse the label's wording.
+
+```nunjucks
+{{ govukInput({
+  label: { text: "Email address" },
+  errorMessage: { text: "Enter an email address in the correct format, like name@example.com" }
+}) }}
+```
+
+Hint text: what to enter (with an example), not why it's asked.

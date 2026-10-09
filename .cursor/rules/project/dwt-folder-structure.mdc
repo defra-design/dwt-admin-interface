@@ -1,0 +1,23 @@
+---
+description: Project-specific notes on this repo's folder structure and what to do when creating new work
+alwaysApply: true
+---
+
+# DWT folder structure
+
+The layout, new version steps and naming conventions are in `general/file-structure-and-versioning.mdc`. That file describes this repo — follow it. This file adds project-specific points only.
+
+- Structure is by **version** (`v1`–`v4`), then by **section** (`regulators/`, `software-providers/`). There are no phase or feature hubs, and no `designs.html` pages.
+- `app/views/index.html` is the only hub. Every new version needs a card there and a `versions/vN.html` page — don't leave new work unlinked.
+- Shared partials are allowed but are per version, with a leading underscore (e.g. `v4/software-providers/_email-addresses.html`, included with `{% include version + "/software-providers/_email-addresses.html" %}`). Copy them into the new version rather than pointing at an older one.
+- Versions intentionally duplicate near-identical pages (`v3/` and `v4/` are copies). Follow the pattern rather than unifying them, unless asked.
+- `v1` and `v2` are the research versions — treat as frozen.
+- Links to something not built point to the `placeholder.html` page in that version's folder (only `v1` and `v2` have one, rendered by the "dead links" route in `routes.js`). Copy it into a new version if you need it. Don't use `#` or a dead link.
+- `app/views/versions/vN.html` and `app/views/index.html` extend `layouts/prototype-hub.html`, not the in-service layout.
+
+## Creating new work
+
+- New version → follow "Starting a new version" in the general file.
+- New page in an existing version → `.html` in the relevant section folder, extending that version's layout, with `version`, `pageName` and `activeSection` set. Add its routes inside that version's `registerVNRoutes()`.
+- New section → new folder inside the version, plus a navigation item in `layouts/vN.html`.
+- No design yet → use the placeholder pattern above.

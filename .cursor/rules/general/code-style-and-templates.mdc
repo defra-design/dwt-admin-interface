@@ -1,0 +1,34 @@
+---
+description: Code formatting conventions and page-template scaffolding
+globs: **/*.html,**/*.njk,**/*.js
+alwaysApply: false
+---
+
+# Code style and templates
+
+2 spaces, no tabs, across Nunjucks/HTML/JS/Sass/JSON.
+
+- Complex logic belongs in `routes.js`, not the view — keep templates simple.
+- One question per page.
+- Match existing patterns in the codebase before introducing a new style.
+- Use includes for repeated content. Keep `data['field-name']` access consistent with the rest of the codebase.
+- Class order: component → modifier → width/sizing → spacing → display, e.g. `govuk-input govuk-input--error govuk-!-width-one-half govuk-!-margin-bottom-4`.
+
+Use the Prototype Kit's built-in templates (**Manage your prototype → Templates**) for standard page types.
+
+```nunjucks
+{% extends "layouts/v4.html" %}
+{% set version = "v4" %}
+{% set pageName = "Change company name" %}
+{% set activeSection = "providers" %}
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/" + version + "/software-providers/" + provider.id }) }}
+{% endblock %}
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds"><!-- content --></div>
+  </div>
+{% endblock %}
+```
+
+Links to pages that don't exist yet go to the version's `placeholder.html` page (see the project folder structure rule), not a dead link or a stubbed-out real page.

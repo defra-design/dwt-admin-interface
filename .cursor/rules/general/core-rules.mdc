@@ -1,0 +1,17 @@
+---
+description: Core non-negotiable rules for any GOV.UK Prototype Kit project
+alwaysApply: true
+---
+
+# Core rules
+
+1. All pages extend a layout — the version's own layout for in-service pages (e.g. `{% extends "layouts/v4.html" %}`), `layouts/prototype-hub.html` for hub pages. See the project rules.
+2. Use Nunjucks macros for GOV.UK components (e.g. `{{ govukButton({...}) }}`) — not raw HTML.
+3. Only use existing GOV.UK classes. No inline styles. Custom CSS only when nothing existing covers the need — add it to `app/assets/sass/application.scss` with an `app-` prefix, and note why in a comment.
+4. Build for progressive enhancement — the service must work without JavaScript first; JS enhances it, never a dependency for basic use.
+5. Accessibility is not optional. GOV.UK components are WCAG 2.2 AA compliant *when used correctly* — using them correctly is the AI's responsibility.
+6. If something isn't possible with existing components or patterns, say so. Don't improvise a workaround silently.
+
+## Data handling
+
+Prototype Kit session data is not secure storage. Never design a flow that assumes it's safe to store, email, or transmit real personal or business data. Use placeholder or synthetic data for anything realistic-looking used in demos or research.

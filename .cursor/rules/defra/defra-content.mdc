@@ -1,0 +1,11 @@
+---
+description: Defra-specific content style and terminology
+globs: **/*.html,**/*.njk
+alwaysApply: false
+---
+
+# Defra content
+
+Follow the GOV.UK style guide, plus the Defra style guide for Defra-specific words and patterns: <https://digital.defra.gov.uk/content/defra-style-guide>
+
+That guide is currently written mainly for livestock, agriculture, and flood terminology. If a project uses sector-specific terms it doesn't cover, agree the wording once with the project team and record it in that project's rules rather than inventing phrasing per page.

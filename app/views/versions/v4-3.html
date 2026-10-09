@@ -1,0 +1,73 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 4.3" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 4.3
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 9 October 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 4.3</span>',
+        href: "/v4-3/start",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A copy of version 4.2, with no changes yet." },
+          { text: "Starting point for the next set of changes." },
+          { html: '<a class="govuk-link" href="/v4-3/start">/v4-3/start</a>' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">Design decisions are the same as in
+      <a class="govuk-link" href="/versions/v4-2#design-rationale">version 4.2</a>, until changes are recorded here.</p>
+
+    <p class="govuk-body">This version has its own session data. Credentials created in this version are not
+      shown in version 4.2, and the other way round.</p>
+
+  </div>
+</div>
+{% endblock %}

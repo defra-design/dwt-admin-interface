@@ -1,0 +1,73 @@
+{#
+  One page for each environment: Test and Production. The MoJ sub navigation
+  switches between them. "Create new credentials" starts from the page the user
+  is on, so the create form does not ask for the environment.
+  https://design-patterns.service.justice.gov.uk/components/sub-navigation/
+
+  The table has no Software provider column: the client name holds the
+  software provider and software name. Each client name has an Edit link, and
+  "Last changed" is the last column (see routes.js for how it is formatted).
+#}
+{% extends "layouts/v4-3.html" %}
+
+{% set version = "v4-3" %}
+{% set pageName = environment.label + " credentials" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    <p class="govuk-body">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+  </div>
+</div>
+
+{{ mojSubNavigation({
+  label: "Environments",
+  items: [
+    {
+      text: "Test",
+      href: "/" + version + "/software-providers/test",
+      active: environment.key === "test"
+    },
+    {
+      text: "Production",
+      href: "/" + version + "/software-providers/production",
+      active: environment.key === "production"
+    }
+  ]
+}) }}
+
+{{ govukButton({
+  text: "Create new credentials",
+  href: "/" + version + "/client-credentials/" + environment.key + "/create",
+  classes: "govuk-button--secondary govuk-!-margin-bottom-7"
+}) }}
+
+<table class="govuk-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">{{ environment.label }} client credentials</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Client name</th>
+      <th scope="col" class="govuk-table__header">Client ID</th>
+      <th scope="col" class="govuk-table__header">Client secret</th>
+      <th scope="col" class="govuk-table__header">Last changed</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for credential in credentials %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">
+          {{ credential.clientName }}
+          <br><a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/edit">Edit<span class="govuk-visually-hidden"> client name for {{ credential.clientName }}</span></a>
+        </td>
+        <td class="govuk-table__cell">{{ credential.clientId }}</td>
+        <td class="govuk-table__cell">
+          <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/rotate">Rotate<span class="govuk-visually-hidden"> client secret for {{ credential.clientName }}</span></a>
+        </td>
+        <td class="govuk-table__cell">{{ credential.lastChangedLabel }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

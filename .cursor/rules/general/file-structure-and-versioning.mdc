@@ -1,0 +1,62 @@
+---
+description: Folder layout, versioning and naming conventions for this prototype (Waste Management Admin Portal)
+alwaysApply: true
+---
+
+# File structure and versioning
+
+Versions are numbered `v1`, `v2`, `v3`, `v4`... Each version is a complete, self-contained copy of the journeys.
+
+```txt
+app/
+├── config.json                       # serviceName, service navigation, plugin settings
+├── routes.js                         # All routes. One register function per version
+├── filters.js                        # No custom filters yet
+├── data/
+│   ├── session-data-defaults.js      # Only holds v3's softwareProviders list. v4 sets its own key in routes.js
+│   └── *.js                          # Mock data and helpers shared by versions
+├── assets/{sass,javascripts,images}/ # application.scss holds all custom styles (app-* classes)
+└── views/
+    ├── index.html                    # Prototype index: one short card per version
+    ├── about-this-service.html       # Hub page
+    ├── layouts/
+    │   ├── main.html                 # Base layout (Defra header and footer on GOV.UK Prototype Kit branded layout)
+    │   ├── prototype-hub.html        # Hub pages and the version pages below
+    │   └── v2.html v3.html v4.html   # In-service layout per version (header and navigation)
+    ├── versions/v1.html ...          # What changed and why, per version
+    └── v1/ v2/ v3/ v4/               # Prototype pages per version
+        ├── start.html
+        ├── regulators/               # Waste organisations report
+        └── software-providers/       # v1 and v2: PAT viewer. v3 and v4: add, detail and API keys
+```
+
+## Starting a new version
+
+- Copy the previous version's views folder (`app/views/vN/`) to `vN+1`. Never move it.
+- Copy its layout to `app/views/layouts/vN+1.html` and extend that from the new pages. Edit the new layout only, never the old one. (`v1` pages extend `layouts/main.html`.)
+- Add a `registerVNRoutes()` function in `routes.js` and call it straight after the previous one. Copy, don't share, so earlier versions stay frozen.
+  - Set `res.locals.version` in a `router.use(base, ...)` block.
+  - Use a separate session data key per version (e.g. `softwareProvidersV4`), so data from one version never appears in another.
+- Set `{% set version = "vN" %}`, `pageName` and `activeSection` at the top of each page. The layout navigation uses these.
+- Create `app/views/versions/vN.html` and add a card at the top of `app/views/index.html`. Move the "Latest version" tag to the new card and page.
+- Never delete or edit old versions to match new designs. Only fix bugs in them, and say so.
+- The unversioned URLs at the end of `routes.js` redirect to `v1` for old links. Leave them alone.
+
+## Recording what changed and why
+
+This is also assessment evidence (see the Defra rules).
+
+- `app/views/versions/vN.html` has: date of last change, user research status, a "Changes in this version" table (Area, Change, Reason for change, URLs), and a "Design rationale" section (`id="design-rationale"`).
+- The index card stays short: date, research status, and links to the version page and any demo pages.
+- Update the date and the changes table whenever a version changes. Say which research finding or decision drove it.
+- Index and version pages use the plain-text pattern for date and research status. The blue "Latest version" tag is the only version tag, and it goes on the latest version only.
+- Pages for demos that aren't part of the journey (e.g. `/vN/software-providers/example`) are linked from the index card and version page, not from the service.
+
+## Naming
+
+| Type | Convention | Example |
+| --- | --- | --- |
+| HTML files, URL paths, form fields | lowercase, hyphens | `change-emails.html`, `period-from-day` |
+| Partials | leading underscore | `_email-addresses.html` |
+| Custom CSS classes | `app-` prefix, BEM | `app-defra-header__link` |
+| JS/Nunjucks variables | camelCase | `activeSection`, `softwareProvidersV4` |

@@ -1,0 +1,16 @@
+---
+description: Final checklist before proposing any change in this repo
+alwaysApply: true
+---
+
+# DWT quality checklist
+
+- [ ] Follows the existing version / section / page pattern, and any new version has an index card and a `versions/vN.html` page
+- [ ] Extends the right layout for its version and sets `version`, `pageName` and `activeSection`; links are built from `version`, not hard-coded
+- [ ] Accessibility met: WCAG 2.2 AA, labelled inputs, `govukErrorSummary` pattern, `aria-live` for dynamic feedback, and the journey works without JavaScript
+- [ ] GOV.UK Design System components used via macros, with custom styles only as `app-*` classes in `application.scss`
+- [ ] New/edited content follows the GOV.UK style guide, without silently rewriting untouched existing content
+- [ ] New form data handled on the server in `routes.js` and held in version-specific session data, with synthetic data only
+- [ ] New routes added inside the right version's `registerVNRoutes()`, under the relevant section banner
+- [ ] The version page records what changed and why
+- [ ] Nothing existing renamed, moved, or restructured without being asked

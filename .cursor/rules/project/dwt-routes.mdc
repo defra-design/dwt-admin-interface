@@ -1,0 +1,50 @@
+---
+description: Route conventions for this repo's single routes.js file
+globs: app/routes.js
+alwaysApply: false
+---
+
+# DWT routes
+
+Single file (about 1,050 lines), edited by multiple people. Routes are grouped by version:
+
+- `registerVersionRoutes(version)` — shared by `v1` and `v2` (a few `if (version === 'v2')` branches).
+- `registerV3Routes()` and `registerV4Routes()` — one function each, called straight after its definition.
+- Unversioned redirects to `v1` sit at the very end. Leave them alone.
+
+Add routes inside the relevant version's function, under the relevant section banner (`// --- Software providers ---`, `// --- API keys ---`). Don't add them at the top or bottom of the file, and don't add routes for one version to another version's function.
+
+Each version function follows the same shape — copy it when starting a new version:
+
+```js
+function registerV4Routes () {
+  const base = '/v4'
+  const view = (page) => `v4/${page}`
+
+  router.use(base, (req, res, next) => {
+    res.locals.version = 'v4'
+    next()
+  })
+
+  // Data in session, with its own key per version — no backend.
+  function providerList (req) {
+    if (!Array.isArray(req.session.data.softwareProvidersV4)) {
+      req.session.data.softwareProvidersV4 = []
+    }
+    return req.session.data.softwareProvidersV4
+  }
+
+  // --- Section name ---
+
+  router.get(`${base}/page-name`, (req, res) => {
+    res.render(view('section/page-name'), { /* data for the view */ })
+  })
+}
+```
+
+- A page's GET and POST use the **same URL** (e.g. `GET` and `POST` `/v4/software-providers/add`). Don't add `-answer` routes.
+- Validate on the server. On error, re-render the same view with `errors` and `errorList` (for `govukErrorSummary`) and the submitted values. On success, redirect to the next page.
+- Build every URL from `base`, never hard-code `/v4/`, so the function can be copied to the next version.
+- Keep logic in `routes.js` or the shared helpers in `app/data/` (e.g. `software-providers.js`), not in the view.
+- Persist data in `req.session.data` under a key that is unique to the version (e.g. `softwareProvidersV4`).
+- Comments explain why, in plain English, so a non-developer can follow the file.

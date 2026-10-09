@@ -1,0 +1,12 @@
+---
+description: Defra-specific accessibility standards and support
+globs: **/*.html,**/*.njk
+alwaysApply: false
+---
+
+# Defra accessibility
+
+- WCAG 2.2 AA is mandatory for all Defra services, public-facing and internal — same baseline as the general accessibility rules.
+- Follow Defra's accessibility guidance: <https://digital.defra.gov.uk/accessibility>, and the Defra Accessibility Resources site (includes how to write an accessibility statement): <https://defra-design.github.io/accessibility/>
+- External supplier products/tools must comply with the Technology Code of Practice.
+- Contact the Defra Accessibility Team for guidance or an external audit: **accessibility@defra.gov.uk**

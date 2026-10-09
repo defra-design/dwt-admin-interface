@@ -1,0 +1,16 @@
+---
+description: Session data conventions for this repo
+globs: **/*.html,**/*.njk,app/routes.js
+alwaysApply: false
+---
+
+# DWT data handling
+
+- There is no backend. Data is either static mock data in `app/data/` (e.g. `regulators-data.js`, `pat-submissions.js`) or held in `req.session.data`.
+- Records added during a session (e.g. software providers) are stored as a list under a key that is unique to the version, such as `softwareProvidersV4`. This stops data from one version appearing in another. Create the list on first use inside the version's route function, as `providerList(req)` does.
+- Form values are read from `req.body` in the route and validated there. They are only written to session data once valid.
+- Helpers for creating, finding and changing records live in `app/data/` (e.g. `software-providers.js`). Reuse them rather than rewriting the logic in the route.
+- Fixed example data for demo pages (e.g. `sp.exampleProviders`) is kept separate from session data.
+- There are no "check your answers" pages in this prototype. Pages show saved records directly (e.g. the provider detail page).
+- "Clear data" in the footer resets session data between research sessions.
+- Treat all session data as non-production, test data (see the general core rules). API keys, client IDs, company names and email addresses must be synthetic — never real ones.

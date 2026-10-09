@@ -1,0 +1,22 @@
+{% extends "layouts/v4-3.html" %}
+
+{% set version = "v4-3" %}
+{% set pageName = "Home" %}
+{% set activeSection = "home" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-xl">Waste management admin portal</h1>
+
+    <p class="govuk-body">Use this service to manage software providers and report on waste organisations.</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li><a class="govuk-link" href="/{{ version }}/software-providers">Manage software providers</a></li>
+      <li><a class="govuk-link" href="/{{ version }}/regulators">Report on waste organisations</a></li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

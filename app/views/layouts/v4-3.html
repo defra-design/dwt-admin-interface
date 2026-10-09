@@ -1,0 +1,42 @@
+{#
+  Layout for version 4.3 in-service pages.
+
+  A copy of the version 4 layout: same Defra header, green service name and
+  green navigation bar. Edit this file (not layouts/v4.html) when version 4.3
+  diverges.
+  Services not on GOV.UK must not use the GOV.UK header or footer.
+#}
+
+{% extends "layouts/prototype-hub.html" %}
+
+{% block govukHeader %}
+  <header class="app-defra-header app-defra-header--service">
+    <div class="govuk-width-container govuk-!-padding-top-3 govuk-!-padding-bottom-3">
+      <div class="app-defra-header__inner">
+        <a href="/" class="app-defra-header__link">
+          {# Crest is decorative; the visible name is in the SVG. Hidden text
+             is the accessible name of the link (Defra branding: ignore the
+             crest for screen readers, keep the link keyboard-focusable). #}
+          <img src="/public/images/defra-logo.svg" alt="" role="presentation" class="app-defra-header__logo" width="86" height="45">
+          <span class="govuk-visually-hidden">Department for Environment, Food and Rural Affairs</span>
+        </a>
+        <a href="/{{ version }}/start" class="app-defra-header__service-name">Waste management admin portal</a>
+      </div>
+    </div>
+    <nav class="app-defra-service-nav" aria-label="Menu">
+      <div class="govuk-width-container">
+        <ul class="app-defra-service-nav__list">
+          <li class="app-defra-service-nav__item">
+            <a class="app-defra-service-nav__link{% if activeSection === 'home' %} app-defra-service-nav__link--active{% endif %}" href="/{{ version }}/start"{% if activeSection === "home" %} aria-current="page"{% endif %}>Home</a>
+          </li>
+          <li class="app-defra-service-nav__item">
+            <a class="app-defra-service-nav__link{% if activeSection === 'providers' %} app-defra-service-nav__link--active{% endif %}" href="/{{ version }}/software-providers"{% if activeSection === "providers" %} aria-current="page"{% endif %}>Software providers</a>
+          </li>
+          <li class="app-defra-service-nav__item">
+            <a class="app-defra-service-nav__link{% if activeSection === 'regulators' %} app-defra-service-nav__link--active{% endif %}" href="/{{ version }}/regulators"{% if activeSection === "regulators" %} aria-current="page"{% endif %}>Waste organisations</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+{% endblock %}

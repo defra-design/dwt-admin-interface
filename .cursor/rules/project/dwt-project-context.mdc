@@ -1,0 +1,28 @@
+---
+description: What this prototype is, who it's for, and the tech it is built with
+alwaysApply: true
+---
+
+# DWT project context
+
+Digital Waste Tracking (DWT) digitises waste transfer and hazardous waste consignment notes across the UK, replacing paper records, to reduce waste crime and improve data on material flows for the circular economy.
+
+This repo is the **Waste Management Admin Portal** prototype — an internal Defra tool, not the production service. It is used for user research, stakeholder review, and iterating on design concepts.
+
+What the portal does, by version:
+
+- **v1 and v2** — a PAT (Production Approval Test) submission viewer, service metrics, and a waste organisations report.
+- **v3 and v4** — software providers (add a provider, manage its email addresses and Test/Production API keys) and the waste organisations report. Service metrics and the PAT viewer were dropped.
+
+`serviceName` in `app/config.json` is **"Waste Management Admin Portal"**. It is only used by `layouts/main.html` (v1 pages). The v2–v4 layouts hard-code "Waste management admin portal" in the header, so changing the config value doesn't change them.
+
+## Tech
+
+- `govuk-prototype-kit` 13.20.1 (`npm run dev`), `govuk-frontend` 6.2.0, `@ministryofjustice/frontend` (pagination in v2)
+- `config.json` has `plugins.govuk-frontend.rebrand: false` — check with the team before changing it
+- In-service pages (v2–v4) use a custom Defra header, service navigation and footer (`app-defra-*` classes in `app/assets/sass/application.scss`), not the GOV.UK header, because the service is not on GOV.UK. v1 uses the Defra "black branding" header from `layouts/main.html`.
+- All routes live in one `app/routes.js`
+- `app/filters.js` has no custom filters. `app/data/session-data-defaults.js` only holds `softwareProviders: []` (used by v3). Don't assume other filters or session defaults exist.
+- No backend. All data is mocked in `app/data/` or held in session data.
+
+**Not yet documented:** hosting/preview URL and access; product owner or delivery lead and team contact/Slack channel; who the users are and the problem the service solves (`about-this-service.html` still has placeholder text).

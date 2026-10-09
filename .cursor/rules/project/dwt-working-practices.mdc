@@ -1,0 +1,22 @@
+---
+description: How to behave as an AI assistant and collaborate via Git in this multi-designer repo
+alwaysApply: true
+---
+
+# DWT working practices
+
+Live repo, several designers committing in parallel, grown organically:
+
+- Read the neighbouring pages/folders before creating or editing anything, and match their pattern even where it's not the textbook Prototype Kit way.
+- Don't restructure. Never rename, move, or delete existing folders, pages, or routes as a side effect of another task — flag it and ask first.
+- Prefer additive changes — new pages and versions alongside what's there. Don't edit earlier versions in place, unless explicitly asked to fix an existing page. `v1` and `v2` are the research versions.
+- Work in the latest version (currently `v4`) unless told otherwise. Its layout (`layouts/v4.html`), views and `registerV4Routes()` are the ones to edit.
+- Match the surrounding file's casing, spacing, and comment style rather than "correcting" it repo-wide.
+- Keep scope tight — touch only the files the task needs.
+- When a change affects a version's behaviour, update its `versions/vN.html` page (changes table and reason) and the date on the index card.
+
+## Git
+
+- Several designers commit in parallel, sometimes on feature branches (currently `ixd`, `main` and `software-provider-management-ui`) — check `git status`/`git branch` before assuming you're editing the only copy of a file.
+- Commit messages: short, plain-English, sentence case (e.g. "Add Create/rotate/delete API key journey to software provider detail") — not Conventional Commits.
+- `routes.js` and `app/views/index.html` are shared, high-traffic files — keep diffs minimal and additive there.

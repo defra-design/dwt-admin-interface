@@ -1,0 +1,41 @@
+---
+description: Page template conventions specific to this repo
+globs: **/*.html,**/*.njk
+alwaysApply: false
+---
+
+# DWT templates
+
+Which layout a page extends depends on what it is:
+
+| Page | Extends |
+| --- | --- |
+| In-service page, v2–v4 | `layouts/vN.html` (its own version) |
+| In-service page, v1 | `layouts/main.html` |
+| Prototype index, `versions/vN.html`, `about-this-service.html` | `layouts/prototype-hub.html` |
+
+`layouts/vN.html` extends `prototype-hub.html`, which extends `main.html`, which extends `govuk-prototype-kit/layouts/govuk-branded.njk`.
+
+Every in-service page starts with:
+
+```nunjucks
+{% extends "layouts/v4.html" %}
+
+{% set version = "v4" %}
+{% set pageName = "Software providers" %}
+{% set activeSection = "providers" %}
+```
+
+- `version` builds the navigation and every link (`href="/{{ version }}/software-providers"`). Never hard-code `/v4/` in a page.
+- `activeSection` is `"home"`, `"providers"` or `"regulators"` in v3 and v4 (the layout also reads `"organisations"`, set by the v1 and v2 placeholder route). It highlights the navigation item.
+- The prototype phase banner is only on hub pages (index, about this service), in `beforeContent`:
+  ```nunjucks
+  {{ govukPhaseBanner({ tag: { text: "Prototype" }, html: 'This is a prototype. It is not a real service.' }) }}
+  ```
+  Don't add it to in-service pages.
+- Back links: sub-pages use `govukBackLink` in `beforeContent` with a real `href` built from `version` (e.g. back to the provider detail page), not `javascript:history.back()`. Top-level pages (start, section lists) have none.
+- Start pages show a heading, one line of text and a bulleted list of links. They don't use the green "Start now" button.
+- Forms: `method="post"`, `novalidate`, action built from `version`. Error summary at the top of the content block, as in `v4/software-providers/add.html`.
+- Use a `govuk-caption-l` above the `h1` to name the section on sub-pages (e.g. "Software providers").
+- Repeated content goes in a partial with a leading underscore, included by version (`{% include version + "/software-providers/_email-addresses.html" %}`).
+- Pages are `.html`. The "related items" sidebar from the common templates isn't used in this prototype — don't introduce it without asking.

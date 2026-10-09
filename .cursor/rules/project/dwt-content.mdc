@@ -1,0 +1,13 @@
+---
+description: Content design exceptions specific to this repo's existing pages
+globs: **/*.html,**/*.njk
+alwaysApply: false
+---
+
+# DWT content
+
+Follow the GOV.UK style guide for **new or edited** content only — existing pages aren't always consistent with it. Don't rewrite existing pages wholesale to bring them into line; flag inconsistencies instead of silently fixing them.
+
+- Earlier versions (`v1`, `v2`, and `v3` once `v4` is the working version) are frozen. Don't change their content to match new wording.
+- `about-this-service.html` still contains bracketed placeholder text (e.g. `[Add a short description of the service...]`). Don't replace it with invented content — ask the team for the facts.
+- The layouts for v2–v4 name the service "Waste management admin portal" (sentence case) in the header; the index and `config.json` use "Waste Management Admin Portal". Flag this rather than changing either.
