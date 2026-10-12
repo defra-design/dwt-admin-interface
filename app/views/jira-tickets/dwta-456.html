@@ -1,0 +1,132 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTA-456: Build the Software providers page and client credentials table" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Jira ticket DWTA-456</span>
+    <h1 class="govuk-heading-l">Build the Software providers page and client credentials table</h1>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design reference page",
+        href: "/jira-tickets/dwta-456/design",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the empty state design",
+        href: "/jira-tickets/dwta-456/design-empty",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">User need</h2>
+    <p class="govuk-body">As a member of Defra staff who uses the DWT admin portal, I need to see which client credentials software providers have, so that I can manage how they connect to the Digital Waste Tracking service.</p>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body">As a member of Defra staff who uses the DWT admin portal, I want to see all client credentials for Test and Production in one list, so that I can find the credentials I need to manage.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">This story builds the Software providers page and the table on it. The table lists the client credentials for both environments, Test and Production, in one place.</p>
+    <p class="govuk-body">The client secret is never shown in the table. The Client secret column only says that a secret has been created.</p>
+    <p class="govuk-body">When there are no client credentials, the page shows a short message instead of the table. A table with only headings and sort buttons would not help anyone.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "Table" },
+          { text: "GOV.UK Design System" },
+          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/table/">Table</a>.' }
+        ],
+        [
+          { text: "Sortable table" },
+          { text: "MoJ Design System / MoJ Frontend" },
+          { html: 'Reason: the GOV.UK Design System has no sortable table. Needs <code>@ministryofjustice/frontend</code>. JavaScript: yes. The script adds a button to each sortable column heading and announces the new sort order to screen readers. Without JavaScript the table is still shown, sorted by Last changed with the newest first, but the columns cannot be sorted. The prototype has <code>rebrand: false</code>, so the table does not follow the GOV.UK rebrand. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/sortable-table/">Sortable table</a>.' }
+        ],
+        [
+          { text: "Headings, paragraphs and spacing" },
+          { text: "GOV.UK Design System" },
+          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/styles/headings/">Headings</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/styles/spacing/">Spacing</a>.' }
+        ],
+        [
+          { text: "Empty state" },
+          { text: "GOV.UK heading and paragraph" },
+          { html: 'The GOV.UK Design System and department design systems have no empty state pattern for tables. Common practice for internal services is to show a heading and a paragraph: <a class="govuk-link" href="https://www.gov.uk/guidance/content-design/tables">Tables</a>.' }
+        ],
+        [
+          { text: "Header, navigation and footer" },
+          { html: "Defra (custom <code>app-defra-*</code> styles)" },
+          { html: 'Built in DWTA-455. Guidance: <a class="govuk-link" href="https://digital.defra.gov.uk/design/branding">Defra branding</a>.' }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+    <p class="govuk-body">On the Software providers page:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The page title is “Software providers - DWT admin portal”.</li>
+      <li>The H1 is “Software providers”. Below it is the text “Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.”</li>
+      <li>The space between the text and the “Client credentials” heading is 50px, or 30px on small screens. This is the same in the empty state. In the design reference, the table’s caption is the heading and the text has a bottom margin of <code>govuk-!-margin-bottom-8</code>. In the empty state, the text has <code>govuk-!-margin-bottom-7</code> (40px), and the H2 adds 10px of padding above it.</li>
+      <li>There is one table with the caption “Client credentials”. It lists the credentials for Test and Production together.</li>
+      <li>The table has four columns, in this order: Client ID, Environment, Client secret, Last changed.</li>
+      <li>There is one row for each set of client credentials.</li>
+      <li>The Environment column shows “Test” or “Production”.</li>
+      <li>The Client secret column shows the text “Created” in every row. It is not a link or a button.</li>
+      <li>The Last changed column shows the date and time, for example “5 October 2026 at 10:15am”.</li>
+      <li>The rows are sorted by Last changed, with the newest first.</li>
+      <li>The Client ID, Environment and Last changed columns can be sorted. The Client secret column cannot.</li>
+      <li>Given I select a column heading, when the table sorts, then it sorts in ascending order. When I select the same heading again, it sorts in descending order.</li>
+      <li>The Last changed column sorts by the date and time, not alphabetically.</li>
+      <li>Given there are no client credentials, then the table is not shown. Instead there is an H2, “Client credentials”, followed by the text “New client credentials will be shown here.”</li>
+      <li>The page matches the design reference, and the empty state matches the empty state design.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">On the Software providers page, meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The table has a visible caption, “Client credentials”, which names it for screen reader users (1.3.1).</li>
+      <li>Every column heading is a <code>th</code> with <code>scope="col"</code> (1.3.1).</li>
+      <li>Each sortable heading has an <code>aria-sort</code> value (<code>none</code> or <code>descending</code> to start with). The MoJ script turns it into a button and keeps <code>aria-sort</code> up to date (4.1.2).</li>
+      <li>When the table sorts, a screen reader announces the new order, for example “Sort by Environment (ascending)”, and focus stays on the heading button (4.1.3, 3.2.2).</li>
+      <li>You can sort every sortable column with a keyboard, and the focus state is visible: the GOV.UK focus style, with a <code>yellow</code> background and <code>black</code> text (2.1.1, 2.4.7).</li>
+      <li>The sort order is shown by an arrow icon next to the heading, as well as by <code>aria-sort</code>. The icons are hidden from screen readers (1.4.1, 1.1.1).</li>
+      <li>In the empty state, the H2 “Client credentials” follows the H1, so the headings stay in order (1.3.1, 2.4.6).</li>
+      <li>The “Software providers” navigation link has <code>aria-current="page"</code> (4.1.2).</li>
+      <li>The page has no horizontal scrolling at 320px wide or at 200% zoom. If the table is too wide, it can scroll on its own, because it is a data table (1.4.4, 1.4.10). Testers must confirm this.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE.</li>
+      <li>Use the table with only a keyboard, including sorting.</li>
+      <li>Check the table and the sort announcements with a screen reader, such as NVDA or VoiceOver.</li>
+      <li>Check the page at 320px wide and at 200% zoom.</li>
+      <li>Turn off JavaScript and check that the table still shows, sorted newest first.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Creating new client credentials.</li>
+      <li>Rotating a client secret. The Rotate journey is not built yet, so the Client secret column shows plain text, not a link.</li>
+      <li>The DWT admin portal and Reporting pages. Their navigation links go to <code>#</code> on the design reference page.</li>
+      <li>Showing the total number of records in the table. We haven't discussed this yet.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

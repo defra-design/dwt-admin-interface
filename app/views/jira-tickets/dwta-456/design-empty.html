@@ -1,0 +1,22 @@
+{#
+  Design reference for DWTA-456: the empty state. The same page as design.html
+  when there are no client credentials. The table is replaced by a heading and a
+  line of text, because there is nothing to compare or sort. The GOV.UK Design
+  System has no empty state pattern for tables.
+#}
+{% extends "layouts/jira-dwta-456.html" %}
+
+{% set pageName = "Software providers" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    <p class="govuk-body govuk-!-margin-bottom-7">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+
+    <h2 class="govuk-heading-m">Client credentials</h2>
+    <p class="govuk-body">New client credentials will be shown here.</p>
+  </div>
+</div>
+{% endblock %}
