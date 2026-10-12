@@ -1,0 +1,24 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Jira tickets" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">Jira tickets</h1>
+
+    <p class="govuk-body">Ticket text drafted from the prototype, ready to copy into Jira.</p>
+
+    <ul class="govuk-list">
+      <li><a class="govuk-link" href="/jira-tickets/dwta-455">DWTA-455: Update branding to a Defra internal service</a></li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

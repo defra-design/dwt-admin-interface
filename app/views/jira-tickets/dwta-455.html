@@ -1,0 +1,104 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTA-455: Update branding to a Defra internal service" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Jira ticket DWTA-455</span>
+    <h1 class="govuk-heading-l">Update branding to a Defra internal service</h1>
+
+    {{ govukButton({
+      text: "View the design reference page",
+      href: "/jira-tickets/dwta-455/design",
+      classes: "govuk-button--secondary"
+    }) }}
+
+    <h2 class="govuk-heading-m">User need</h2>
+    <p class="govuk-body">As a member of Defra staff who uses the DWT admin portal, I need to know it is a genuine Defra internal tool, so that I can trust it and use it with confidence.</p>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body">As a member of Defra staff who uses the DWT admin portal, I want it to look and work like other Defra internal services, so that I can trust it is a genuine Defra tool and find my way around it more easily.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">This story updates the branding from the current live service to a Defra internal service. It covers the page layout, the header and footer, breadcrumbs, the page title, sentence case and the size and spacing of H1s.</p>
+    <p class="govuk-body">The reason for this change is to bring the live service in line with Defra branding, as set out in Defra’s design guidance.</p>
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Defra digital service manual header, navigation and footer, using custom <code>app-defra-*</code> styles because the service is not on GOV.UK. Guidance: <a class="govuk-link" href="https://digital.defra.gov.uk/design/branding">Defra branding</a>.</li>
+      <li>GOV.UK Design System typography for headings and paragraphs. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/styles/headings/">Headings</a>.</li>
+      <li>GOV.UK Design System spacing between headings and paragraphs. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/styles/spacing/">Spacing</a>.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Colours</h2>
+    <p class="govuk-body">The acceptance criteria refer to these colours by name. Colours marked GOV.UK are in the <a class="govuk-link" href="https://design-system.service.gov.uk/styles/colour/">GOV.UK Design System colour palette</a>. Colours marked Defra are specific to the Defra branding.</p>
+
+    {{ govukTable({
+      caption: "Colours used in the header, navigation bar and footer",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Name" },
+        { text: "Value" },
+        { text: "Source" },
+        { text: "Used for" }
+      ],
+      rows: [
+        [{ text: "white" }, { text: "#ffffff" }, { text: "GOV.UK" }, { text: "Header background. Navigation link text. Bar under the current navigation link." }],
+        [{ text: "black" }, { text: "#0b0c0c" }, { text: "GOV.UK" }, { text: "Footer text. Text on a focused link." }],
+        [{ text: "yellow" }, { text: "#ffdd00" }, { text: "GOV.UK" }, { text: "Focus state background." }],
+        [{ text: "light-grey" }, { text: "#f3f2f1" }, { text: "GOV.UK (earlier palette)" }, { text: "Footer background." }],
+        [{ text: "defra-green" }, { text: "#00a33b" }, { text: "Defra" }, { text: "Service name in the header." }],
+        [{ text: "defra-green-dark" }, { text: "#008531" }, { text: "Defra" }, { text: "Navigation bar background. Border across the top of the footer." }],
+        [{ text: "nav-current-overlay" }, { text: "black at 20% opacity (about #006a27 over defra-green-dark)" }, { text: "Defra" }, { text: "Background of the current navigation link." }]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+    <p class="govuk-body">On every page:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The page content is the standard GOV.UK width of 960px.</li>
+      <li>The header has a <code>white</code> background, with the Defra logo 60px high and 12px of padding above and below it (84px in total). The service name “DWT admin portal” is <code>defra-green</code>.</li>
+      <li>The navigation bar is <code>defra-green-dark</code>, with <code>white</code> link text. Each link has 16px text with 12px of padding above and below (about 46px in total). The current page is bold, with a <code>nav-current-overlay</code> background and a 4px <code>white</code> bar underneath.</li>
+      <li>The footer has a 10px <code>defra-green-dark</code> border across the top and a <code>light-grey</code> background. The text “Maintained by the DWT Software Provider team at Defra” is <code>black</code>.</li>
+      <li>The page title is the page name followed by “DWT admin portal”, with no “GOV.UK”. On the home page it is just “DWT admin portal” (WCAG 2.4.2).</li>
+      <li>There are no breadcrumbs.</li>
+      <li>Headings, links and labels are in sentence case.</li>
+      <li>The H1 is the large heading size, with the standard GOV.UK space between it and the paragraph below.</li>
+      <li>The page matches the design reference.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">On every page, meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>Text in the header, navigation bar and footer has enough contrast against its background: at least 4.5:1, or 3:1 for the service name, which is large bold text (1.4.3).</li>
+      <li>The current page in the navigation is shown by bold text, the <code>nav-current-overlay</code> background and a <code>white</code> bar, not by colour alone (1.4.1). The link has <code>aria-current="page"</code> (4.1.2).</li>
+      <li>The page has one banner (header), one navigation, one main and one contentinfo (footer) landmark. The navigation has a label (1.3.1).</li>
+      <li>There is one H1 and headings are in order (1.3.1, 2.4.6).</li>
+      <li>You can reach and use every link with a keyboard, in a logical order, and the focus state is visible: the GOV.UK focus style, with a <code>yellow</code> background and <code>black</code> text (2.1.1, 2.4.3, 2.4.7).</li>
+      <li>The Defra logo image has empty alternative text (<code>alt=""</code>). Its link has visually hidden text, “Department for Environment, Food and Rural Affairs”, as its name (1.1.1, 2.4.4).</li>
+      <li>The page has no horizontal scrolling at 320px wide or at 200% zoom (1.4.4, 1.4.10).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE.</li>
+      <li>Use the page with only a keyboard.</li>
+      <li>Check the header, navigation bar and footer with a screen reader, such as NVDA or VoiceOver.</li>
+      <li>Check the page at 320px wide and at 200% zoom.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Privacy, cookies and accessibility statement links in the footer.</li>
+      <li>The Software providers and Reporting pages.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

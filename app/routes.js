@@ -1860,6 +1860,212 @@ function registerV44Routes () {
 
 registerV44Routes()
 
+// --- Version 5 -----------------------------------------------------------
+// A copy of version 4.4, with no changes yet. It has its own function and its
+// own session data key, so version 4.4 stays frozen while this is edited.
+function registerV5Routes () {
+  const base = '/v5'
+  const view = (page) => `v5/${page}`
+
+  router.use(base, (req, res, next) => {
+    res.locals.version = 'v5'
+    next()
+  })
+
+  // Credentials created or changed in this session. See data/client-credentials.js.
+  function credentialList (req) {
+    if (!Array.isArray(req.session.data.clientCredentialsV5)) {
+      req.session.data.clientCredentialsV5 = []
+    }
+    return req.session.data.clientCredentialsV5
+  }
+
+  // The environment comes from the URL: /test or /production.
+  function environmentFor (key) {
+    const match = cc.ENVIRONMENTS.find((e) => e.value.toLowerCase() === key)
+    return match ? { key: match.value.toLowerCase(), label: match.value } : null
+  }
+
+  function tablePath (environmentLabel) {
+    return `${base}/software-providers`
+  }
+
+  // --- Reporting (same as version 4.1) -----------------------------------------
+
+  router.get(`${base}/regulators`, (req, res) => {
+    const filtered = hasDateFilter(req.query)
+    const period = filtered ? lenientPeriod(req.query) : emptyPeriod
+    const orgs = filtered
+      ? reg.listRegisteredInPeriod(period.from, period.to)
+      : reg.listAllOrganisations()
+    const { rows, pagination, total } = paginate(mapOrgRows(orgs), req.query.page, {
+      path: `${base}/regulators`,
+      query: req.query,
+      itemName: 'organisations'
+    })
+    res.render(view('regulators/index'), {
+      period,
+      rows,
+      count: total,
+      filtered,
+      periodLabel: filtered ? periodLabel(period) : null,
+      pagination
+    })
+  })
+
+  // --- Software providers --------------------------------------------------
+
+  // One table for all credentials, Test and Production.
+  router.get(`${base}/software-providers`, (req, res) => {
+    // Most recently changed first. The page marks "Last changed" as sorted.
+    const credentials = cc.listCredentials(credentialList(req))
+      .map((c) => Object.assign({}, c, {
+        lastChangedLabel: formatDateTimeObj(new Date(c.lastChanged)),
+        lastChangedSort: new Date(c.lastChanged).getTime()
+      }))
+      .sort((a, b) => b.lastChangedSort - a.lastChangedSort)
+    res.render(view('software-providers/index'), { credentials })
+  })
+
+  // Old per-environment URLs go to the one table.
+  router.get(`${base}/software-providers/:environment`, (req, res) => {
+    res.redirect(`${base}/software-providers`)
+  })
+
+  // --- Client credentials ---------------------------------------------------
+
+  // The create and edit pages share one form. Only the client name is asked for.
+  function renderClientNameForm (res, options) {
+    res.render(view('client-credentials/create'), Object.assign({
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  router.get(`${base}/client-credentials/:environment/create`, (req, res) => {
+    const environment = environmentFor(req.params.environment)
+    if (!environment) return res.redirect(`${base}/software-providers`)
+    renderClientNameForm(res, {
+      environment,
+      mode: 'create',
+      values: { clientName: '' }
+    })
+  })
+
+  router.post(`${base}/client-credentials/:environment/create`, (req, res) => {
+    const environment = environmentFor(req.params.environment)
+    if (!environment) return res.redirect(`${base}/software-providers`)
+    const values = { clientName: (req.body.clientName || '').trim() }
+    const errors = cc.validateClientName(values.clientName, credentialList(req))
+    if (Object.keys(errors).length) {
+      return renderClientNameForm(res, {
+        environment,
+        mode: 'create',
+        values,
+        errors,
+        errorList: cc.clientNameErrorList(errors)
+      })
+    }
+
+    // The environment is set from the page the user started on, not the form.
+    const credential = cc.createCredential({
+      clientName: values.clientName,
+      environment: environment.label
+    })
+    credentialList(req).push(credential)
+    res.redirect(`${base}/client-credentials/${credential.id}/created`)
+  })
+
+  // The edit page is the create page with the current client name filled in.
+  router.get(`${base}/client-credentials/:id/edit`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    renderClientNameForm(res, {
+      environment: environmentFor(credential.environment.toLowerCase()),
+      mode: 'edit',
+      credential,
+      values: { clientName: credential.clientName }
+    })
+  })
+
+  router.post(`${base}/client-credentials/:id/edit`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    const values = { clientName: (req.body.clientName || '').trim() }
+    // The credential's own name does not count as "already exists".
+    const errors = cc.validateClientName(values.clientName, credentialList(req), credential.id)
+    if (Object.keys(errors).length) {
+      return renderClientNameForm(res, {
+        environment: environmentFor(credential.environment.toLowerCase()),
+        mode: 'edit',
+        credential,
+        values,
+        errors,
+        errorList: cc.clientNameErrorList(errors)
+      })
+    }
+
+    // Only a real change counts as a change, so "Last changed" stays put if
+    // the user saves without editing.
+    if (values.clientName !== credential.clientName) {
+      const toChange = cc.credentialToChange(credentialList(req), credential.id)
+      toChange.clientName = values.clientName
+      toChange.lastChanged = new Date().toISOString()
+    }
+    res.redirect(tablePath(credential.environment))
+  })
+
+  // The one-time reveal, for new credentials and for a rotated secret. Once
+  // closed there is nothing left to show, so this sends the user back to the
+  // table rather than showing the secret again.
+  function renderReveal (res, credential) {
+    res.render(view('client-credentials/created'), {
+      credential,
+      rotated: credential.pendingAction === 'rotated',
+      caption: `${credential.environment} credentials`
+    })
+  }
+
+  router.get(`${base}/client-credentials/:id/created`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    if (!credential.pendingSecret) return res.redirect(tablePath(credential.environment))
+    renderReveal(res, credential)
+  })
+
+  // Closing returns to the page for the environment the credentials belong to.
+  router.post(`${base}/client-credentials/:id/created`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    delete credential.pendingSecret
+    delete credential.pendingAction
+    res.redirect(tablePath(credential.environment))
+  })
+
+  // Rotating asks the user to confirm first. Only the POST gives a new secret.
+  // A refresh of the reveal page keeps the same new secret, because it is only
+  // replaced once the user has closed the page.
+  router.get(`${base}/client-credentials/:id/rotate`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    res.render(view('client-credentials/rotate'), {
+      credential,
+      caption: `${credential.environment} credentials`
+    })
+  })
+
+  router.post(`${base}/client-credentials/:id/rotate`, (req, res) => {
+    if (!cc.getCredential(credentialList(req), req.params.id)) {
+      return res.redirect(`${base}/software-providers`)
+    }
+    const credential = cc.credentialToChange(credentialList(req), req.params.id)
+    if (credential.pendingAction !== 'rotated') cc.rotateSecret(credential)
+    res.redirect(`${base}/client-credentials/${credential.id}/created`)
+  })
+}
+
+registerV5Routes()
+
 function redirectToV1 (req, res) {
   const qs = new URLSearchParams(req.query).toString()
   res.redirect('/v1' + req.path + (qs ? `?${qs}` : ''))

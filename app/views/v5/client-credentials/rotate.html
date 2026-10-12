@@ -1,0 +1,53 @@
+{#
+  Asks the user to confirm before the client secret is rotated. The secret is
+  only replaced when the form is posted (see routes.js), then the user is sent
+  to the page where they can copy the new credentials. The current secret is
+  never shown. The warning button follows the GOV.UK Design System guidance
+  for actions that cannot easily be undone.
+#}
+{% extends "layouts/v5.html" %}
+
+{% set version = "v5" %}
+{% set pageName = "Client credentials" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Rotate {{ credential.environment | lower }} environment credentials</span>
+    <h1 class="govuk-heading-l">Confirm that you want to rotate the client secret</h1>
+
+    {{ mojAlert({
+      variant: "warning",
+      title: "The current secret will stop working immediately, once you rotate the client secret.",
+      showTitleAsHeading: true,
+      html: "Ensure the software provider is aware that their current secret will stop working.",
+      disableAutoFocus: true
+    }) }}
+
+    {% set credentialsHtml %}
+      <h2 class="govuk-heading-m">{{ credential.clientName }}</h2>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ credential.environment }} environment</p>
+      <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
+      <p class="govuk-body govuk-!-margin-bottom-0">{{ credential.clientId }}</p>
+    {% endset %}
+
+    <div class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+      {{ mojTicketPanel({
+        attributes: { "aria-label": "Client credentials" },
+        items: [{ html: credentialsHtml, classes: "moj-ticket-panel__content--blue" }]
+      }) }}
+    </div>
+
+    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/rotate" novalidate>
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Rotate secret", classes: "govuk-button--warning" }) }}
+        <a class="govuk-link" href="/{{ version }}/software-providers/{{ credential.environment | lower }}">Cancel</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

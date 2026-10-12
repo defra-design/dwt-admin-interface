@@ -1,0 +1,153 @@
+---
+description: Writing Jira ticket text (user needs, user stories, acceptance criteria, accessibility criteria, colours, design reference pages, non-GOV.UK components). Use when asked to draft or refine Jira tickets or backlog items.
+alwaysApply: false
+---
+
+# Writing Jira tickets
+
+Plain, specific, British English, GOV.UK style (sentence case, no jargon, no unexplained acronyms). Use synthetic data only; never real personal or business data.
+
+If the user, the outcome or the evidence isn't known, ask the designer rather than guessing.
+
+## Where tickets live in this prototype
+
+- `app/views/jira-tickets.html` is the list, linked from the index page. One link per ticket.
+- Each ticket has its own page: `app/views/jira-tickets/dwta-NNN.html` (URL `/jira-tickets/dwta-NNN`). It extends `layouts/prototype-hub.html` and has a back link to the list. Section headings are H2s under one H1, with the ticket ID in a `govuk-caption-l`.
+- Add a link on the list page for each new ticket. Don't use in-page anchors.
+- Keep the ticket text copyable into Jira: plain headings, lists and tables.
+
+## Ticket structure
+
+1. **Title**: short, action-led, describes the outcome (not the solution).
+2. **Design reference button**: a secondary button under the H1, "View the design reference page". Don't bury the link in a paragraph.
+3. **User need**
+4. **User story**
+5. **Context**: what the story covers, and the reason for the change (see below).
+6. **Components and patterns**
+7. **Colours** (if the ticket specifies colours)
+8. **Acceptance criteria**
+9. **Accessibility acceptance criteria**, then a short **How to test** list
+10. **Out of scope**
+
+## User needs (GDS)
+
+- Format: **As a [user], I need to [do or know something], so that [outcome].**
+- Describe the need, not a solution. No UI words ("click", "dropdown", "page").
+- Name the user specifically (e.g. "member of Defra staff who uses the DWT admin portal", "Defra regulator"), never "the user".
+- Base it on research or evidence. If there is none, don't imply there is. Say the reason in Context (for example, "a branding requirement from Defra's design guidance").
+- One need per statement. Keep it independent of implementation.
+- Reference: <https://www.gov.uk/service-manual/user-research/start-by-learning-user-needs>
+
+## User stories
+
+- Format: **As a [user], I want to [action], so that [benefit].**
+- A story is a deliverable slice of work that meets (part of) a user need. Link it to the need.
+- The benefit must be a real user or service outcome (for example trust, speed, fewer errors), not "so that it is familiar".
+- Small enough to complete in a sprint; split by user outcome, not by technical layer.
+- Don't prescribe the design in the story.
+
+## Context
+
+- Say what the story covers and why. Include the reason for the change.
+- Don't repeat what's in "Out of scope" or the acceptance criteria.
+- Don't put measurements or colours here. They belong in the acceptance criteria.
+
+## Design reference page
+
+The design reference page is the source of truth for developers and testers.
+
+- Build it as a subpage of the ticket, e.g. `app/views/jira-tickets/dwta-NNN/design.html` (URL `/jira-tickets/dwta-NNN/design`), as a copy of the real prototype page.
+- Give it its own layout (e.g. `app/views/layouts/jira-dwta-NNN.html`), copied from the version layout. Never edit the version layout for this.
+- Only include what is in scope. Remove navigation items and pages that aren't part of the ticket. Where a link must stay for the design to look right, use `#` (the one exception to the "no dead links" rule, and only on a design reference page) so nobody lands in the full prototype by accident.
+- Before handing over, check the page against the acceptance criteria. Fetch the rendered HTML and check the landmarks, headings, page title, `alt` text and `aria-*` attributes. Report what fails.
+
+## Acceptance criteria
+
+- A short **numbered** list under "On every page:" (or the relevant scope). Numbered so people can refer to "AC 4".
+- One behaviour per criterion, written as a plain statement that a tester can pass or fail. Don't repeat "Given I am on any page" on every line.
+- Keep it simple and concise. Say what to build, not how. Don't over-specify.
+- Add "The page matches the design reference" as the last criterion.
+- Include the exact page title and key content when agreed (for example the footer text).
+- Use **Given / When / Then** only for interactions (forms, errors, journeys), not for static layout or branding.
+- Avoid vague words ("easy", "intuitive", "quickly", "appropriate", "clearly").
+- Include "works without JavaScript" only where the feature uses JavaScript.
+
+### Measurements
+
+- Specify how a size is made up, not only the result. For example: "logo 60px high with 12px padding above and below (84px in total)", not "header 84px high".
+- Fixed heights can clip text when users resize or zoom (WCAG 1.4.4, 1.4.12). Composition keeps text flexible and reuses existing styles, so it avoids new custom CSS.
+- If a total is approximate, say "about". A tester must still check it.
+- Use GOV.UK spacing and type scale where they exist: <https://design-system.service.gov.uk/styles/spacing/>, <https://design-system.service.gov.uk/styles/headings/>.
+
+### Colours
+
+- Whenever a ticket specifies colour, add a **Colours** table before the acceptance criteria: name, value (hex, or rgba and the resulting hex), source, and what it's used for.
+- Mark the source as **GOV.UK** (in <https://design-system.service.gov.uk/styles/colour/>), **GOV.UK (earlier palette)** if the value is no longer in the current palette, or **Defra** (Defra-specific).
+- Refer to colours by name in the acceptance criteria (in `<code>`), for example `defra-green-dark`, so developers don't have to look the hex up elsewhere.
+- Names are labels for the ticket unless the Sass defines variables. Read the values from `app/assets/sass/application.scss`. Don't guess them.
+- Flag contrast. Text needs 4.5:1; large text (18.66px bold or 24px regular and over) and UI components need 3:1. Work it out, say if it passes only because the text is large, and tell testers to confirm.
+
+## Accessibility acceptance criteria
+
+Include on every ticket that changes UI. Target **WCAG 2.2 AA** and the GOV.UK Service Standard (point 5).
+
+- Numbered list. About 5 to 8 criteria, each **testable** and **specific to this feature**. Drop generic items that don't apply (for example target size or JavaScript on a static header).
+- **Add the WCAG success criterion number** at the end of each, for example "(1.4.3)". Testers can look it up and it is useful assessment evidence.
+- **Say exactly how it's done.** Don't rely on the design reference. For example, "the current page is shown by bold text, the `nav-current-overlay` background and a `white` bar, not by colour alone (1.4.1), and the link has `aria-current="page"` (4.1.2)".
+- **Landmarks:** one banner (header), one navigation (labelled), one main and one contentinfo (footer) per page (1.3.1).
+- **Decorative images:** `alt=""` (`role="presentation"` is optional). If the image is inside a link, give the link a name another way, such as visually hidden text (1.1.1, 2.4.4).
+- **Headings:** one H1, in order (1.3.1, 2.4.6).
+- **Page title:** unique and descriptive, page name then service name, prefixed with "Error:" on error pages (2.4.2).
+- **Keyboard and focus:** every function works with a keyboard, in a logical order, with a visible focus state. Name the GOV.UK focus style, with `yellow` and `black` (2.1.1, 2.4.3, 2.4.7).
+- **Contrast and colour:** give the ratios (1.4.3, 1.4.11) and don't rely on colour alone (1.4.1).
+- **Resize and reflow:** no horizontal scrolling at 320px wide or at 200% zoom (1.4.4, 1.4.10).
+- **Forms and errors** (when relevant): labels linked to inputs, hints and errors linked with `aria-describedby`, error summary at the top with focus moved to it (3.3.1, 3.3.2, 1.3.1).
+- **Dynamic updates** (when relevant): announced with `aria-live`, without moving focus unexpectedly (4.1.3).
+- **Tables** (when relevant): header cells use `scope`; sort state announced (e.g. `aria-sort`); tables have a caption (1.3.1).
+- **Targets and motion** (when relevant): interactive targets at least 24 by 24px (2.5.8); nothing depends on hover alone (1.4.13).
+
+End with a **How to test** list: an automated check (axe or WAVE), keyboard only, a screen reader (NVDA or VoiceOver), and 320px wide and 200% zoom.
+
+References: <https://design-system.service.gov.uk/accessibility/>, <https://www.w3.org/TR/WCAG22/>
+
+### Known faults in this repo (check, don't assume)
+
+- The Prototype Kit already wraps `govukHeader` and `govukFooter` blocks in `<header>` and `<footer>`. A second `<header>` or `<footer>` inside gives two banner or contentinfo landmarks. Use a `<div>`. Fixed in `layouts/v5.html` and the design reference layouts. Still present in `layouts/prototype-hub.html`, and probably v2 to v4.
+- The default page title ends in "GOV.UK". Override the `pageTitle` block in the layout for services that aren't on GOV.UK.
+
+## Components and patterns
+
+List every component or pattern used, with its source, so developers know what to install and where to read guidance. Include links to the relevant guidance (for example Spacing and Headings for layout). Check the live documentation for macro names and classes; do not guess.
+
+- **GOV.UK Design System / govuk-frontend**: <https://design-system.service.gov.uk/components/>. Default choice.
+- **MoJ Design System / `@ministryofjustice/frontend`**: <https://design-patterns.service.justice.gov.uk/>. MoJ publishes its own Frontend kit, built on govuk-frontend, which we can use for components GOV.UK does not offer. It is installed in this prototype (see `app/views/` for `moj*` macros and `moj-*` classes).
+- **Defra patterns**: <https://digital.defra.gov.uk/design/components-and-patterns>. Check after GOV.UK and before anything bespoke.
+- **Bespoke (`app-*`)**: only where nothing above fits. Note why, and that DesignOps (DesignOps@defra.gov.uk) was contacted.
+
+For each non-GOV.UK component, add a line in the ticket:
+
+> **[Component name]** — MoJ Design System / MoJ Frontend. Used on [page(s)]. Reason: [why GOV.UK has no equivalent]. Guidance: [link]. Needs `@ministryofjustice/frontend` (JS: [yes/no, and the no-JS fallback]).
+
+Components used in this repo that come from MoJ (check the code for the current list): sortable table columns, pagination, filter a list, sub navigation, alert, ticket panel, add another, timeline, case list patterns.
+
+Also flag in the ticket:
+
+- Any JavaScript the component needs, and its behaviour without JavaScript.
+- Any accessibility caveats in the MoJ guidance or known issues.
+- Whether the component follows the GOV.UK rebrand (this prototype has `rebrand: false`; confirm with the team before changing it).
+
+## When the ticket changes the prototype
+
+- If the work changes a version's behaviour, update that version's `versions/vN.html` (changes table, reason, date), as in the working practices rule.
+- Prefer fixing a fault in the working version's layout only. Say what you changed and where the same fault remains.
+
+## Writing checks
+
+- Is the user named specifically, and is the evidence (or lack of it) stated honestly?
+- Is the story solution-neutral, with a real benefit, and sized for one sprint?
+- Is every acceptance criterion numbered, short and testable by someone who didn't write it?
+- Are sizes given as composition and colours given by name, with a colours table (hex and source)?
+- Does each accessibility criterion say exactly how it's met and carry a WCAG number?
+- Has the design reference page been checked against the criteria, and does the ticket link to it prominently?
+- Are Context, Components, Colours and Out of scope each used for their own purpose, with no repetition?
+- Are all non-GOV.UK components named, sourced and justified?

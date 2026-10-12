@@ -17,9 +17,14 @@
 
     <p class="govuk-body">This page is the index for different versions of the prototype for the Waste Management Admin Portal.</p>
 
-    <p class="govuk-body">
-      <a class="govuk-link" href="/about-this-service">About this service</a>
-    </p>
+    <ul class="govuk-list">
+      <li><a class="govuk-link" href="/about-this-service">About this service</a></li>
+      <li><a class="govuk-link" href="/jira-tickets">Jira tickets</a></li>
+      {% if GOVUKPrototypeKit.isDevelopment %}
+        <li><a class="govuk-link" href="/manage-prototype">Manage your prototype</a></li>
+      {% endif %}
+      <li><a class="govuk-link" href="/manage-prototype/clear-data">Clear data</a></li>
+    </ul>
 
     <h2 class="govuk-heading-l">Prototype versions</h2>
 
@@ -30,8 +35,34 @@
     <div class="govuk-summary-card">
       <div class="govuk-summary-card__title-wrapper">
         <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 4
+          Version 5
           {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+        </h3>
+      </div>
+      <div class="govuk-summary-card__content">
+        <div>
+          {{ govukButton({
+            html: 'View prototype<span class="govuk-visually-hidden"> for version 5</span>',
+            href: "/v5/start",
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+
+        <p class="govuk-body-s">
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 12 October 2026<br>
+          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-body-s">
+          <li><a class="govuk-link" href="/versions/v5">Changes and design rationale for version 5</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
+          Version 4
         </h3>
       </div>
       <div class="govuk-summary-card__content">

@@ -1,0 +1,110 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 5" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 5
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 12 October 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 5</span>',
+        href: "/v5/start",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A copy of version 4.4, the starting point for aligning the prototype with the live service." },
+          { text: "The prototype needs to match the live service. Changes will be recorded here as they are made." },
+          { html: '<a class="govuk-link" href="/v5/start">/v5/start</a>' }
+        ],
+        [
+          { text: "Service name, navigation and home page" },
+          { text: "Header service name changed to “DWT admin portal”. Navigation item 1 changed from “Home” to “DWT admin portal” and item 3 from “Waste organisations” to “Reporting”. Home page heading is now “DWT admin portal”, with new introductory text, and the links are removed." },
+          { text: "Align with the live service." },
+          { html: '<a class="govuk-link" href="/v5/start">/v5/start</a>' }
+        ],
+        [
+          { text: "Software providers table" },
+          { text: "One table for Test and Production, with the columns Client ID, Environment, Client secret and Last changed. Removed the Client name column, the Edit link and the Test and Production sub navigation." },
+          { text: "Align with the live service, which has one table." },
+          { html: '<a class="govuk-link" href="/v5/software-providers">/v5/software-providers</a>' }
+        ],
+        [
+          { text: "Header, navigation and footer" },
+          { text: "Header follows the Defra digital service manual: taller logo, green “DWT admin portal” service name, and a navigation bar in #008531 with regular-weight links (the current page is bold, on a darker background with a white underline). The footer has a new line, “Maintained by the DWT Software Provider team at Defra”. The footer border stays #008531. No privacy, cookies or accessibility statement links yet. The “Manage your prototype” and “Clear data” links are removed from the footer and are on the prototype index page instead." },
+          { text: "Align with Defra branding (digital.defra.gov.uk/design/branding). Defra Green #00a33b is used sparingly, and #008531 gives better contrast for white text. This also moves away from the black header on the live service." },
+          { html: '<a class="govuk-link" href="/v5/start">/v5/start</a>' }
+        ],
+        [
+          { text: "Page title and landmarks" },
+          { text: "The page title is the page name followed by “DWT admin portal”, with no “GOV.UK”. The home page title is just “DWT admin portal”. The header and footer no longer add a second banner and contentinfo landmark inside the ones the Prototype Kit already provides." },
+          { text: "The service is not on GOV.UK. One banner and one contentinfo landmark per page is the expected structure for screen reader users (WCAG 2.2 1.3.1). Recorded in DWTA-455." },
+          { html: '<a class="govuk-link" href="/v5/start">/v5/start</a>' }
+        ],
+        [
+          { text: "Page width and header layout" },
+          { text: "Page width is the standard GOV.UK 960px, instead of 1200px, on every page in the prototype, including versions 1 to 4. The service name is left-aligned next to the logo, instead of centred on the page." },
+          { text: "Match the Defra digital service manual, which uses a 960px container and keeps the service name close to the logo." },
+          { html: '<a class="govuk-link" href="/v5/start">/v5/start</a>' }
+        ],
+        [
+          { text: "Sortable columns" },
+          { text: "The Client ID, Environment and Last changed columns can be sorted, using the MoJ sortable table pattern. The table loads sorted by Last changed, most recent first, and that heading shows it is sorted. Client secret cannot be sorted." },
+          { text: "TO CONFIRM: the research finding or decision behind this change. Suggested wording: users need to find a client quickly, and to see what changed most recently." },
+          { html: '<a class="govuk-link" href="/v5/software-providers">/v5/software-providers</a>' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">Design decisions are the same as in
+      <a class="govuk-link" href="/versions/v4-4#design-rationale">version 4.4</a>, until changes are recorded here.</p>
+
+    <p class="govuk-body">This version has its own session data. Credentials created in this version are not
+      shown in version 4.4, and the other way round.</p>
+
+  </div>
+</div>
+{% endblock %}

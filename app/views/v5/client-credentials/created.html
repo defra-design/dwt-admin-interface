@@ -1,0 +1,84 @@
+{#
+  The one-time reveal of a client secret, for new credentials and for a rotated
+  secret (see routes.js, which sets the caption). Not a confirmation page: the
+  important things here are the values to copy and a warning that the secret
+  will not be shown again, so there is no "success" panel. No back link: the
+  credentials are already saved and the secret cannot be shown a second time.
+
+  The Client ID and Client secret sit together in one grey block, labels
+  included, with one Copy button. The user copies the whole block at once and
+  pastes it into an email. The block holds exactly the text that is copied, so
+  keep the two lines as they are, with no extra spaces. The warning is the MoJ
+  information alert, directly under the block and above "Close and save", so it
+  is read at the point it matters. Auto focus is switched off, otherwise the
+  alert would take focus when the page loads.
+  https://design-patterns.service.justice.gov.uk/components/alert/
+
+  The Copy button is hidden until JavaScript runs (see application.js), so
+  without JavaScript the text is still on the page to select and copy by hand.
+#}
+{% extends "layouts/v5.html" %}
+
+{% set version = "v5" %}
+{% set pageName = "Copy the client credentials" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">{{ "Rotate" if rotated else "Create" }} {{ credential.environment | lower }} environment credentials</span>
+    <h1 class="govuk-heading-l">Client secret successfully {{ "rotated" if rotated else "created" }}</h1>
+
+    {{ mojAlert({
+      variant: "warning",
+      title: "Copy the client secret before leaving this page.",
+      showTitleAsHeading: true,
+      html: "Once you leave this page, you can not view the client secret again.",
+      disableAutoFocus: true
+    }) }}
+
+    {% set credentialsHtml %}
+      <h2 class="govuk-heading-m">{{ credential.clientName }}</h2>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ credential.environment }} environment</p>
+      <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
+      <p class="govuk-body">{{ credential.clientId }}</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client secret</p>
+      <p class="govuk-body govuk-!-margin-bottom-0">{{ credential.pendingSecret }}</p>
+    {% endset %}
+
+    <div class="govuk-!-margin-top-6">
+      {{ mojTicketPanel({
+        attributes: { "aria-label": "Client credentials" },
+        items: [{ html: credentialsHtml, classes: "moj-ticket-panel__content--blue" }]
+      }) }}
+    </div>
+
+    {# Plain text copied by the Copy button. Hidden, so the panel's layout does not affect what is pasted. #}
+    <div id="client-credentials" hidden>{{ credential.environment }} environment
+http://waste-tracking.integration.api.defra.gov.uk/
+
+Client ID
+{{ credential.clientId }}
+
+Client secret
+{{ credential.pendingSecret }}</div>
+
+    <div class="app-copy govuk-!-margin-top-4 govuk-!-margin-bottom-9" hidden>
+      {{ govukButton({
+        html: 'Copy<span class="govuk-visually-hidden"> client ID and client secret</span>',
+        classes: "govuk-button--secondary govuk-!-margin-bottom-0",
+        type: "button",
+        attributes: { "data-copy-target": "client-credentials", "data-copy-message": "Client ID and client secret copied" }
+      }) }}
+      <span class="app-copy-status govuk-body govuk-!-margin-bottom-0" role="status" aria-live="polite"></span>
+    </div>
+
+    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/created" novalidate>
+      {{ govukButton({ text: "Close" }) }}
+    </form>
+
+  </div>
+</div>
+{% endblock %}
