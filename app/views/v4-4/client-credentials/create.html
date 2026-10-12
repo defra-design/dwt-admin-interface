@@ -1,8 +1,9 @@
 {#
   Used to create credentials and to edit a client name (see routes.js), so the
   two journeys look and behave the same. Only one question is asked, so the
-  label is the page heading. The caption names the task and the environment,
-  which the user already chose on the Test or Production page.
+  label is the page heading. The caption names the task
+  and the environment, which the user already chose on the Test or Production
+  page.
   There is no software provider field: the client name holds the software
   provider and software name.
 #}
@@ -21,8 +22,8 @@
       {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
     {% endif %}
 
-    <span class="govuk-caption-l">{{ environment.label }} credentials</span>
 
+    <span class="govuk-caption-l">{{ "Edit" if editing else "Create" }} {{ environment.label | lower }} environment credentials</span>
     <h1 class="govuk-heading-l">What is the name of the software provider and application?</h1>
 
     <form method="post" action="/{{ version }}/client-credentials/{{ credential.id + '/edit' if editing else environment.key + '/create' }}" novalidate>

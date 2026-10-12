@@ -30,131 +30,53 @@
     <div class="govuk-summary-card">
       <div class="govuk-summary-card__title-wrapper">
         <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 4.4
+          Version 4
           {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
         </h3>
       </div>
       <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 4.4</span>',
-            href: "/v4-4/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
         <p class="govuk-body-s">
           <span class="govuk-!-font-weight-bold">Date of last change:</span> 9 October 2026<br>
           <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
         </p>
 
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v4-4">Changes and design rationale for version 4.4</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 4.3
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 4.3</span>',
-            href: "/v4-3/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 9 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v4-3">Changes and design rationale for version 4.3</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 4.2
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 4.2</span>',
-            href: "/v4-2/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 6 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v4-2">Changes and design rationale for version 4.2</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 4.1
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 4.1</span>',
-            href: "/v4-1/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 5 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v4-1">Changes and design rationale for version 4.1</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 4
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 4</span>',
-            href: "/v4/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 5 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v4">Changes and design rationale for version 4</a></li>
-        </ul>
+        <table class="govuk-table govuk-body-s">
+          <caption class="govuk-table__caption govuk-visually-hidden">Version 4 versions</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Version</th>
+              <th scope="col" class="govuk-table__header">Focus</th>
+              <th scope="col" class="govuk-table__header">Rationale</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-4/start"><span class="govuk-visually-hidden">Version </span>4.4</a></td>
+              <td class="govuk-table__cell">Includes rotate journey</td>
+              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-4">View<span class="govuk-visually-hidden"> rationale for version 4.4</span></a></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-3/start"><span class="govuk-visually-hidden">Version </span>4.3</a></td>
+              <td class="govuk-table__cell">Credentials generated page has all credentials for copy</td>
+              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-3">View<span class="govuk-visually-hidden"> rationale for version 4.3</span></a></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-2/start"><span class="govuk-visually-hidden">Version </span>4.2</a></td>
+              <td class="govuk-table__cell">Edit client name and rotate secret links in list</td>
+              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-2">View<span class="govuk-visually-hidden"> rationale for version 4.2</span></a></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-1/start"><span class="govuk-visually-hidden">Version </span>4.1</a></td>
+              <td class="govuk-table__cell">Two tables and Create credentials with software provider name field</td>
+              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-1">View<span class="govuk-visually-hidden"> rationale for version 4.1</span></a></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a class="govuk-link" href="/v4/start"><span class="govuk-visually-hidden">Version </span>4</a></td>
+              <td class="govuk-table__cell">One table for Production and test environments</td>
+              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4">View<span class="govuk-visually-hidden"> rationale for version 4</span></a></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 

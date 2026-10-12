@@ -27,14 +27,14 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <span class="govuk-caption-l">{{ caption }}</span>
+    <span class="govuk-caption-l">{{ "Rotate" if rotated else "Create" }} {{ credential.environment | lower }} environment credentials</span>
     <h1 class="govuk-heading-l">Client secret successfully {{ "rotated" if rotated else "created" }}</h1>
 
     {{ mojAlert({
       variant: "warning",
-      title: "Copy the Client secret before leaving this page.",
+      title: "Copy the client secret before leaving this page.",
       showTitleAsHeading: true,
-      html: "Once you leave this page, you can not view the Client secret again.",
+      html: "Once you leave this page, you can not view the client secret again.",
       disableAutoFocus: true
     }) }}
 
