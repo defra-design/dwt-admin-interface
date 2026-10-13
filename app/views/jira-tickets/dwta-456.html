@@ -34,7 +34,6 @@
 
     <h2 class="govuk-heading-m">Context</h2>
     <p class="govuk-body">This story builds the Software providers page and the table on it. The table lists the client credentials for both environments, Test and Production, in one place.</p>
-    <p class="govuk-body">The client secret is never shown in the table. The Client secret column only says that a secret has been created.</p>
     <p class="govuk-body">When there are no client credentials, the page shows a short message instead of the table. A table with only headings and sort buttons would not help anyone.</p>
 
     <h2 class="govuk-heading-m">Components and patterns</h2>
@@ -83,13 +82,12 @@
       <li>The H1 is “Software providers”. Below it is the text “Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.”</li>
       <li>The space between the text and the “Client credentials” heading is 50px, or 30px on small screens. This is the same in the empty state. In the design reference, the table’s caption is the heading and the text has a bottom margin of <code>govuk-!-margin-bottom-8</code>. In the empty state, the text has <code>govuk-!-margin-bottom-7</code> (40px), and the H2 adds 10px of padding above it.</li>
       <li>There is one table with the caption “Client credentials”. It lists the credentials for Test and Production together.</li>
-      <li>The table has four columns, in this order: Client ID, Environment, Client secret, Last changed.</li>
+      <li>The table has four columns, in this order: Client name, Client ID, Environment, Last changed.</li>
       <li>There is one row for each set of client credentials.</li>
       <li>The Environment column shows “Test” or “Production”.</li>
-      <li>The Client secret column shows the text “Created” in every row. It is not a link or a button.</li>
-      <li>The Last changed column shows the date and time, for example “5 October 2026 at 10:15am”.</li>
+      <li>The Last changed column shows the date and time on two lines, for example “5 October 2026” and, below it, “at 10:15am”. This keeps the times aligned down the column.</li>
       <li>The rows are sorted by Last changed, with the newest first.</li>
-      <li>The Client ID, Environment and Last changed columns can be sorted. The Client secret column cannot.</li>
+      <li>The Client name, Client ID, Environment and Last changed columns can be sorted.</li>
       <li>Given I select a column heading, when the table sorts, then it sorts in ascending order. When I select the same heading again, it sorts in descending order.</li>
       <li>The Last changed column sorts by the date and time, not alphabetically.</li>
       <li>Given there are no client credentials, then the table is not shown. Instead there is an H2, “Client credentials”, followed by the text “New client credentials will be shown here.”</li>
@@ -122,7 +120,7 @@
     <h2 class="govuk-heading-m">Out of scope</h2>
     <ul class="govuk-list govuk-list--bullet">
       <li>Creating new client credentials.</li>
-      <li>Rotating a client secret. The Rotate journey is not built yet, so the Client secret column shows plain text, not a link.</li>
+      <li>The Client secret column, and rotating a client secret. These will be added in another ticket.</li>
       <li>The DWT admin portal and Reporting pages. Their navigation links go to <code>#</code> on the design reference page.</li>
       <li>Showing the total number of records in the table. We haven't discussed this yet.</li>
     </ul>
