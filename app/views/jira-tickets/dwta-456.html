@@ -55,7 +55,7 @@
         [
           { text: "Sortable table" },
           { text: "MoJ Design System / MoJ Frontend" },
-          { html: 'Reason: the GOV.UK Design System has no sortable table. Needs <code>@ministryofjustice/frontend</code>. JavaScript: yes. The script adds a button to each sortable column heading and announces the new sort order to screen readers. Without JavaScript the table is still shown, sorted by Last changed with the newest first, but the columns cannot be sorted. The prototype has <code>rebrand: false</code>, so the table does not follow the GOV.UK rebrand. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/sortable-table/">Sortable table</a>.' }
+          { html: 'Reason: the GOV.UK Design System has no sortable table. Needs <code>@ministryofjustice/frontend</code>. JavaScript: yes. The script adds a button to each sortable column heading and announces the new sort order to screen readers. Without JavaScript the table is still shown, sorted by Client name from A to Z, but the columns cannot be sorted. The prototype has <code>rebrand: false</code>, so the table does not follow the GOV.UK rebrand. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/sortable-table/">Sortable table</a>.' }
         ],
         [
           { text: "Headings, paragraphs and spacing" },
@@ -82,14 +82,12 @@
       <li>The H1 is “Software providers”. Below it is the text “Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.”</li>
       <li>The space between the text and the “Client credentials” heading is 50px, or 30px on small screens. This is the same in the empty state. In the design reference, the table’s caption is the heading and the text has a bottom margin of <code>govuk-!-margin-bottom-8</code>. In the empty state, the text has <code>govuk-!-margin-bottom-7</code> (40px), and the H2 adds 10px of padding above it.</li>
       <li>There is one table with the caption “Client credentials”. It lists the credentials for Test and Production together.</li>
-      <li>The table has four columns, in this order: Client name, Client ID, Environment, Last changed.</li>
+      <li>The table has three columns, in this order: Client name, Client ID, Environment.</li>
       <li>There is one row for each set of client credentials.</li>
       <li>The Environment column shows “Test” or “Production”.</li>
-      <li>The Last changed column shows the date and time on two lines, for example “5 October 2026” and, below it, “at 10:15am”. This keeps the times aligned down the column.</li>
-      <li>The rows are sorted by Last changed, with the newest first.</li>
-      <li>The Client name, Client ID, Environment and Last changed columns can be sorted.</li>
-      <li>Given I select a column heading, when the table sorts, then it sorts in ascending order. When I select the same heading again, it sorts in descending order.</li>
-      <li>The Last changed column sorts by the date and time, not alphabetically.</li>
+      <li>The rows are sorted by Client name, from A to Z.</li>
+      <li>The Client name, Client ID and Environment columns can be sorted.</li>
+      <li>Given I select a column heading that is not sorted, when the table sorts, then it sorts in ascending order. When I select the same heading again, it sorts in descending order.</li>
       <li>Given there are no client credentials, then the table is not shown. Instead there is an H2, “Client credentials”, followed by the text “New client credentials will be shown here.”</li>
       <li>The page matches the design reference, and the empty state matches the empty state design.</li>
     </ol>
@@ -99,7 +97,7 @@
     <ol class="govuk-list govuk-list--number">
       <li>The table has a visible caption, “Client credentials”, which names it for screen reader users (1.3.1).</li>
       <li>Every column heading is a <code>th</code> with <code>scope="col"</code> (1.3.1).</li>
-      <li>Each sortable heading has an <code>aria-sort</code> value (<code>none</code> or <code>descending</code> to start with). The MoJ script turns it into a button and keeps <code>aria-sort</code> up to date (4.1.2).</li>
+      <li>Each sortable heading has an <code>aria-sort</code> value (<code>ascending</code> on Client name and <code>none</code> on the others to start with). The MoJ script turns it into a button and keeps <code>aria-sort</code> up to date (4.1.2).</li>
       <li>When the table sorts, a screen reader announces the new order, for example “Sort by Environment (ascending)”, and focus stays on the heading button (4.1.3, 3.2.2).</li>
       <li>You can sort every sortable column with a keyboard, and the focus state is visible: the GOV.UK focus style, with a <code>yellow</code> background and <code>black</code> text (2.1.1, 2.4.7).</li>
       <li>The sort order is shown by an arrow icon next to the heading, as well as by <code>aria-sort</code>. The icons are hidden from screen readers (1.4.1, 1.1.1).</li>
@@ -114,13 +112,14 @@
       <li>Use the table with only a keyboard, including sorting.</li>
       <li>Check the table and the sort announcements with a screen reader, such as NVDA or VoiceOver.</li>
       <li>Check the page at 320px wide and at 200% zoom.</li>
-      <li>Turn off JavaScript and check that the table still shows, sorted newest first.</li>
+      <li>Turn off JavaScript and check that the table still shows, sorted by Client name from A to Z.</li>
     </ul>
 
     <h2 class="govuk-heading-m">Out of scope</h2>
     <ul class="govuk-list govuk-list--bullet">
       <li>Creating new client credentials.</li>
       <li>The Client secret column, and rotating a client secret. These will be added in another ticket.</li>
+      <li>The Last changed column. It will be added in a later ticket. The design and criteria are on the <a class="govuk-link" href="/jira-tickets/last-changed-column">Last changed column</a> page, under Out of scope.</li>
       <li>The DWT admin portal and Reporting pages. Their navigation links go to <code>#</code> on the design reference page.</li>
       <li>Showing the total number of records in the table. We haven't discussed this yet.</li>
     </ul>

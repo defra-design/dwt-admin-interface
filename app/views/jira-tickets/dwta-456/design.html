@@ -2,7 +2,7 @@
   Design reference for DWTA-456. A copy of v5/software-providers/index.html with:
   - no "Create new credentials" button
   - no "Client secret" column (it will be added in another ticket)
-  - the date and time in "Last changed" on two lines, so the times line up
+  - no "Last changed" column (it will be added in another ticket; see jira-tickets/last-changed-column)
   The rows are fixed, synthetic data (the same as data/client-credentials.js), so
   the page looks the same every time and does not depend on session data.
 #}
@@ -11,13 +11,13 @@
 {% set pageName = "Software providers" %}
 {% set activeSection = "providers" %}
 
-{# Newest first, as the live page sorts them. lastChangedSort is a number made from the date and time. #}
+{# Sorted by Client name, A to Z, which is the default sort order. #}
 {% set credentials = [
-  { clientName: "Greenlane_Digital_Live", clientId: "2f95e07b-4c86-41d3-9a72-58be6d10c9f4", environment: "Production", lastChangedDate: "5 October 2026", lastChangedTime: "10:15am", lastChangedSort: 20261005101500 },
-  { clientName: "Skipflow_Test", clientId: "1c847b52-9de6-4a03-b7f8-52c96e1d4a37", environment: "Test", lastChangedDate: "1 October 2026", lastChangedTime: "11am", lastChangedSort: 20261001110000 },
-  { clientName: "Kerbside_Collect_Live", clientId: "7e21d0a6-5b93-4f17-8c62-1af49e30d8b5", environment: "Production", lastChangedDate: "29 September 2026", lastChangedTime: "2:05pm", lastChangedSort: 20260929140500 },
-  { clientName: "Wastebase_Manager_Test", clientId: "4a0e91c7-3f28-4d65-bc19-7e53a8d20f96", environment: "Test", lastChangedDate: "22 September 2026", lastChangedTime: "4:48pm", lastChangedSort: 20260922164800 },
-  { clientName: "Kerbside_Collect_Test", clientId: "b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4", environment: "Test", lastChangedDate: "14 September 2026", lastChangedTime: "9:32am", lastChangedSort: 20260914093200 }
+  { clientName: "Greenlane_Digital_Live", clientId: "2f95e07b-4c86-41d3-9a72-58be6d10c9f4", environment: "Production" },
+  { clientName: "Kerbside_Collect_Live", clientId: "7e21d0a6-5b93-4f17-8c62-1af49e30d8b5", environment: "Production" },
+  { clientName: "Kerbside_Collect_Test", clientId: "b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4", environment: "Test" },
+  { clientName: "Skipflow_Test", clientId: "1c847b52-9de6-4a03-b7f8-52c96e1d4a37", environment: "Test" },
+  { clientName: "Wastebase_Manager_Test", clientId: "4a0e91c7-3f28-4d65-bc19-7e53a8d20f96", environment: "Test" }
 ] %}
 
 {% block content %}
@@ -30,15 +30,14 @@
 </div>
 
 {# MoJ sortable table: the MoJ script turns each header with aria-sort into a sort button.
-   The rows arrive sorted by Last changed, newest first, so that header starts as descending. #}
+   The rows arrive sorted by Client name, A to Z, so that header starts as ascending. #}
 <table class="govuk-table" data-module="moj-sortable-table">
   <caption class="govuk-table__caption govuk-table__caption--m">Client credentials</caption>
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <th scope="col" class="govuk-table__header" aria-sort="none">Client name</th>
+      <th scope="col" class="govuk-table__header" aria-sort="ascending">Client name</th>
       <th scope="col" class="govuk-table__header" aria-sort="none">Client ID</th>
       <th scope="col" class="govuk-table__header" aria-sort="none">Environment</th>
-      <th scope="col" class="govuk-table__header" aria-sort="descending">Last changed</th>
     </tr>
   </thead>
   <tbody class="govuk-table__body">
@@ -47,7 +46,6 @@
         <td class="govuk-table__cell">{{ credential.clientName }}</td>
         <td class="govuk-table__cell">{{ credential.clientId }}</td>
         <td class="govuk-table__cell">{{ credential.environment }}</td>
-        <td class="govuk-table__cell" data-sort-value="{{ credential.lastChangedSort }}">{{ credential.lastChangedDate }}<br>at {{ credential.lastChangedTime }}</td>
       </tr>
     {% endfor %}
   </tbody>

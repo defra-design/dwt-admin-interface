@@ -1,0 +1,53 @@
+{#
+  Design reference for the "Last changed" column, which is out of scope for
+  DWTA-456 and has no ticket yet. The same page as dwta-456/design.html, with the
+  Last changed column added. Rows are fixed, synthetic data.
+  The date and time are on two lines, so the times line up.
+#}
+{% extends "layouts/jira-dwta-456.html" %}
+
+{% set pageName = "Software providers" %}
+{% set activeSection = "providers" %}
+
+{# Newest first, as the live page sorts them. lastChangedSort is a number made from the date and time. #}
+{% set credentials = [
+  { clientName: "Greenlane_Digital_Live", clientId: "2f95e07b-4c86-41d3-9a72-58be6d10c9f4", environment: "Production", lastChangedDate: "5 October 2026", lastChangedTime: "10:15am", lastChangedSort: 20261005101500 },
+  { clientName: "Skipflow_Test", clientId: "1c847b52-9de6-4a03-b7f8-52c96e1d4a37", environment: "Test", lastChangedDate: "1 October 2026", lastChangedTime: "11am", lastChangedSort: 20261001110000 },
+  { clientName: "Kerbside_Collect_Live", clientId: "7e21d0a6-5b93-4f17-8c62-1af49e30d8b5", environment: "Production", lastChangedDate: "29 September 2026", lastChangedTime: "2:05pm", lastChangedSort: 20260929140500 },
+  { clientName: "Wastebase_Manager_Test", clientId: "4a0e91c7-3f28-4d65-bc19-7e53a8d20f96", environment: "Test", lastChangedDate: "22 September 2026", lastChangedTime: "4:48pm", lastChangedSort: 20260922164800 },
+  { clientName: "Kerbside_Collect_Test", clientId: "b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4", environment: "Test", lastChangedDate: "14 September 2026", lastChangedTime: "9:32am", lastChangedSort: 20260914093200 }
+] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    {# Spacing scale 8 (50px, 30px on small screens) matches design-empty.html, where the 40px margin plus the H2's 10px padding gives the same space. #}
+    <p class="govuk-body govuk-!-margin-bottom-8">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+  </div>
+</div>
+
+{# MoJ sortable table: the MoJ script turns each header with aria-sort into a sort button.
+   The rows arrive sorted by Last changed, newest first, so that header starts as descending. #}
+<table class="govuk-table" data-module="moj-sortable-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">Client credentials</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header" aria-sort="none">Client name</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Client ID</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Environment</th>
+      <th scope="col" class="govuk-table__header" aria-sort="descending">Last changed</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for credential in credentials %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">{{ credential.clientName }}</td>
+        <td class="govuk-table__cell">{{ credential.clientId }}</td>
+        <td class="govuk-table__cell">{{ credential.environment }}</td>
+        <td class="govuk-table__cell" data-sort-value="{{ credential.lastChangedSort }}">{{ credential.lastChangedDate }}<br>at {{ credential.lastChangedTime }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
