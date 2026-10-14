@@ -11,13 +11,13 @@
 {% set pageName = "Software providers" %}
 {% set activeSection = "providers" %}
 
-{# Sorted by Client name, A to Z, which is the default sort order. #}
+{# Sorted by Client name, A to Z, which is the default sort order.
+   The page shows only the credentials for the environment the user is in. The environment
+   can be Dev, Test, Performance test, External test or Production. This design shows External test. #}
 {% set credentials = [
-  { clientName: "Greenlane_Digital_Live", clientId: "2f95e07b-4c86-41d3-9a72-58be6d10c9f4", environment: "Production" },
-  { clientName: "Kerbside_Collect_Live", clientId: "7e21d0a6-5b93-4f17-8c62-1af49e30d8b5", environment: "Production" },
-  { clientName: "Kerbside_Collect_Test", clientId: "b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4", environment: "Test" },
-  { clientName: "Skipflow_Test", clientId: "1c847b52-9de6-4a03-b7f8-52c96e1d4a37", environment: "Test" },
-  { clientName: "Wastebase_Manager_Test", clientId: "4a0e91c7-3f28-4d65-bc19-7e53a8d20f96", environment: "Test" }
+  { clientName: "Kerbside_Collect_Test", clientId: "b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4", environment: "External test" },
+  { clientName: "Skipflow_Test", clientId: "1c847b52-9de6-4a03-b7f8-52c96e1d4a37", environment: "External test" },
+  { clientName: "Wastebase_Manager_Test", clientId: "4a0e91c7-3f28-4d65-bc19-7e53a8d20f96", environment: "External test" }
 ] %}
 
 {% block content %}

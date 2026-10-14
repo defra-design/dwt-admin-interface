@@ -13,24 +13,31 @@
     <span class="govuk-caption-l">Jira ticket DWTA-456</span>
     <h1 class="govuk-heading-l">Build the Software providers page and client credentials table</h1>
 
+    <h2 class="govuk-heading-m">Design reference</h2>
+
+    <h3 class="govuk-heading-s">Credentials for the user’s environment</h3>
     <div class="govuk-button-group">
       {{ govukButton({
-        text: "View the design reference page",
+        text: "View the design reference page (External test)",
         href: "/jira-tickets/dwta-456/design",
         classes: "govuk-button--secondary"
       }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">Empty state</h3>
+    <div class="govuk-button-group">
       {{ govukButton({
-        text: "View the empty state design",
+        text: "View the empty state design (External test)",
         href: "/jira-tickets/dwta-456/design-empty",
         classes: "govuk-button--secondary"
       }) }}
     </div>
 
     <h2 class="govuk-heading-m">User need</h2>
-    <p class="govuk-body">As a member of Defra staff who uses the DWT admin portal, I need to see which client credentials software providers have, so that I can manage how they connect to the Digital Waste Tracking service.</p>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I need</strong> to see which client credentials software providers have,<br><strong>so that</strong> I can manage how they connect to the Digital Waste Tracking service.</p>
 
     <h2 class="govuk-heading-m">User story</h2>
-    <p class="govuk-body">As a member of Defra staff who uses the DWT admin portal, I want to see all client credentials for Test and Production in one list, so that I can find the credentials I need to manage.</p>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to see all client credentials for Test and Production in one list,<br><strong>so that</strong> I can find the credentials I need to manage.</p>
 
     <h2 class="govuk-heading-m">Context</h2>
     <p class="govuk-body">This story builds the Software providers page and the table on it. The table lists the client credentials for both environments, Test and Production, in one place.</p>
@@ -80,11 +87,13 @@
     <ol class="govuk-list govuk-list--number">
       <li>The page title is “Software providers - DWT admin portal”.</li>
       <li>The H1 is “Software providers”. Below it is the text “Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.”</li>
-      <li>The space between the text and the “Client credentials” heading is 50px, or 30px on small screens. This is the same in the empty state. In the design reference, the table’s caption is the heading and the text has a bottom margin of <code>govuk-!-margin-bottom-8</code>. In the empty state, the text has <code>govuk-!-margin-bottom-7</code> (40px), and the H2 adds 10px of padding above it.</li>
-      <li>There is one table with the caption “Client credentials”. It lists the credentials for Test and Production together.</li>
+      <li>The space between the text and the table caption, or the H2 in the empty state, is 50px, or 30px on small screens. In the design reference, the table’s caption is the heading and the text has a bottom margin of <code>govuk-!-margin-bottom-8</code>. In the empty state, the text has <code>govuk-!-margin-bottom-7</code> (40px), and the H2 adds 10px of padding above it.</li>
+      <li>The page shows the client credentials for the environment the user is in. It never shows credentials for another environment.</li>
+      <li>The environment is one of these five, with these labels: Dev, Test, Performance test, External test, Production.</li>
+      <li>There is one table, with the caption “Client credentials”. The design reference shows External test.</li>
       <li>The table has three columns, in this order: Client name, Client ID, Environment.</li>
       <li>There is one row for each set of client credentials.</li>
-      <li>The Environment column shows “Test” or “Production”.</li>
+      <li>The Environment column shows the label of the environment the user is in, in every row.</li>
       <li>The rows are sorted by Client name, from A to Z.</li>
       <li>The Client name, Client ID and Environment columns can be sorted.</li>
       <li>Given I select a column heading that is not sorted, when the table sorts, then it sorts in ascending order. When I select the same heading again, it sorts in descending order.</li>
@@ -123,6 +132,30 @@
       <li>The DWT admin portal and Reporting pages. Their navigation links go to <code>#</code> on the design reference page.</li>
       <li>Showing the total number of records in the table. We haven't discussed this yet.</li>
     </ul>
+
+    <h3 class="govuk-heading-s">Out of date: Separate pages for test and production credentials</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the old Test credentials design",
+        href: "/jira-tickets/dwta-456/design-test",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the old Production credentials design",
+        href: "/jira-tickets/dwta-456/design-production",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the old Test credentials empty state design",
+        href: "/jira-tickets/dwta-456/design-empty-test",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the old Production credentials empty state design",
+        href: "/jira-tickets/dwta-456/design-empty-production",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
 
   </div>
 </div>

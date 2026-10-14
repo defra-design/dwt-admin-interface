@@ -1,0 +1,60 @@
+{#
+  OUT OF DATE, NOT TO BE USED. Replaced by design.html (one page for the user's environment).
+  Design reference for DWTA-456. A copy of v5/software-providers/index.html with:
+  - no "Create new credentials" button
+  - no "Client secret" column (it will be added in another ticket)
+  - no "Last changed" column (it will be added in another ticket; see jira-tickets/last-changed-column)
+  The rows are fixed, synthetic data (the same as data/client-credentials.js), so
+  the page looks the same every time and does not depend on session data.
+  This copy is for the Production credentials page. It is the same as design.html except that
+  the table caption is "Production credentials" and the table only lists Production rows.
+#}
+{% extends "layouts/jira-dwta-456.html" %}
+
+{% set pageName = "Software providers" %}
+{% set activeSection = "providers" %}
+{% set providersHref = "/jira-tickets/dwta-456/design-production" %}
+
+{# Sorted by Client name, A to Z, which is the default sort order. #}
+{% set credentials = [
+  { clientName: "Greenlane_Digital_Live", clientId: "2f95e07b-4c86-41d3-9a72-58be6d10c9f4", environment: "Production" },
+  { clientName: "Kerbside_Collect_Live", clientId: "7e21d0a6-5b93-4f17-8c62-1af49e30d8b5", environment: "Production" }
+] %}
+
+{% block content %}
+{# Out of date: not to be used. See design.html. #}
+{{ govukWarningText({
+  text: "This design is out of date and must not be used. The service will have one page, which shows the credentials for the environment the user is in. See the current design reference.",
+  iconFallbackText: "Warning"
+}) }}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    {# Spacing scale 8 (50px, 30px on small screens) matches design-empty.html, where the 40px margin plus the H2's 10px padding gives the same space. #}
+    <p class="govuk-body govuk-!-margin-bottom-8">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+  </div>
+</div>
+
+{# MoJ sortable table: the MoJ script turns each header with aria-sort into a sort button.
+   The rows arrive sorted by Client name, A to Z, so that header starts as ascending. #}
+<table class="govuk-table" data-module="moj-sortable-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">Production credentials</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header" aria-sort="ascending">Client name</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Client ID</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Environment</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for credential in credentials %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">{{ credential.clientName }}</td>
+        <td class="govuk-table__cell">{{ credential.clientId }}</td>
+        <td class="govuk-table__cell">{{ credential.environment }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,30 @@
+{#
+  OUT OF DATE, NOT TO BE USED. Replaced by design.html (one page for the user's environment).
+  Design reference for DWTA-456: the empty state of the Production credentials page. The same
+  page as design-production.html when there are no Production credentials. The table is replaced by a heading and a
+  line of text, because there is nothing to compare or sort. The GOV.UK Design
+  System has no empty state pattern for tables.
+#}
+{% extends "layouts/jira-dwta-456.html" %}
+
+{% set pageName = "Software providers" %}
+{% set activeSection = "providers" %}
+{% set providersHref = "/jira-tickets/dwta-456/design-production" %}
+
+{% block content %}
+{# Out of date: not to be used. See design.html. #}
+{{ govukWarningText({
+  text: "This design is out of date and must not be used. The service will have one page, which shows the credentials for the environment the user is in. See the current design reference.",
+  iconFallbackText: "Warning"
+}) }}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    <p class="govuk-body govuk-!-margin-bottom-7">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+
+    <h2 class="govuk-heading-m">Production credentials</h2>
+    <p class="govuk-body">New client credentials will be shown here.</p>
+  </div>
+</div>
+{% endblock %}

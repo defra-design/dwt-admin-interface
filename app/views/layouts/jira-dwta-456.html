@@ -36,7 +36,7 @@
             <a class="app-defra-service-nav__link{% if activeSection === 'home' %} app-defra-service-nav__link--active{% endif %}" href="#"{% if activeSection === "home" %} aria-current="page"{% endif %}>DWT admin portal</a>
           </li>
           <li class="app-defra-service-nav__item">
-            <a class="app-defra-service-nav__link{% if activeSection === 'providers' %} app-defra-service-nav__link--active{% endif %}" href="/jira-tickets/dwta-456/design"{% if activeSection === "providers" %} aria-current="page"{% endif %}>Software providers</a>
+            <a class="app-defra-service-nav__link{% if activeSection === 'providers' %} app-defra-service-nav__link--active{% endif %}" href="{{ providersHref or '/jira-tickets/dwta-456/design' }}"{% if activeSection === "providers" %} aria-current="page"{% endif %}>Software providers</a>
           </li>
           <li class="app-defra-service-nav__item">
             <a class="app-defra-service-nav__link{% if activeSection === 'regulators' %} app-defra-service-nav__link--active{% endif %}" href="#"{% if activeSection === "regulators" %} aria-current="page"{% endif %}>Reporting</a>
