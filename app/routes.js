@@ -2066,6 +2066,14 @@ function registerV5Routes () {
 
 registerV5Routes()
 
+// --- Design page ------------------------------------------------------------
+//
+// Links out to screens in the versions and the Jira design pages. The list
+// lives in app/data/design-index.js, so adding a variant doesn't touch this.
+router.get('/design', (req, res) => {
+  res.render('design', { screens: require('./data/design-index') })
+})
+
 function redirectToV1 (req, res) {
   const qs = new URLSearchParams(req.query).toString()
   res.redirect('/v1' + req.path + (qs ? `?${qs}` : ''))

@@ -9,7 +9,8 @@
 {% extends "layouts/prototype-hub.html" %}
 
 {% block govukHeader %}
-  <header class="app-defra-header app-defra-header--service">
+  {# A div, not a header: the kit already wraps this block in a header. #}
+  <div class="app-defra-header app-defra-header--service">
     <div class="govuk-width-container govuk-!-padding-top-3 govuk-!-padding-bottom-3">
       <div class="app-defra-header__inner">
         <a href="/" class="app-defra-header__link">
@@ -37,5 +38,5 @@
         </ul>
       </div>
     </nav>
-  </header>
+  </div>
 {% endblock %}

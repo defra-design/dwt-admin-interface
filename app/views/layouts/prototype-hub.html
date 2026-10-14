@@ -12,7 +12,9 @@
 {% extends "layouts/main.html" %}
 
 {% block govukHeader %}
-  <header class="app-defra-header">
+  {# A div, not a header: the kit already wraps this block in a header, and a
+     second one would give the page two banner landmarks. #}
+  <div class="app-defra-header">
     <div class="govuk-width-container govuk-!-padding-top-3 govuk-!-padding-bottom-3">
       <a href="/" class="app-defra-header__link">
         {# Crest is decorative; the visible name is in the SVG. Hidden text
@@ -22,13 +24,14 @@
         <span class="govuk-visually-hidden">Department for Environment, Food and Rural Affairs</span>
       </a>
     </div>
-  </header>
+  </div>
 {% endblock %}
 
 {% block govukServiceNavigation %}{% endblock %}
 
 {% block govukFooter %}
-  <footer class="app-defra-footer" role="contentinfo">
+  {# A div, not a footer: the kit already wraps this block in a footer. #}
+  <div class="app-defra-footer">
     <div class="govuk-width-container">
       <div class="app-defra-footer__meta">
         <div class="app-defra-footer__meta-item">
@@ -51,5 +54,5 @@
         </div>
       </div>
     </div>
-  </footer>
+  </div>
 {% endblock %}

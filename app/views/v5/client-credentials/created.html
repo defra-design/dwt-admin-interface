@@ -8,11 +8,9 @@
   The Client ID and Client secret sit together in one grey block, labels
   included, with one Copy button. The user copies the whole block at once and
   pastes it into an email. The block holds exactly the text that is copied, so
-  keep the two lines as they are, with no extra spaces. The warning is the MoJ
-  information alert, directly under the block and above "Close and save", so it
-  is read at the point it matters. Auto focus is switched off, otherwise the
-  alert would take focus when the page loads.
-  https://design-patterns.service.justice.gov.uk/components/alert/
+  keep the two lines as they are, with no extra spaces. The warning is GOV.UK
+  warning text, between the Copy and Close buttons, so it is read at the point
+  it matters.
 
   The Copy button is hidden until JavaScript runs (see application.js), so
   without JavaScript the text is still on the page to select and copy by hand.
@@ -29,14 +27,6 @@
 
     <span class="govuk-caption-l">{{ "Rotate" if rotated else "Create" }} {{ credential.environment | lower }} environment credentials</span>
     <h1 class="govuk-heading-l">Client secret successfully {{ "rotated" if rotated else "created" }}</h1>
-
-    {{ mojAlert({
-      variant: "warning",
-      title: "Copy the client secret before leaving this page.",
-      showTitleAsHeading: true,
-      html: "Once you leave this page, you can not view the client secret again.",
-      disableAutoFocus: true
-    }) }}
 
     {% set credentialsHtml %}
       <h2 class="govuk-heading-m">{{ credential.clientName }}</h2>
@@ -65,7 +55,7 @@ Client ID
 Client secret
 {{ credential.pendingSecret }}</div>
 
-    <div class="app-copy govuk-!-margin-top-4 govuk-!-margin-bottom-9" hidden>
+    <div class="app-copy govuk-!-margin-top-4 govuk-!-margin-bottom-0" hidden>
       {{ govukButton({
         html: 'Copy<span class="govuk-visually-hidden"> client ID and client secret</span>',
         classes: "govuk-button--secondary govuk-!-margin-bottom-0",
@@ -74,6 +64,12 @@ Client secret
       }) }}
       <span class="app-copy-status govuk-body govuk-!-margin-bottom-0" role="status" aria-live="polite"></span>
     </div>
+
+    {{ govukWarningText({
+      text: "Copy the client secret before leaving this page. Once you leave this page, you can not view the client secret again.",
+      iconFallbackText: "Warning",
+      classes: "govuk-!-margin-top-6"
+    }) }}
 
     <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/created" novalidate>
       {{ govukButton({ text: "Close" }) }}

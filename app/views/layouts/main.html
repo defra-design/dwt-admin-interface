@@ -14,6 +14,12 @@
 
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 
+{# Page name, then the service name, with no "GOV.UK" because the service is
+   not on GOV.UK. Overridden again in layouts/v5.html. #}
+{% block pageTitle %}
+  {% if pageName %}{{ pageName }} - {% endif %}{{ serviceName }}
+{% endblock %}
+
 {# Defra "black branding" header — the department name in place of the crown
    (per DEFRA/waste-organisation-frontend PR #116). #}
 {% block govukHeader %}

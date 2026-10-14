@@ -36,11 +36,13 @@ If the user, the outcome or the evidence isn't known, ask the designer rather th
 - Name the user specifically (e.g. "member of Defra staff who uses the DWT admin portal", "Defra regulator"), never "the user".
 - Base it on research or evidence. If there is none, don't imply there is. Say the reason in Context (for example, "a branding requirement from Defra's design guidance").
 - One need per statement. Keep it independent of implementation.
+- On the ticket page, bold **As a**, **I need** and **so that**, each starting on a new line (`<strong>` with `<br>`), so the statement is easy to skim. Keep it as one paragraph, and don't use a list.
 - Reference: <https://www.gov.uk/service-manual/user-research/start-by-learning-user-needs>
 
 ## User stories
 
 - Format: **As a [user], I want to [action], so that [benefit].**
+- Lay it out like the user need: bold **As a**, **I want** and **so that**, each on a new line.
 - A story is a deliverable slice of work that meets (part of) a user need. Link it to the need.
 - The benefit must be a real user or service outcome (for example trust, speed, fewer errors), not "so that it is familiar".
 - Small enough to complete in a sprint; split by user outcome, not by technical layer.
@@ -110,10 +112,11 @@ End with a **How to test** list: an automated check (axe or WAVE), keyboard only
 
 References: <https://design-system.service.gov.uk/accessibility/>, <https://www.w3.org/TR/WCAG22/>
 
-### Known faults in this repo (check, don't assume)
+### Layout pitfalls (fixed in this repo, don't reintroduce)
 
-- The Prototype Kit already wraps `govukHeader` and `govukFooter` blocks in `<header>` and `<footer>`. A second `<header>` or `<footer>` inside gives two banner or contentinfo landmarks. Use a `<div>`. Fixed in `layouts/v5.html` and the design reference layouts. Still present in `layouts/prototype-hub.html`, and probably v2 to v4.
-- The default page title ends in "GOV.UK". Override the `pageTitle` block in the layout for services that aren't on GOV.UK.
+- The Prototype Kit already wraps the `govukHeader` and `govukFooter` blocks in `<header>` and `<footer>`. A second `<header>` or `<footer>` inside gives two banner or contentinfo landmarks. Use a `<div>` in any new layout. All current layouts do.
+- The kit's default page title ends in "GOV.UK". `layouts/main.html` overrides `pageTitle` so it doesn't. `layouts/v5.html` and the design reference layouts override it again (page name, then "DWT admin portal"). Copy that when starting a new version.
+- Still to fix: the index page title repeats the service name ("Waste Management Admin Portal - Waste Management Admin Portal"), and v1 to v4 layouts say "Waste management admin portal" in the header but the title uses the config name.
 
 ## Components and patterns
 

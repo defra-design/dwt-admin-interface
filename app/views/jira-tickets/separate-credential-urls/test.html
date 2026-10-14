@@ -1,0 +1,48 @@
+{#
+  Design reference for "Separate URLs for production and test credentials", which is
+  out of scope for DWTA-456 and has no ticket yet. A copy of dwta-456/design.html that
+  shows only the Test credentials. production.html is the same page for Production.
+  The rows are fixed, synthetic data.
+#}
+{% extends "layouts/jira-separate-credential-urls.html" %}
+
+{% set pageName = "Test credentials" %}
+{% set activeSection = "test" %}
+
+{# Sorted by Client name, A to Z, which is the default sort order. #}
+{% set credentials = [
+  { clientName: "Kerbside_Collect_Test", clientId: "b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4", environment: "Test" },
+  { clientName: "Skipflow_Test", clientId: "1c847b52-9de6-4a03-b7f8-52c96e1d4a37", environment: "Test" },
+  { clientName: "Wastebase_Manager_Test", clientId: "4a0e91c7-3f28-4d65-bc19-7e53a8d20f96", environment: "Test" }
+] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Test credentials</h1>
+    <p class="govuk-body govuk-!-margin-bottom-8">Manage the test client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+  </div>
+</div>
+
+{# MoJ sortable table: the MoJ script turns each header with aria-sort into a sort button.
+   The rows arrive sorted by Client name, A to Z, so that header starts as ascending. #}
+<table class="govuk-table" data-module="moj-sortable-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">Client credentials</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header" aria-sort="ascending">Client name</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Client ID</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Environment</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for credential in credentials %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">{{ credential.clientName }}</td>
+        <td class="govuk-table__cell">{{ credential.clientId }}</td>
+        <td class="govuk-table__cell">{{ credential.environment }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
