@@ -25,17 +25,19 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <span class="govuk-caption-l">{{ "Rotate" if rotated else "Create" }} {{ credential.environment | lower }} environment credentials</span>
+    <span class="govuk-caption-l">{{ "Rotate" if rotated else "Create" }} external test environment credentials</span>
     <h1 class="govuk-heading-l">Client secret successfully {{ "rotated" if rotated else "created" }}</h1>
 
     {% set credentialsHtml %}
       <h2 class="govuk-heading-m">{{ credential.clientName }}</h2>
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ credential.environment }} environment</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">External test environment</p>
       <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
       <p class="govuk-body">{{ credential.clientId }}</p>
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client secret</p>
-      <p class="govuk-body govuk-!-margin-bottom-0">{{ credential.pendingSecret }}</p>
+      <p class="govuk-body">{{ credential.pendingSecret }}</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Generated on</p>
+      <p class="govuk-body govuk-!-margin-bottom-0">{{ generatedOn }}</p>
     {% endset %}
 
     <div class="govuk-!-margin-top-6">
@@ -46,14 +48,17 @@
     </div>
 
     {# Plain text copied by the Copy button. Hidden, so the panel's layout does not affect what is pasted. #}
-    <div id="client-credentials" hidden>{{ credential.environment }} environment
+    <div id="client-credentials" hidden>External test environment
 http://waste-tracking.integration.api.defra.gov.uk/
 
 Client ID
 {{ credential.clientId }}
 
 Client secret
-{{ credential.pendingSecret }}</div>
+{{ credential.pendingSecret }}
+
+Generated on
+{{ generatedOn }}</div>
 
     <div class="app-copy govuk-!-margin-top-4 govuk-!-margin-bottom-0" hidden>
       {{ govukButton({

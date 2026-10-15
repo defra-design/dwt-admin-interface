@@ -23,8 +23,8 @@
     {% endif %}
 
 
-    <span class="govuk-caption-l">{{ "Edit" if editing else "Create" }} {{ environment.label | lower }} environment credentials</span>
-    <h1 class="govuk-heading-l">What is the name of the software provider and application?</h1>
+    <span class="govuk-caption-l">{{ "Edit" if editing else "Create" }} external test environment credentials</span>
+    <h1 class="govuk-heading-l">What is the name of the software provider and package?</h1>
 
     <form method="post" action="/{{ version }}/client-credentials/{{ credential.id + '/edit' if editing else environment.key + '/create' }}" novalidate>
 
@@ -32,7 +32,7 @@
         id: "clientName",
         name: "clientName",
         label: { text: "Client name", classes: "govuk-label--s" },
-        hint: { text: "Enter the software provider name and the software name, using letters and underscores only. For example, Waste_Technologies_Software." },
+        hint: { text: "Enter the name of the software provider and software package, using letters and underscores only. For example, Waste_Technologies_Software." },
         classes: "govuk-!-width-two-thirds",
         value: values.clientName,
         errorMessage: { text: errors.clientName } if errors.clientName else undefined,
@@ -41,7 +41,7 @@
       }) }}
 
       <div class="govuk-button-group">
-        {{ govukButton({ text: "Save" if editing else "Save and generate credentials" }) }}
+        {{ govukButton({ text: "Save" if editing else "Generate credentials" }) }}
         <a class="govuk-link" href="/{{ version }}/software-providers">Cancel</a>
       </div>
 

@@ -1917,13 +1917,13 @@ function registerV5Routes () {
 
   // One table for all credentials, Test and Production.
   router.get(`${base}/software-providers`, (req, res) => {
-    // Most recently changed first. The page marks "Last changed" as sorted.
+    // Client name, A to Z. The page marks "Client name" as sorted.
+    // Production credentials are hidden and Test is shown as "External test".
+    // Only the label changes here, so the shared data stays as it is.
     const credentials = cc.listCredentials(credentialList(req))
-      .map((c) => Object.assign({}, c, {
-        lastChangedLabel: formatDateTimeObj(new Date(c.lastChanged)),
-        lastChangedSort: new Date(c.lastChanged).getTime()
-      }))
-      .sort((a, b) => b.lastChangedSort - a.lastChangedSort)
+      .filter((c) => c.environment !== 'Production')
+      .map((c) => Object.assign({}, c, { environment: 'External test' }))
+      .sort((a, b) => a.clientName.localeCompare(b.clientName))
     res.render(view('software-providers/index'), { credentials })
   })
 
@@ -2021,6 +2021,7 @@ function registerV5Routes () {
   function renderReveal (res, credential) {
     res.render(view('client-credentials/created'), {
       credential,
+      generatedOn: formatDateTimeObj(new Date(credential.lastChanged)),
       rotated: credential.pendingAction === 'rotated',
       caption: `${credential.environment} credentials`
     })
@@ -2050,6 +2051,7 @@ function registerV5Routes () {
     if (!credential) return res.redirect(`${base}/software-providers`)
     res.render(view('client-credentials/rotate'), {
       credential,
+      generatedOn: formatDateTimeObj(new Date(credential.lastChanged)),
       caption: `${credential.environment} credentials`
     })
   })
@@ -2061,6 +2063,22 @@ function registerV5Routes () {
     const credential = cc.credentialToChange(credentialList(req), req.params.id)
     if (credential.pendingAction !== 'rotated') cc.rotateSecret(credential)
     res.redirect(`${base}/client-credentials/${credential.id}/created`)
+  })
+
+  // "Add another secret" is not designed yet — goes to the placeholder page.
+  router.get(`${base}/client-credentials/:id/add-secret`, (req, res) => {
+    res.render(view('placeholder'), {
+      heading: 'Add another secret',
+      activeSection: 'providers'
+    })
+  })
+
+  // Replacing the secret asks the user to confirm first. The form on this page
+  // posts to the rotate route above, which is what replaces the secret.
+  router.get(`${base}/client-credentials/:id/replace`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    res.render(view('client-credentials/replace'), { credential })
   })
 }
 

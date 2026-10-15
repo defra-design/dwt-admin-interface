@@ -1,9 +1,9 @@
 {#
-  Asks the user to confirm before the client secret is rotated. The secret is
-  only replaced when the form is posted (see routes.js), then the user is sent
+  Manage page for one client's credentials, with the actions. The secret is
+  only replaced from replace.html (see routes.js), then the user is sent
   to the page where they can copy the new credentials. The current secret is
-  never shown. The warning button follows the GOV.UK Design System guidance
-  for actions that cannot easily be undone.
+  never shown. "Replace this secret" is a warning button that goes to
+  replace.html, which asks the user to confirm.
 #}
 {% extends "layouts/v5.html" %}
 
@@ -15,23 +15,19 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <span class="govuk-caption-l">Rotate {{ credential.environment | lower }} environment credentials</span>
-    <h1 class="govuk-heading-l">Confirm that you want to rotate the client secret</h1>
-
-    {{ mojAlert({
-      variant: "warning",
-      title: "The current secret will stop working immediately, once you rotate the client secret.",
-      showTitleAsHeading: true,
-      html: "Ensure the software provider is aware that their current secret will stop working.",
-      disableAutoFocus: true
-    }) }}
+    <span class="govuk-caption-l">External test environment credentials</span>
+    <h1 class="govuk-heading-l">Manage client credentials</h1>
 
     {% set credentialsHtml %}
       <h2 class="govuk-heading-m">{{ credential.clientName }}</h2>
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ credential.environment }} environment</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">External test environment</p>
       <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
-      <p class="govuk-body govuk-!-margin-bottom-0">{{ credential.clientId }}</p>
+      <p class="govuk-body">{{ credential.clientId }}</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client secret</p>
+      <p class="govuk-body">[Redacted for security]</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Generated on</p>
+      <p class="govuk-body govuk-!-margin-bottom-0">{{ generatedOn }}</p>
     {% endset %}
 
     <div class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
@@ -41,12 +37,19 @@
       }) }}
     </div>
 
-    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/rotate" novalidate>
-      <div class="govuk-button-group">
-        {{ govukButton({ text: "Rotate secret", classes: "govuk-button--warning" }) }}
-        <a class="govuk-link" href="/{{ version }}/software-providers/{{ credential.environment | lower }}">Cancel</a>
-      </div>
-    </form>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "Add another secret",
+        href: "/" + version + "/client-credentials/" + credential.id + "/add-secret",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "Replace this secret",
+        href: "/" + version + "/client-credentials/" + credential.id + "/replace",
+        classes: "govuk-button--warning"
+      }) }}
+      <a class="govuk-link" href="/{{ version }}/software-providers">Cancel</a>
+    </div>
 
   </div>
 </div>
