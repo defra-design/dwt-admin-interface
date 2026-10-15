@@ -65,6 +65,20 @@ module.exports = [
     summary: 'The page you reach from “Software providers” in the navigation.',
     variants: [
       {
+        label: 'DWTA-466 design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-466/design',
+        difference: 'DWTA-458 table plus a Client secret column. Each row has a Manage link. Shows External test as an example.',
+        rationaleHref: '/jira-tickets/dwta-466'
+      },
+      {
+        label: 'DWTA-458 design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-458/design',
+        difference: 'DWTA-456 table plus a secondary Create new credentials button between the text and the table. Shows External test as an example.',
+        rationaleHref: '/jira-tickets/dwta-458'
+      },
+      {
         label: 'Version 5',
         source: 'Prototype',
         href: '/v5/software-providers',
@@ -213,6 +227,34 @@ module.exports = [
     summary: 'The question page for the client name, reached from the Create credentials button.',
     variants: [
       {
+        label: 'DWTA-458 name page duplicate name error design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-458/design-name-error-duplicate',
+        difference: 'The name page with an error: “A client with this name already exists. Enter a different client name”. Page title starts with “Error: ”.',
+        rationaleHref: '/jira-tickets/dwta-458'
+      },
+      {
+        label: 'DWTA-458 name page letters and underscores error design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-458/design-name-error-characters',
+        difference: 'The name page with an error: “Client name must only include letters and underscores”. Page title starts with “Error: ”.',
+        rationaleHref: '/jira-tickets/dwta-458'
+      },
+      {
+        label: 'DWTA-458 name page empty name error design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-458/design-name-error',
+        difference: 'The name page with an error summary and the error “Enter a client name”. Page title starts with “Error: ”.',
+        rationaleHref: '/jira-tickets/dwta-458'
+      },
+      {
+        label: 'DWTA-458 name page design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-458/design-name',
+        difference: 'Heading is “What is the name of the software provider and package?”, with the caption “Create external test environment credentials”. One input labelled Client name.',
+        rationaleHref: '/jira-tickets/dwta-458'
+      },
+      {
         label: 'Version 5',
         source: 'Prototype',
         href: '/v5/software-providers',
@@ -267,6 +309,20 @@ module.exports = [
     summary: 'Shown once, after credentials are created or a secret is rotated. Needs session data, so these links open the list.',
     variants: [
       {
+        label: 'DWTA-466 page shown after adding a secret',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-466/design-add',
+        difference: 'The DWTA-458 credentials page, with the existing secret in a second panel below the Copy button, redacted.',
+        rationaleHref: '/jira-tickets/dwta-466'
+      },
+      {
+        label: 'DWTA-458 credentials page design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-458/design-credentials',
+        difference: 'Caption “Manage client credentials” and the heading “Copy the client credentials”. Warning text under the heading. One panel with Generated on first, then environment, client ID and secret. Copy, then Close.',
+        rationaleHref: '/jira-tickets/dwta-458'
+      },
+      {
         label: 'Version 5',
         source: 'Prototype',
         href: '/v5/software-providers',
@@ -313,6 +369,34 @@ module.exports = [
     name: 'Rotate client secret',
     summary: 'Reached from the Rotate link in the table.',
     variants: [
+      {
+        label: 'DWTA-466 remove confirmation design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-466/design-remove',
+        difference: 'MoJ interruption card: “Are you sure you want to remove this secret?”. Removes the older of two secrets.',
+        rationaleHref: '/jira-tickets/dwta-466'
+      },
+      {
+        label: 'DWTA-466 replace confirmation design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-466/design-replace',
+        difference: 'MoJ interruption card: “Are you sure you want to replace the current secret?”. Replaces the only secret.',
+        rationaleHref: '/jira-tickets/dwta-466'
+      },
+      {
+        label: 'DWTA-466 Manage client credentials, two secrets',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-466/design-manage-two',
+        difference: 'Two panels, newest first, each redacted. No Add another secret. The red button is Remove this secret.',
+        rationaleHref: '/jira-tickets/dwta-466'
+      },
+      {
+        label: 'DWTA-466 Manage client credentials, one secret',
+        source: 'Jira design',
+        href: '/jira-tickets/dwta-466/design-manage',
+        difference: 'Client name as the heading. One redacted panel. Add another secret, Replace this secret and Cancel.',
+        rationaleHref: '/jira-tickets/dwta-466'
+      },
       {
         label: 'Version 5',
         source: 'Prototype',

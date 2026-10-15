@@ -1,0 +1,42 @@
+{#
+  Design reference for DWTA-458: the name page with an error. A client with this name already exists.
+#}
+{% extends "layouts/jira-dwta-458.html" %}
+
+{% set pageName = "Error: What is the name of the software provider and package?" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {{ govukErrorSummary({ titleText: "There is a problem", errorList: [{ text: "A client with this name already exists. Enter a different client name", href: "#clientName" }] }) }}
+
+    <span class="govuk-caption-l">Create external test environment credentials</span>
+    <h1 class="govuk-heading-l">What is the name of the software provider and package?</h1>
+
+    {# Static design: method="get" and action="#" so Generate credentials is a real submit button that goes nowhere. #}
+    <form method="get" action="#" novalidate>
+
+      {{ govukInput({
+        id: "clientName",
+        name: "clientName",
+        label: { text: "Client name", classes: "govuk-label--s" },
+        hint: { text: "Enter the name of the software provider and software package, using letters and underscores only. For example, Waste_Technologies_Software." },
+        classes: "govuk-!-width-two-thirds",
+        value: "Skipflow_Test",
+        errorMessage: { text: "A client with this name already exists. Enter a different client name" },
+        autocomplete: "off",
+        spellcheck: false
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Generate credentials" }) }}
+        <a class="govuk-link" href="#">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

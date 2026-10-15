@@ -1,0 +1,26 @@
+{#
+  Design reference for DWTA-466: confirm before replacing the secret. A copy of v5/client-credentials/replace.html.
+  The MoJ interruption card, written out so the first action is a button.
+#}
+{% extends "layouts/jira-dwta-466.html" %}
+
+{% set pageName = "Replace the client secret" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="moj-interruption-card">
+  <div class="moj-interruption-card__content">
+    <h1 class="moj-interruption-card__heading">Are you sure you want to replace the current secret?</h1>
+    <div class="moj-interruption-card__body">
+      <p>The current secret for Kerbside_Collect_Test will stop working immediately. Make sure the software provider knows before you continue.</p>
+    </div>
+    {# Static design: method="get" so the first action is a real button that goes nowhere. #}
+    <form method="get" action="#" novalidate>
+      <div class="govuk-button-group moj-interruption-card__actions">
+        {{ govukButton({ text: "Yes, replace secret", classes: "govuk-button--inverse", preventDoubleClick: true }) }}
+        <a class="govuk-link govuk-link--inverse" href="#">Go back to Manage client credentials</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

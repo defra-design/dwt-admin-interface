@@ -1,0 +1,66 @@
+{#
+  Design reference for DWTA-466: Manage client credentials, two secrets. Add another secret is hidden and the red button is Remove this secret.
+#}
+{% extends "layouts/jira-dwta-466.html" %}
+
+{% set pageName = "Manage client credentials" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Manage client credentials</span>
+    <h1 class="govuk-heading-l">Kerbside_Collect_Test</h1>
+
+    {% set newHtml %}
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Generated on</p>
+      <p class="govuk-body">15 October 2026 at 4:49pm</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">External test environment</p>
+      <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
+      <p class="govuk-body">b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client secret</p>
+      <p class="govuk-body govuk-!-margin-bottom-0">[Redacted for security]</p>
+    {% endset %}
+
+    <div class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+      {{ mojTicketPanel({
+        attributes: { "aria-label": "Client credentials generated on 15 October 2026 at 4:49pm" },
+        items: [{ html: newHtml, classes: "moj-ticket-panel__content--blue" }]
+      }) }}
+    </div>
+
+    {% set oldHtml %}
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Generated on</p>
+      <p class="govuk-body">12 October 2026 at 2:49pm</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">External test environment</p>
+      <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
+      <p class="govuk-body">b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client secret</p>
+      <p class="govuk-body govuk-!-margin-bottom-0">[Redacted for security]</p>
+    {% endset %}
+
+    <div class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+      {{ mojTicketPanel({
+        attributes: { "aria-label": "Client credentials generated on 12 October 2026 at 2:49pm" },
+        items: [{ html: oldHtml, classes: "moj-ticket-panel__content--blue" }]
+      }) }}
+    </div>
+
+    {# Static design: the form wraps the group, as in the prototype, so Add another secret is a real button. #}
+    <form method="get" action="#" novalidate>
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: "Remove this secret",
+          href: "#",
+          classes: "govuk-button--warning"
+        }) }}
+        <a class="govuk-link" href="#">Cancel</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

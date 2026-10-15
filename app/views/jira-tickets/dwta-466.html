@@ -1,0 +1,265 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTA-466: Replace or remove secrets" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Jira ticket DWTA-466</span>
+    <h1 class="govuk-heading-l">Replace or remove secrets</h1>
+
+    <h2 class="govuk-heading-m">Design reference</h2>
+
+    <h3 class="govuk-heading-s">Software providers page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design reference page (External test)",
+        href: "/jira-tickets/dwta-466/design",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">Manage client credentials</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design with one secret",
+        href: "/jira-tickets/dwta-466/design-manage",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the design with two secrets",
+        href: "/jira-tickets/dwta-466/design-manage-two",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">Adding, replacing and removing a secret</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the page shown after adding a secret",
+        href: "/jira-tickets/dwta-466/design-add",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the replace confirmation design",
+        href: "/jira-tickets/dwta-466/design-replace",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the remove confirmation design",
+        href: "/jira-tickets/dwta-466/design-remove",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">User need</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I need</strong> to change the client secret a software provider uses,<br><strong>so that</strong> the software provider can keep connecting to the Digital Waste Tracking service without an old or exposed secret.</p>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to add another secret for a client, and to replace or remove a secret,<br><strong>so that</strong> I can give a software provider a new secret and stop the old one working at a time that suits them.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">This story covers the Client secret column on the Software providers page and everything you can do with a client secret from there: the Manage client credentials page, adding another secret, and replacing or removing a secret.</p>
+    <p class="govuk-body">There is no research behind this design yet. We are building it so that we can learn from it, and we will test it in user research once it is built.</p>
+    <p class="govuk-body">A client can have two secrets at most. Adding a second one lets the software provider switch to the new secret before the old one stops working. When there are two secrets, the red button removes the older one instead of replacing it, and the most recent one stays.</p>
+    <p class="govuk-body">Replacing and removing secrets are the actions that can break a software provider’s connection, because the secret stops working immediately. Each one asks the user to confirm first.</p>
+    <p class="govuk-body">The service never shows a secret again after it is created, so every secret on the Manage page is redacted. Generated on is at the top of each panel, because it is the one thing that differs when there are two secrets.</p>
+    <p class="govuk-body">Replacing a secret, and adding another, show the new secret on the credentials page built in <a class="govuk-link" href="/jira-tickets/dwta-458">DWTA-458</a>.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "Table and sortable table" },
+          { text: "GOV.UK Design System and MoJ Design System / MoJ Frontend" },
+          { html: 'Built in DWTA-456. This ticket adds a Client secret column, which cannot be sorted. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/sortable-table/">Sortable table</a>.' }
+        ],
+        [
+          { text: "Button and button group" },
+          { text: "GOV.UK Design System" },
+          { html: '“Add another secret” is a secondary button. “Replace this secret” and “Remove this secret” are warning buttons. “Add another secret” submits a form because it changes data. The other two are links that look like buttons, because they go to another page. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/button/">Button</a>.' }
+        ],
+        [
+          { text: "Ticket panel" },
+          { text: "MoJ Design System / MoJ Frontend" },
+          { html: 'Used on the Manage page. Reason: the GOV.UK Design System has no component for a block of labelled values. Needs <code>@ministryofjustice/frontend</code>. JavaScript: no. Each panel is an <code>article</code> with an <code>aria-label</code>. The prototype has <code>rebrand: false</code>, so it does not follow the GOV.UK rebrand. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/ticket-panel/">Ticket panel</a>.' }
+        ],
+        [
+          { text: "Interruption card" },
+          { text: "MoJ Design System / MoJ Frontend" },
+          { html: 'Used on the replace and remove confirmation pages. Reason: the GOV.UK Design System has no “Are you sure?” page for an action that cannot be undone. The card is written out in the page, not called with the macro, because the macro’s main action is a link and here it must submit a form. Needs <code>@ministryofjustice/frontend</code>. JavaScript: no. MoJ guidance says the card is not announced to screen reader users, so the H1 says the user is being asked to confirm. Buttons and links use the inverse styles. The card should be the only content in the page. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/interruption-card/">Interruption card</a>.' }
+        ],
+        [
+          { text: "Warning text" },
+          { text: "GOV.UK Design System" },
+          { html: 'Used on the page shown after adding a secret. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/warning-text/">Warning text</a>.' }
+        ],
+        [
+          { text: "Copy button" },
+          { html: "Bespoke (<code>app-copy</code>)" },
+          { html: 'Used on the page shown after adding a secret, as built in DWTA-458.' }
+        ],
+        [
+          { text: "Headings, captions and spacing" },
+          { text: "GOV.UK Design System" },
+          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/styles/headings/">Headings</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/styles/spacing/">Spacing</a>.' }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Colours</h2>
+    <p class="govuk-body">Names are the GOV.UK Design System names, from <a class="govuk-link" href="https://design-system.service.gov.uk/styles/colour/">Colour</a>. Use the names, not the hex values, so the colours follow any change in the GOV.UK palette. The hex values are for reference.</p>
+    {{ govukTable({
+      caption: "Colours used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Name" },
+        { text: "Value" },
+        { text: "Source" },
+        { text: "Used for" }
+      ],
+      rows: [
+        [
+          { html: "<code>govuk-colour(\"black\", $variant: \"tint-95\")</code>" },
+          { text: "#f3f3f3" },
+          { text: "GOV.UK web palette" },
+          { text: "Background of the panels." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"blue\")</code>" },
+          { text: "#1d70b8" },
+          { text: "GOV.UK web palette" },
+          { text: "4px left border of the panels. Background of the interruption card." }
+        ],
+        [
+          { html: "<code>brand</code>" },
+          { text: "#1d70b8" },
+          { text: "GOV.UK functional colour" },
+          { text: "Text of the inverse button." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"white\")</code>" },
+          { text: "#ffffff" },
+          { text: "GOV.UK web palette" },
+          { text: "Text on the interruption card and the inverse link. Background of the inverse button. Text on the warning buttons." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"red\")</code>" },
+          { text: "#ca3535" },
+          { text: "GOV.UK web palette" },
+          { text: "Background of the warning buttons." }
+        ]
+      ]
+    }) }}
+    <p class="govuk-body">Contrast: white on blue is about 5.2:1, and white text on red is about 5.1:1. Both pass for text (4.5:1). The blue border on black tint 95% is about 4.7:1, which passes for a user interface component (3:1). Testers must confirm all three.</p>
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+
+    <p class="govuk-body">On the Software providers page:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The table has four columns, in this order: Client name, Client ID, Environment, Client secret. The Client secret column cannot be sorted.</li>
+      <li>In each row, the Client secret cell has a link, “Manage”, followed by the visually hidden text “ client secret for [client name]”.</li>
+      <li>Given I select “Manage”, then I go to the Manage client credentials page for that client.</li>
+    </ol>
+
+    <p class="govuk-body">On the Manage client credentials page, with one secret:</p>
+    <ol class="govuk-list govuk-list--number" start="4">
+      <li>The page title is “Manage client credentials - DWT admin portal”.</li>
+      <li>Above the H1 is a caption, “Manage client credentials”. The H1 is the client name.</li>
+      <li>One panel shows, in this order, each with a bold label above its value: Generated on, External test environment, Client ID and Client secret. External test environment is followed by the API URL. The client secret is “[Redacted for security]”.</li>
+      <li>Below the panel are a secondary button, “Add another secret”, a warning button, “Replace this secret”, and a link, “Cancel”. “Cancel” goes to the Software providers page.</li>
+      <li>Given I select “Add another secret”, then a new secret is created straight away, with no confirmation. The existing secret keeps working. I go to the page shown after adding a secret.</li>
+      <li>Given I select “Replace this secret”, then I go to the replace confirmation page.</li>
+    </ol>
+
+    <p class="govuk-body">On the Manage client credentials page, with two secrets:</p>
+    <ol class="govuk-list govuk-list--number" start="10">
+      <li>There are two panels, with the most recent secret first. Each has the same content in the same order as with one secret, and each client secret is “[Redacted for security]”. Each panel has its own Generated on date and time.</li>
+      <li>“Add another secret” is not shown. A client never has more than two secrets.</li>
+      <li>The warning button says “Remove this secret”, not “Replace this secret”.</li>
+      <li>Given I select “Remove this secret”, then I go to the remove confirmation page.</li>
+    </ol>
+
+    <p class="govuk-body">On the page shown after adding a secret:</p>
+    <ol class="govuk-list govuk-list--number" start="14">
+      <li>The page is the credentials page from DWTA-458, showing the new secret in full, with the warning text and the Copy button. The H1 is “Copy the client credentials”, and the client name is an H2 above the new secret’s panel.</li>
+      <li>Below the Copy button is a second panel with the existing secret. It has the same content in the same order, with its own Generated on date and time. The client secret is “[Redacted for security]”.</li>
+      <li>Below the second panel is a primary button, “Close”. Given I select “Close”, then I go to the Software providers page.</li>
+    </ol>
+
+    <p class="govuk-body">On the replace confirmation page:</p>
+    <ol class="govuk-list govuk-list--number" start="17">
+      <li>The page title is “Replace the client secret - DWT admin portal”.</li>
+      <li>The page is an interruption card and has no other content in the main area. The H1 is “Are you sure you want to replace the current secret?”.</li>
+      <li>The text is “The current secret for [client name] will stop working immediately. Make sure the software provider knows before you continue.”.</li>
+      <li>The card has an inverse button, “Yes, replace secret”, and an inverse link, “Go back to Manage client credentials”. The link goes to the Manage client credentials page.</li>
+      <li>Given I select “Yes, replace secret”, then a new secret is created, the current secret stops working immediately, and I go to the credentials page from DWTA-458 showing the new secret. The client then has one secret.</li>
+      <li>“Replace this secret” is only offered when the client has one secret.</li>
+    </ol>
+
+    <p class="govuk-body">On the remove confirmation page:</p>
+    <ol class="govuk-list govuk-list--number" start="23">
+      <li>The page title is “Remove the client secret - DWT admin portal”.</li>
+      <li>The page is an interruption card and has no other content in the main area. The H1 is “Are you sure you want to remove this secret?”.</li>
+      <li>The text is “The secret for [client name] generated on [date and time of the older secret] will stop working immediately. Make sure the software provider is using the newer secret before you continue.”.</li>
+      <li>The card has an inverse button, “Yes, remove secret”, and an inverse link, “Go back to Manage client credentials”. The link goes to the Manage client credentials page.</li>
+      <li>Given I select “Yes, remove secret”, then the older secret is removed and stops working immediately. The most recent secret stays. I go to the Manage client credentials page, which now shows one secret.</li>
+    </ol>
+
+    <p class="govuk-body">On every page in this ticket:</p>
+    <ol class="govuk-list govuk-list--number" start="28">
+      <li>The environment is the one the user is in. In the panels it is capitalised, for example “External test environment”. The API URL is the one for that environment. The design reference shows External test.</li>
+      <li>The pages match the design references.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">On every page in this ticket, meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>Each page has one H1. On the Manage page the caption above it is a <code>span</code>, not a heading. On the confirmation pages the H1 is the first heading in the card (1.3.1, 2.4.6).</li>
+      <li>Each “Manage” link has a unique accessible name, “Manage client secret for [client name]”, because of its visually hidden text (2.4.4, 4.1.2).</li>
+      <li>Table headings are <code>th</code> elements with <code>scope="col"</code>. The sortable headings keep the <code>aria-sort</code> values from DWTA-456, and the Client secret heading has none (1.3.1, 4.1.2).</li>
+      <li>Each panel is an <code>article</code> with an accessible name, “Client credentials generated on [date and time]”, using the date and time in that panel. With two panels, the names are different, so a screen reader user can tell which panel is which. Each panel also starts with Generated on (1.3.1, 2.4.6).</li>
+      <li>“[Redacted for security]” is real text, not an image or a row of symbols, so a screen reader reads it as it is written (1.1.1, 1.3.1).</li>
+      <li>“Add another secret” is a <code>button</code>, because it changes data. “Replace this secret” and “Remove this secret” are links that look like buttons, because they go to another page (4.1.2).</li>
+      <li>The H1 of each confirmation page says the user is being asked to confirm, because a screen reader does not announce the interruption card. “Replace” and “Remove” each ask for confirmation before anything changes (2.4.6, 3.3.4).</li>
+      <li>On the interruption card, white text on <code>blue</code> is about 5.2:1, the inverse button’s <code>blue</code> text on <code>white</code> is about 5.2:1, and the inverse link is <code>white</code> on <code>blue</code>. The warning buttons are <code>white</code> on <code>red</code> at about 5.1:1 (1.4.3, 1.4.11).</li>
+      <li>Every link and button can be used with a keyboard, in an order that matches the page. The focus state is the GOV.UK focus style, with the <code>focus</code> colour (#ffdd00) as the background and <code>focus-text</code> (#0b0c0c) as the text (2.1.1, 2.4.3, 2.4.7).</li>
+      <li>The button groups wrap onto separate lines on small screens, and the pages have no horizontal scrolling at 320px wide or at 200% zoom (1.4.4, 1.4.10).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE, on each page.</li>
+      <li>Use the whole journey with only a keyboard, with one secret and with two.</li>
+      <li>Check the panels, the Manage links and both confirmation pages with a screen reader, such as NVDA or VoiceOver.</li>
+      <li>Check each page at 320px wide and at 200% zoom.</li>
+      <li>Turn off JavaScript. Check that adding, replacing and removing a secret still work, and that the table shows, sorted by Client name from A to Z.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Creating a new set of credentials. This is in <a class="govuk-link" href="/jira-tickets/dwta-458">DWTA-458</a>.</li>
+      <li>Choosing which secret to replace or remove when there are two. The red button always acts on the older one.</li>
+      <li>More than two secrets for a client.</li>
+      <li>Changing the name of a client after it has been created.</li>
+      <li>Showing a secret again after it has been created.</li>
+      <li>The Last changed column. See <a class="govuk-link" href="/jira-tickets/last-changed-column">Last changed column</a>.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

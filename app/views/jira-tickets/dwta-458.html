@@ -1,0 +1,238 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTA-458: Create new credentials" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Jira ticket DWTA-458</span>
+    <h1 class="govuk-heading-l">Create new credentials</h1>
+
+    <h2 class="govuk-heading-m">Design reference</h2>
+
+    <h3 class="govuk-heading-s">Software providers page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design reference page (External test)",
+        href: "/jira-tickets/dwta-458/design",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">Name page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the name page design",
+        href: "/jira-tickets/dwta-458/design-name",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the empty name error design",
+        href: "/jira-tickets/dwta-458/design-name-error",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the letters and underscores error design",
+        href: "/jira-tickets/dwta-458/design-name-error-characters",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the duplicate name error design",
+        href: "/jira-tickets/dwta-458/design-name-error-duplicate",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">Credentials page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the credentials page design",
+        href: "/jira-tickets/dwta-458/design-credentials",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">User need</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I need</strong> to give a software provider the credentials it uses to connect to the Digital Waste Tracking service,<br><strong>so that</strong> its software can connect to the service.</p>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to create client credentials for a software provider and copy them,<br><strong>so that</strong> I can pass them to the software provider.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">This story covers the whole journey for creating credentials: the “Create new credentials” button on the Software providers page, a page that asks for the client name, and a page that shows the new credentials.</p>
+    <p class="govuk-body">There is no research behind this design yet. We are building it so that we can learn from it, and we will test it in user research once it is built.</p>
+    <p class="govuk-body">The client name holds both the name of the software provider and the name of the software package, because there is no separate field for each. For example, Waste_Technologies_Software.</p>
+    <p class="govuk-body">The client secret is shown once, on the credentials page. After the user leaves the page it cannot be shown again, so the page warns them to copy it first. The pages work the same in every environment. Only the environment name and the API URL change. The design reference shows External test.</p>
+    <p class="govuk-body">The API URL on the credentials page is an example. We need to confirm the real URL for each environment.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "Button and button group" },
+          { text: "GOV.UK Design System" },
+          { html: 'The “Create new credentials” button is secondary. “Generate credentials” and “Close” are primary. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/button/">Button</a>.' }
+        ],
+        [
+          { text: "Text input, label and hint" },
+          { text: "GOV.UK Design System" },
+          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/text-input/">Text input</a>.' }
+        ],
+        [
+          { text: "Error message and error summary" },
+          { text: "GOV.UK Design System" },
+          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/error-message/">Error message</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/components/error-summary/">Error summary</a>.' }
+        ],
+        [
+          { text: "Warning text" },
+          { text: "GOV.UK Design System" },
+          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/warning-text/">Warning text</a>.' }
+        ],
+        [
+          { text: "Headings, captions and spacing" },
+          { text: "GOV.UK Design System" },
+          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/styles/headings/">Headings</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/styles/spacing/">Spacing</a>.' }
+        ],
+        [
+          { text: "Ticket panel" },
+          { text: "MoJ Design System / MoJ Frontend" },
+          { html: 'Used on the credentials page. Reason: the GOV.UK Design System has no component for a block of labelled values that someone reads and copies. Needs <code>@ministryofjustice/frontend</code>. JavaScript: no. The panel is an <code>article</code> with an <code>aria-label</code>. The blue modifier adds a blue left border. The prototype has <code>rebrand: false</code>, so the panel does not follow the GOV.UK rebrand. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/ticket-panel/">Ticket panel</a>.' }
+        ],
+        [
+          { text: "Copy button" },
+          { html: "Bespoke (<code>app-copy</code> in <code>application.scss</code> and <code>application.js</code>)" },
+          { html: 'Used on the credentials page. Reason: the GOV.UK Design System has no copy button. JavaScript: yes. The button is hidden until JavaScript runs. Without JavaScript the credentials are still on the page, so the user can select and copy them by hand. When the user copies, a message appears beside the button in a <code>role="status"</code> region. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/copy-button/">Copy button</a>.' }
+        ],
+        [
+          { text: "Sortable table" },
+          { text: "MoJ Design System / MoJ Frontend" },
+          { html: 'Built in DWTA-456. This ticket only adds the button above it.' }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Colours</h2>
+    <p class="govuk-body">Names are the GOV.UK Design System names, from <a class="govuk-link" href="https://design-system.service.gov.uk/styles/colour/">Colour</a>. Use the names, not the hex values, so the colours follow any change in the GOV.UK palette. The hex values are for reference.</p>
+    {{ govukTable({
+      caption: "Colours used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Name" },
+        { text: "Value" },
+        { text: "Source" },
+        { text: "Used for" }
+      ],
+      rows: [
+        [
+          { html: "<code>text</code>" },
+          { text: "#0b0c0c" },
+          { text: "GOV.UK functional colour" },
+          { text: "Text in the panel and warning text." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"black\", $variant: \"tint-95\")</code>" },
+          { text: "#f3f3f3" },
+          { text: "GOV.UK web palette" },
+          { text: "Background of the panel." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"blue\")</code>" },
+          { text: "#1d70b8" },
+          { text: "GOV.UK web palette" },
+          { text: "4px left border of the panel." }
+        ]
+      ]
+    }) }}
+    <p class="govuk-body">Contrast: <code>text</code> on black tint 95% is about 17:1, which passes for text (4.5:1). The blue border on black tint 95% is about 4.7:1, which passes for a user interface component (3:1). Testers must confirm both.</p>
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+
+    <p class="govuk-body">On the Software providers page:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>Between the introductory text and the table is a secondary button, “Create new credentials”. The text above it has a bottom margin of <code>govuk-!-margin-bottom-7</code> (40px on desktop, 25px on small screens), and so does the button.</li>
+      <li>Given I select “Create new credentials”, then I go to the name page.</li>
+    </ol>
+
+    <p class="govuk-body">On the name page:</p>
+    <ol class="govuk-list govuk-list--number" start="3">
+      <li>The page title is “What is the name of the software provider and package? - DWT admin portal”.</li>
+      <li>Above the H1 is a caption, “Create external test environment credentials”. The H1 is “What is the name of the software provider and package?”.</li>
+      <li>There is one text input, labelled “Client name”, with the hint “Enter the name of the software provider and software package, using letters and underscores only. For example, Waste_Technologies_Software.”. The input is two thirds of the width of the content. Autocomplete and spellcheck are off.</li>
+      <li>Below the input is a primary button, “Generate credentials”, and a link, “Cancel”. “Cancel” goes to the Software providers page.</li>
+      <li>Given I leave Client name empty and select “Generate credentials”, then the error is “Enter a client name”. See the empty name error design.</li>
+      <li>Given the client name has anything other than letters and underscores in it, then the error is “Client name must only include letters and underscores”. See the letters and underscores error design.</li>
+      <li>Given a client with the same name already exists, ignoring capital letters, then the error is “A client with this name already exists. Enter a different client name”. See the duplicate name error design.</li>
+      <li>Given there is an error, then an error summary titled “There is a problem” is at the top of the page and links to the input. The input shows the same error message and keeps what I typed. The page title starts with “Error: ”.</li>
+      <li>Given the client name is valid, when I select “Generate credentials”, then the credentials are saved with a new client ID and a new client secret, and I go to the credentials page.</li>
+    </ol>
+
+    <p class="govuk-body">On the credentials page:</p>
+    <ol class="govuk-list govuk-list--number" start="12">
+      <li>The page title is “Copy the client credentials - DWT admin portal”.</li>
+      <li>Above the H1 is a caption, “Manage client credentials”. The H1 is “Copy the client credentials”.</li>
+      <li>Under the H1 is warning text: “Copy the client secret before leaving this page. Once you leave this page, you cannot view the client secret again.”.</li>
+      <li>Under the warning text is an H2 with the client name, with a top margin of <code>govuk-!-margin-top-6</code> (30px on desktop, 20px on small screens). Below it, one panel shows, in this order, each with a bold label above its value: Generated on, External test environment, Client ID and Client secret. External test environment is followed by the API URL, and the client secret is shown in full.</li>
+      <li>Generated on is the date and time the secret was created, for example “15 October 2026 at 4:49pm”.</li>
+      <li>Given JavaScript is on, a secondary “Copy” button is below the panel. When I select it, the generated on date, environment, API URL, client ID and client secret are copied as plain text, in the same order as the panel. Each label is on its own line, followed by its value, with a blank line between each pair.</li>
+      <li>Given I have copied the credentials, then the message “Client credentials copied” appears beside the button.</li>
+      <li>Below the panel and the Copy button is a primary button, “Close”, with a top margin of <code>govuk-!-margin-top-6</code> (30px on desktop, 20px on small screens). There is no back link.</li>
+      <li>Given I select “Close”, then I go to the Software providers page and the new credentials are in the table.</li>
+      <li>Given I have left the credentials page and go back to it, then the secret is not shown and I go to the Software providers page.</li>
+    </ol>
+
+    <p class="govuk-body">On every page in this ticket:</p>
+    <ol class="govuk-list govuk-list--number" start="22">
+      <li>The environment is the one the user is in. In the caption it is in lower case, for example “external test”. In the panel it is capitalised, for example “External test environment”. The API URL is the one for that environment. The design reference shows External test.</li>
+      <li>The pages match the design references.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">On every page in this ticket, meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>Each page has one H1. The caption above it is a <code>span</code>, not a heading. On the credentials page the client name is an H2, so the headings stay in order (1.3.1, 2.4.6).</li>
+      <li>The name input has a <code>label</code> linked with <code>for</code> and <code>id</code>. The hint and the error message are linked to the input with <code>aria-describedby</code> (1.3.1, 3.3.2, 4.1.2).</li>
+      <li>The error message starts with the visually hidden text “Error:”, and the input has a red border. The error is not shown by colour alone (3.3.1, 1.4.1).</li>
+      <li>The error summary is at the top of the page, with focus moved to it when the page loads. Each link in it goes to the input (3.3.1, 2.4.3).</li>
+      <li>The page title is unique and says what the page is for. On the error page it starts with “Error: ” (2.4.2).</li>
+      <li>The warning text icon is hidden from screen readers, and the visually hidden text “Warning” comes before the message (1.1.1, 1.3.1).</li>
+      <li>The panel is an <code>article</code> with an accessible name, “Client credentials generated on [date and time]”, using the date and time in the panel. Each label and value is text that can be selected, not an image (1.3.1).</li>
+      <li>The Copy button works with a keyboard. Its accessible name is “Copy client ID and client secret”, which includes its visible text (2.1.1, 2.5.3).</li>
+      <li>The “copied” message is in a <code>role="status"</code> region with <code>aria-live="polite"</code>, so a screen reader announces it without focus moving (4.1.3).</li>
+      <li>Every link and button can be used with a keyboard, in an order that matches the page. The focus state is the GOV.UK focus style, with the <code>focus</code> colour (#ffdd00) as the background and <code>focus-text</code> (#0b0c0c) as the text (2.1.1, 2.4.3, 2.4.7).</li>
+      <li>The page has no horizontal scrolling at 320px wide or at 200% zoom. The client ID and client secret have no spaces, so testers must confirm they wrap or scroll inside the panel (1.4.4, 1.4.10).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE, on each page, including the error state.</li>
+      <li>Use the whole journey with only a keyboard.</li>
+      <li>Check the error summary, the warning text, the panel and the “copied” message with a screen reader, such as NVDA or VoiceOver.</li>
+      <li>Check each page at 320px wide and at 200% zoom.</li>
+      <li>Turn off JavaScript. Check that the journey still works, the Copy button is not shown, and the credentials can be selected and copied by hand.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Adding, replacing and removing client secrets, and the Client secret column. These are in <a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a>.</li>
+      <li>Changing the name of a client after it has been created.</li>
+      <li>The real API URL for each environment.</li>
+      <li>The Last changed column. See <a class="govuk-link" href="/jira-tickets/last-changed-column">Last changed column</a>.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}
