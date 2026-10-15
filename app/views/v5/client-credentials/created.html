@@ -8,9 +8,8 @@
   The Client ID and Client secret sit together in one grey block, labels
   included, with one Copy button. The user copies the whole block at once and
   pastes it into an email. The block holds exactly the text that is copied, so
-  keep the two lines as they are, with no extra spaces. The warning is GOV.UK
-  warning text, between the Copy and Close buttons, so it is read at the point
-  it matters.
+  keep the lines as they are, with no extra spaces. The warning is GOV.UK
+  warning text, under the heading and above the credentials, so it is read first.
 
   The Copy button is hidden until JavaScript runs (see application.js), so
   without JavaScript the text is still on the page to select and copy by hand.
@@ -25,11 +24,16 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <span class="govuk-caption-l">{{ "Rotate" if rotated else "Create" }} external test environment credentials</span>
-    <h1 class="govuk-heading-l">Client secret successfully {{ "rotated" if rotated else "created" }}</h1>
+    <span class="govuk-caption-l">Manage client credentials</span>
+    <h1 class="govuk-heading-l">{{ credential.clientName }}</h1>
+
+    {{ govukWarningText({
+      text: "Copy the client secret before leaving this page. Once you leave this page, you can not view the client secret again.",
+      iconFallbackText: "Warning",
+      classes: "govuk-!-margin-top-6"
+    }) }}
 
     {% set credentialsHtml %}
-      <h2 class="govuk-heading-m">{{ credential.clientName }}</h2>
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">External test environment</p>
       <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
       <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
@@ -70,13 +74,28 @@ Generated on
       <span class="app-copy-status govuk-body govuk-!-margin-bottom-0" role="status" aria-live="polite"></span>
     </div>
 
-    {{ govukWarningText({
-      text: "Copy the client secret before leaving this page. Once you leave this page, you can not view the client secret again.",
-      iconFallbackText: "Warning",
-      classes: "govuk-!-margin-top-6"
-    }) }}
+    {% for olderGeneratedOn in otherSecrets %}
+      {% set olderHtml %}
+          <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">External test environment</p>
+        <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
+        <p class="govuk-body">{{ credential.clientId }}</p>
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client secret</p>
+        <p class="govuk-body">[Redacted for security]</p>
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Generated on</p>
+        <p class="govuk-body govuk-!-margin-bottom-0">{{ olderGeneratedOn }}</p>
+      {% endset %}
 
-    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/created" novalidate>
+      {# The older secret keeps working and cannot be shown again, so it is redacted. #}
+      <div class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+        {{ mojTicketPanel({
+          attributes: { "aria-label": "Existing client secret" },
+          items: [{ html: olderHtml, classes: "moj-ticket-panel__content--blue" }]
+        }) }}
+      </div>
+    {% endfor %}
+
+    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/created" class="govuk-!-margin-top-6" novalidate>
       {{ govukButton({ text: "Close" }) }}
     </form>
 

@@ -15,41 +15,45 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <span class="govuk-caption-l">External test environment credentials</span>
-    <h1 class="govuk-heading-l">Manage client credentials</h1>
+    <span class="govuk-caption-l">Manage client credentials</span>
+    <h1 class="govuk-heading-l">{{ credential.clientName }}</h1>
 
-    {% set credentialsHtml %}
-      <h2 class="govuk-heading-m">{{ credential.clientName }}</h2>
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">External test environment</p>
-      <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
-      <p class="govuk-body">{{ credential.clientId }}</p>
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client secret</p>
-      <p class="govuk-body">[Redacted for security]</p>
-      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Generated on</p>
-      <p class="govuk-body govuk-!-margin-bottom-0">{{ generatedOn }}</p>
-    {% endset %}
+    {# One panel per secret, newest first. Each secret can only be shown once, so they are all redacted. #}
+    {% for generatedOn in secretLabels %}
+      {% set credentialsHtml %}
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Generated on</p>
+        <p class="govuk-body">{{ generatedOn }}</p>
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">External test environment</p>
+        <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
+        <p class="govuk-body">{{ credential.clientId }}</p>
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client secret</p>
+        <p class="govuk-body govuk-!-margin-bottom-0">[Redacted for security]</p>
+      {% endset %}
 
-    <div class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
-      {{ mojTicketPanel({
-        attributes: { "aria-label": "Client credentials" },
-        items: [{ html: credentialsHtml, classes: "moj-ticket-panel__content--blue" }]
-      }) }}
-    </div>
+      <div class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+        {{ mojTicketPanel({
+          attributes: { "aria-label": "Client credentials, secret " + loop.index },
+          items: [{ html: credentialsHtml, classes: "moj-ticket-panel__content--blue" }]
+        }) }}
+      </div>
+    {% endfor %}
 
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: "Add another secret",
-        href: "/" + version + "/client-credentials/" + credential.id + "/add-secret",
-        classes: "govuk-button--secondary"
-      }) }}
-      {{ govukButton({
-        text: "Replace this secret",
-        href: "/" + version + "/client-credentials/" + credential.id + "/replace",
-        classes: "govuk-button--warning"
-      }) }}
-      <a class="govuk-link" href="/{{ version }}/software-providers">Cancel</a>
-    </div>
+    {# The form wraps the group so "Add another secret" can post. The other two are links styled as buttons. #}
+    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/add-secret" novalidate>
+      <div class="govuk-button-group">
+        {% if canAddSecret %}
+          {{ govukButton({ text: "Add another secret", classes: "govuk-button--secondary", preventDoubleClick: true }) }}
+        {% endif %}
+        {# With two secrets the red button removes the older one. With one it replaces it. #}
+        {{ govukButton({
+          text: "Replace this secret" if canAddSecret else "Remove this secret",
+          href: "/" + version + "/client-credentials/" + credential.id + ("/replace" if canAddSecret else "/remove"),
+          classes: "govuk-button--warning"
+        }) }}
+        <a class="govuk-link" href="/{{ version }}/software-providers">Cancel</a>
+      </div>
+    </form>
 
   </div>
 </div>

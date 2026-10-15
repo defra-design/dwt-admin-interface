@@ -2018,10 +2018,21 @@ function registerV5Routes () {
   // The one-time reveal, for new credentials and for a rotated secret. Once
   // closed there is nothing left to show, so this sends the user back to the
   // table rather than showing the secret again.
+  // When each secret was generated, newest first, as text for the page.
+  function secretLabels (credential) {
+    return cc.secretDates(credential)
+      .slice()
+      .sort((a, b) => new Date(b) - new Date(a))
+      .map((d) => formatDateTimeObj(new Date(d)))
+  }
+
   function renderReveal (res, credential) {
     res.render(view('client-credentials/created'), {
       credential,
       generatedOn: formatDateTimeObj(new Date(credential.lastChanged)),
+      // When a second secret is added, the older one is shown redacted below the new one.
+      otherSecrets: credential.pendingAction === 'added' ? secretLabels(credential).slice(1) : [],
+      added: credential.pendingAction === 'added',
       rotated: credential.pendingAction === 'rotated',
       caption: `${credential.environment} credentials`
     })
@@ -2051,7 +2062,8 @@ function registerV5Routes () {
     if (!credential) return res.redirect(`${base}/software-providers`)
     res.render(view('client-credentials/rotate'), {
       credential,
-      generatedOn: formatDateTimeObj(new Date(credential.lastChanged)),
+      secretLabels: secretLabels(credential),
+      canAddSecret: cc.secretDates(credential).length < cc.MAX_SECRETS,
       caption: `${credential.environment} credentials`
     })
   })
@@ -2061,16 +2073,46 @@ function registerV5Routes () {
       return res.redirect(`${base}/software-providers`)
     }
     const credential = cc.credentialToChange(credentialList(req), req.params.id)
-    if (credential.pendingAction !== 'rotated') cc.rotateSecret(credential)
+    if (credential.pendingAction !== 'rotated') {
+      cc.rotateSecret(credential)
+      // Replacing leaves one secret, generated now.
+      delete credential.secrets
+    }
     res.redirect(`${base}/client-credentials/${credential.id}/created`)
   })
 
-  // "Add another secret" is not designed yet — goes to the placeholder page.
-  router.get(`${base}/client-credentials/:id/add-secret`, (req, res) => {
-    res.render(view('placeholder'), {
-      heading: 'Add another secret',
-      activeSection: 'providers'
-    })
+  // Adding a secret changes data, so it is a POST. Two secrets at most. Goes
+  // straight to the page where the new secret is shown once.
+  router.post(`${base}/client-credentials/:id/add-secret`, (req, res) => {
+    if (!cc.getCredential(credentialList(req), req.params.id)) {
+      return res.redirect(`${base}/software-providers`)
+    }
+    const credential = cc.credentialToChange(credentialList(req), req.params.id)
+    if (cc.secretDates(credential).length < cc.MAX_SECRETS && credential.pendingAction !== 'added') {
+      cc.addSecret(credential)
+    }
+    res.redirect(`${base}/client-credentials/${credential.id}/created`)
+  })
+
+  // Removing the older of two secrets asks the user to confirm first. The most
+  // recent secret stays. Only the POST removes it, then the user goes back to
+  // the manage page, which now shows one secret.
+  router.get(`${base}/client-credentials/:id/remove`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    const labels = secretLabels(credential)
+    if (labels.length < 2) return res.redirect(`${base}/client-credentials/${credential.id}/rotate`)
+    res.render(view('client-credentials/remove'), { credential, olderSecretDate: labels[1] })
+  })
+
+  router.post(`${base}/client-credentials/:id/remove`, (req, res) => {
+    if (!cc.getCredential(credentialList(req), req.params.id)) {
+      return res.redirect(`${base}/software-providers`)
+    }
+    const credential = cc.credentialToChange(credentialList(req), req.params.id)
+    const dates = cc.secretDates(credential)
+    if (dates.length > 1) credential.secrets = dates.slice(-1)
+    res.redirect(`${base}/client-credentials/${credential.id}/rotate`)
   })
 
   // Replacing the secret asks the user to confirm first. The form on this page

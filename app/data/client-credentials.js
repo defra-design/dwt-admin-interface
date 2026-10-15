@@ -181,6 +181,26 @@ function rotateSecret (credential) {
   credential.lastChanged = new Date().toISOString()
 }
 
+// Adding another secret keeps the existing one working and gives the credential
+// a second, new secret, shown once on the next page. `secrets` holds when each
+// secret was generated (oldest first). Used from version 5. A credential
+// without `secrets` has one secret, generated at `lastChanged`.
+const MAX_SECRETS = 2
+
+function secretDates (credential) {
+  return credential.secrets && credential.secrets.length
+    ? credential.secrets
+    : [credential.lastChanged]
+}
+
+function addSecret (credential) {
+  const now = new Date().toISOString()
+  credential.secrets = secretDates(credential).concat(now)
+  credential.pendingSecret = generateClientSecret(credential.environment)
+  credential.pendingAction = 'added'
+  credential.lastChanged = now
+}
+
 // Only the client name is asked for. `ownId` lets an edit keep its own name.
 function validateClientName (clientName, sessionList, ownId) {
   const errors = {}
@@ -215,6 +235,9 @@ module.exports = {
   credentialToChange,
   createCredential,
   rotateSecret,
+  MAX_SECRETS,
+  secretDates,
+  addSecret,
   validateClientName,
   clientNameErrorList
 }
