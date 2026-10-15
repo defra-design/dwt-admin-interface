@@ -36,6 +36,7 @@ Every in-service page starts with:
 - Back links: sub-pages use `govukBackLink` in `beforeContent` with a real `href` built from `version` (e.g. back to the provider detail page), not `javascript:history.back()`. Top-level pages (start, section lists) have none.
 - Start pages show a heading, one line of text and a bulleted list of links. They don't use the green "Start now" button.
 - Forms: `method="post"`, `novalidate`, action built from `version`. Error summary at the top of the content block, as in `v4/software-providers/add.html`.
+- Page titles: `pageName` is the page title, and the layout adds " - DWT admin portal". A question page uses the question as its title. An error page starts with "Error: " (WCAG 2.4.2). v5 titles: the name page is "What is the name of the software provider and package?", the Manage page is "Manage client credentials".
 - Use a `govuk-caption-l` above the `h1` to name the section on sub-pages (e.g. "Software providers").
 - Repeated content goes in a partial with a leading underscore, included by version (`{% include version + "/software-providers/_email-addresses.html" %}`).
 - Pages are `.html`. The "related items" sidebar from the common templates isn't used in this prototype — don't introduce it without asking.

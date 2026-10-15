@@ -11,7 +11,7 @@
 
 {% set version = "v5" %}
 {% set editing = (mode === "edit") %}
-{% set pageName = ("Edit " if editing else "Generate ") + (environment.label | lower) + " credentials" %}
+{% set pageName = ("Edit " + (environment.label | lower) + " credentials") if editing else (("Error: " if errorList.length else "") + "What is the name of the software provider and package?") %}
 {% set activeSection = "providers" %}
 
 {% block content %}

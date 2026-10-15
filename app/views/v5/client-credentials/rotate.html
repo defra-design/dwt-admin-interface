@@ -8,7 +8,7 @@
 {% extends "layouts/v5.html" %}
 
 {% set version = "v5" %}
-{% set pageName = "Client credentials" %}
+{% set pageName = "Manage client credentials" %}
 {% set activeSection = "providers" %}
 
 {% block content %}
@@ -33,7 +33,7 @@
 
       <div class="govuk-!-margin-top-6 govuk-!-margin-bottom-6">
         {{ mojTicketPanel({
-          attributes: { "aria-label": "Client credentials, secret " + loop.index },
+          attributes: { "aria-label": "Client credentials generated on " + generatedOn },
           items: [{ html: credentialsHtml, classes: "moj-ticket-panel__content--blue" }]
         }) }}
       </div>

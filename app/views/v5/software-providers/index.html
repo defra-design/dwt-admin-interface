@@ -44,7 +44,7 @@
         <td class="govuk-table__cell">{{ credential.clientId }}</td>
         <td class="govuk-table__cell">{{ credential.environment }}</td>
         <td class="govuk-table__cell">
-          <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/rotate">Manage<span class="govuk-visually-hidden"> client secret for {{ credential.clientId }}</span></a>
+          <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/rotate">Manage<span class="govuk-visually-hidden"> client secret for {{ credential.clientName }}</span></a>
         </td>
       </tr>
     {% endfor %}
