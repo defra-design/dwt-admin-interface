@@ -66,7 +66,7 @@
         ],
         [
           { text: "Software provider page" },
-          { text: "The Manage client credentials page (URL changed from rotate to software-provider-detail) is now the software provider page, reached from the client name in the table. It shows the client name as the H1 with an “External test” tag below it, the client ID, and an H2 “Client secrets for external test environment”. The secrets are in a table (Generated on, Client secret as “[Hidden]”, Actions) instead of panels. With one secret the row has “Replace”, with an “Add another secret” button below. With two secrets the older row has “Remove”. Replace and Remove still ask for confirmation first. The sections are spaced further apart. There is a back link to the table." },
+          { text: "The Manage client credentials page (URL changed from rotate to software-provider-detail) is now the software provider page, reached from the client name in the table. It shows the client name as the H1 with an “External test” tag below it, the client ID, and an H2 “Client secrets for external test environment”. The secrets are in a table (Generated on, Client secret as “[Hidden]”, Actions) instead of panels. With one secret the row has “Replace”, with an “Add another secret” button below. With two secrets the older row has “Remove”. Replace and Remove still ask for confirmation first. The sections are spaced further apart. There is a “New” tag on the newest secret the first time the page is shown after the user closes the copy page." },
           { text: "Sketch from the interaction designer. The page is expected to grow into a case file. The tag and the H2 both name the environment because there are four environments (Dev, Test, Perf-test, External test and Production) and the user only sees the one for the URL they are on, which is confusing. No research yet." },
           { html: '<a class="govuk-link" href="/v6/client-credentials/client-1/software-provider-detail">/v6/client-credentials/client-1/software-provider-detail</a>' }
         ],
@@ -78,15 +78,15 @@
         ],
         [
           { text: "Copy the client credentials" },
-          { text: "The copy page is redesigned. One warning instead of a warning and a line of body text, a plain summary list instead of a grey panel, the client name as the caption, and a primary “Copy credentials” button with a secondary “Close” button. After copying, the Copy button changes to “Credentials copied” for four seconds, with no text beside it, so the Close button does not move. The earlier panel design is kept as an orphan screen." },
-          { text: "The earlier page had a warning, body text, a panel and two buttons that competed for attention, and the “copied” message pushed the other button sideways. The label change follows the MoJ and GOV.UK Design System copy buttons. The MoJ button also removes its background once copied, which is not possible for a primary button outside a panel. No research yet." },
+          { text: "The copy page is redesigned. One MoJ warning alert (heading “You must copy the credentials”, body text “You cannot view the client secret after closing this page.”) replaces the warning, body text and grey panel. The credentials are a plain summary list in the order Client ID, Client secret, External test environment, Generated on, with the client name as the caption. A primary “Copy credentials” button sits beside a secondary “Close” button. After copying, the Copy button changes to “Credentials copied” for four seconds, with no text beside it, so the Close button does not move. Two earlier designs are kept as orphan screens." },
+          { text: "The earlier page had a warning, body text, a panel and two buttons that competed for attention, and the “copied” message pushed the other button sideways. The label change follows the MoJ and GOV.UK Design System copy buttons. The MoJ button also removes its background once copied, which is not possible for a primary button outside a panel. The MoJ alert was chosen over GOV.UK warning text after comparing the two. No research yet." },
           { html: '<a class="govuk-link" href="/v6/software-providers">/v6/software-providers</a><br><a class="govuk-link" href="/v6/client-credentials/created-panel">/v6/client-credentials/created-panel</a> (earlier design)' }
         ],
         [
-          { text: "Copy page, design option 3" },
-          { text: "An orphan screen that is not part of the journey. It uses the MoJ warning alert instead of GOV.UK warning text, with the heading “You cannot view the client secret after closing this page” and the body text “You must copy the credentials”. The order is Client ID, Client secret, External test environment, then Generated on, and the copied text follows the same order." },
-          { text: "To compare against the journey version. The MoJ warning alert was used in an earlier version. No research yet." },
-          { html: '<a class="govuk-link" href="/v6/client-credentials/created-3">/v6/client-credentials/created-3</a>' }
+          { text: "Copy page, earlier design with GOV.UK warning text" },
+          { text: "An orphan screen that is not part of the journey, kept for the record. It uses GOV.UK warning text (“You must copy the credentials. You cannot view the client secret after closing this page.”) instead of the MoJ alert. The list order and buttons are the same as the journey page." },
+          { text: "To compare against the journey version. No research yet." },
+          { html: '<a class="govuk-link" href="/v6/client-credentials/created-warning">/v6/client-credentials/created-warning</a>' }
         ]
       ]
     }) }}

@@ -4,17 +4,14 @@
   A secret is never shown again, so every secret is "[Hidden]".
   One secret: "Replace" in its row and an "Add another secret" button. Two
   secrets: "Remove" on the older row only, and no add button. Replace and Remove
-  go to a confirmation page first.
+  go to a confirmation page first. After the user closes the copy page, the newest
+  secret has a "New" tag, once (see routes.js).
 #}
 {% extends "layouts/v6.html" %}
 
 {% set version = "v6" %}
 {% set pageName = credential.clientName %}
 {% set activeSection = "providers" %}
-
-{% block beforeContent %}
-  {{ govukBackLink({ text: "Back to software providers", href: "/" + version + "/software-providers" }) }}
-{% endblock %}
 
 {% block content %}
 <div class="govuk-grid-row">
@@ -51,7 +48,7 @@
       <tbody class="govuk-table__body">
         {% for generatedOn in secretLabels %}
           <tr class="govuk-table__row">
-            <td class="govuk-table__cell">{{ generatedOn }}</td>
+            <td class="govuk-table__cell">{{ generatedOn }}{% if showNew and loop.first %} {{ govukTag({ text: "New", classes: "govuk-tag--green" }) }}{% endif %}</td>
             <td class="govuk-table__cell">[Hidden]</td>
             <td class="govuk-table__cell">
               {% if canAddSecret %}

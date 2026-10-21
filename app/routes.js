@@ -2324,15 +2324,15 @@ function registerV6Routes () {
     })
   })
 
-  // Orphan screen: design option 3 for the copy page (MoJ warning alert).
-  router.get(`${base}/client-credentials/created-3`, (req, res) => {
+  // Orphan screen: the copy page with GOV.UK warning text.
+  router.get(`${base}/client-credentials/created-warning`, (req, res) => {
     const credential = {
       id: 'client-1',
       clientName: 'Kerbside_Collect_Test',
       clientId: 'b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4',
       pendingSecret: 'dwt_test_b796d64665f65a16ef1ab2faa5954b25'
     }
-    res.render(view('client-credentials/created-3'), {
+    res.render(view('client-credentials/created-warning'), {
       credential,
       generatedOn: formatDateTimeObj(new Date('2026-10-21T08:14:00'))
     })
@@ -2344,6 +2344,8 @@ function registerV6Routes () {
     if (!credential) return res.redirect(`${base}/software-providers`)
     delete credential.pendingSecret
     delete credential.pendingAction
+    // Tells the detail page to tag the new secret, once.
+    credential.showNewTag = true
     res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
   })
 
@@ -2353,8 +2355,11 @@ function registerV6Routes () {
   router.get(`${base}/client-credentials/:id/software-provider-detail`, (req, res) => {
     const credential = cc.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
+    const showNew = Boolean(credential.showNewTag)
+    delete credential.showNewTag
     res.render(view('client-credentials/software-provider-detail'), {
       credential,
+      showNew,
       secretLabels: secretLabels(credential),
       canAddSecret: cc.secretDates(credential).length < cc.MAX_SECRETS,
       caption: `${credential.environment} credentials`
