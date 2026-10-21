@@ -1,0 +1,67 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Allowed characters in the client name" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Out of scope</span>
+    <h1 class="govuk-heading-l">Allowed characters in the client name</h1>
+
+    <p class="govuk-body">The design and acceptance criteria for this change, to use when a ticket is written for it. It has no ticket number yet. It changes the name page built in DWTA-458, which only allows letters and underscores, so that the client name can also include numbers, hyphens and full stops.</p>
+    <p class="govuk-body">The allowed characters are A to Z, a to z, 0 to 9, _ (underscore), - (hyphen) and . (full stop). Spaces are not allowed. This needs confirming with the developers.</p>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the name page design",
+        href: "/jira-tickets/allowed-characters/design-name",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the invalid characters error design",
+        href: "/jira-tickets/allowed-characters/design-name-error-characters",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+    <p class="govuk-body">On the name page:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>Between the H1 and the input is a paragraph: “You can use letters, numbers, underscores (_), hyphens (-) and full stops (.). Do not use spaces.”. The rules are in the page, not hidden in a details component, so I can read them before I type.</li>
+      <li>The hint is “Enter the name of the software provider and software package, for example, Waste_Technologies_Software.”.</li>
+      <li>Spellcheck is off on the input (<code>spellcheck="false"</code>).</li>
+      <li>Given the client name has anything in it other than the characters listed in the paragraph above the input, including a space, then the error is “Client name must only include letters, numbers, underscores, hyphens and full stops”. See the invalid characters error design. What I typed is not changed, and no characters are removed.</li>
+      <li>The characters are checked on the server, when I select “Generate credentials”. The input has no <code>pattern</code> attribute, because browsers show their own error messages, which we cannot word or make accessible. The form keeps <code>novalidate</code> so that only our error summary and error message show.</li>
+      <li>Given the client name only has the allowed characters in it, then it passes this check. The empty name and duplicate name errors are unchanged.</li>
+      <li>The pages match the design references.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">On the name page, meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The paragraph above the input is real text. A screen reader reads it before the label and input, so the rules are heard before the user types. The symbols are named in words (underscores, hyphens, full stops), with the symbol in brackets (1.3.1, 3.3.2).</li>
+      <li>The error message is the same in the error summary and beside the input, and says what the user can use (3.3.1, 3.3.3).</li>
+      <li>Spellcheck is off, so the browser does not underline names such as “Waste_Technologies_Software” as spelling mistakes.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Enter a name with a space, then names with each allowed character. Check that only the name with the space shows the error.</li>
+      <li>Check the paragraph and the error with a screen reader, such as NVDA or VoiceOver.</li>
+      <li>Check the page at 320px wide and at 200% zoom.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>A limit on the length of the client name. There is no limit yet.</li>
+      <li>Changing the name of a client after it has been created.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}
