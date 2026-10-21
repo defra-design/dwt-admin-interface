@@ -79,10 +79,17 @@ module.exports = [
         rationaleHref: '/jira-tickets/dwta-458'
       },
       {
+        label: 'Version 6',
+        source: 'Prototype',
+        href: '/v6/software-providers',
+        difference: 'The Client secret column is removed. Each client name is a link to the Manage client credentials page. Client ID and Environment are unchanged.',
+        rationaleHref: '/versions/v6'
+      },
+      {
         label: 'Version 5',
         source: 'Prototype',
         href: '/v5/software-providers',
-        difference: 'One table for Test and Production, with Client ID, Environment, Client secret and Last changed. No Client name column or Edit link. Sortable, and loads sorted by Last changed.',
+        difference: 'One table with Client name, Client ID, Environment and Client secret (a Manage link in each row). Production is hidden and every row says External test. Sortable, and loads sorted by Client name from A to Z. The Create new credentials button stays above the table.',
         rationaleHref: '/versions/v5'
       },
       {
@@ -227,6 +234,20 @@ module.exports = [
     summary: 'The question page for the client name, reached from the Create credentials button.',
     variants: [
       {
+        label: 'Allowed characters invalid characters error design',
+        source: 'Jira design',
+        href: '/jira-tickets/allowed-characters/design-name-error-characters',
+        difference: 'The name page with an error: “Client name must only include letters, numbers, underscores, hyphens and full stops”. Out of scope for DWTA-458.',
+        rationaleHref: '/jira-tickets/allowed-characters'
+      },
+      {
+        label: 'Allowed characters name page design',
+        source: 'Jira design',
+        href: '/jira-tickets/allowed-characters/design-name',
+        difference: 'The name page with a paragraph above the input saying which characters are allowed (letters, numbers, underscores, hyphens and full stops), and an example in the hint. Out of scope for DWTA-458.',
+        rationaleHref: '/jira-tickets/allowed-characters'
+      },
+      {
         label: 'DWTA-458 name page duplicate name error design',
         source: 'Jira design',
         href: '/jira-tickets/dwta-458/design-name-error-duplicate',
@@ -259,7 +280,7 @@ module.exports = [
         source: 'Prototype',
         href: '/v5/software-providers',
         linkNote: 'Select Create new credentials.',
-        difference: 'Caption names the task and environment, for example “Create test environment credentials”. Heading is “What is the name of the software provider and application?”. Same as version 4.4.',
+        difference: 'Caption names the task and environment, for example “Create external test environment credentials”. Heading is “What is the name of the software provider and package?”, with new help text. Page title is the question, and starts with “Error: ” on an error page.',
         rationaleHref: '/versions/v5'
       },
       {
@@ -327,7 +348,7 @@ module.exports = [
         source: 'Prototype',
         href: '/v5/software-providers',
         linkNote: 'Select Create new credentials, then save.',
-        difference: 'Heading is “Client secret successfully created” (or “rotated”). Warning to copy the secret before leaving the page. Button is Close. Same content as version 4.4.',
+        difference: 'Heading is “Copy the client credentials”, with the caption “Manage client credentials” and the client name as an H2. Warning text under the heading is the only message. The panel starts with Generated on. Copy, then Close.',
         rationaleHref: '/versions/v5'
       },
       {
@@ -401,8 +422,8 @@ module.exports = [
         label: 'Version 5',
         source: 'Prototype',
         href: '/v5/software-providers',
-        linkNote: 'Select Rotate in the table.',
-        difference: 'Confirmation page: “Confirm that you want to rotate the client secret”, with a red Rotate secret button. Same as version 4.4.',
+        linkNote: 'Select Manage in the table.',
+        difference: 'Now “Manage client credentials”, reached from Manage in the table. Client name as the heading and a redacted secret. Add another secret, Replace this secret (or Remove this secret with two secrets) and Cancel. Replace and Remove each have a confirmation page.',
         rationaleHref: '/versions/v5'
       },
       {

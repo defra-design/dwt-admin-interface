@@ -1,0 +1,113 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 6" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 6
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 21 October 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 6</span>',
+        href: "/v6/start",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A copy of version 5, the starting point for the CDP demo. This version addresses usability issues left as design debt in version 5, in the software providers table, the software provider page and the credentials journeys." },
+          { text: "Version 5 was built under time constraints. Changes are recorded here as they are made." },
+          { html: '<a class="govuk-link" href="/v6/start">/v6/start</a>' }
+        ],
+        [
+          { text: "Software providers table" },
+          { text: "The Client secret column (the “Manage” link) is removed. The client name in each row is now a link to the Manage client credentials page. The column heading is “Client name” and the table caption stays “Client credentials”. The button label “Create new credentials” is unchanged." },
+          { text: "Content designer feedback on the sketch: one link per row is clearer than a separate action column, and a link with the client name describes where it goes. No research yet." },
+          { html: '<a class="govuk-link" href="/v6/software-providers">/v6/software-providers</a>' }
+        ],
+        [
+          { text: "Copy the client credentials" },
+          { text: "The “Manage client credentials” caption above the heading is removed. The warning text is “You cannot view the client secret after closing this page.” There is new body text under the warning: “You must copy the client secret and other credentials.” The client name stays as an H2 above the grey panel." },
+          { text: "Content designer feedback on the annotated screenshot: a shorter warning, with the instruction in body text, is easier to scan. No research yet." },
+          { html: '<a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a>' }
+        ],
+        [
+          { text: "Software provider page" },
+          { text: "The Manage client credentials page (URL changed from rotate to software-provider-detail) is now the software provider page, reached from the client name in the table. It shows the client name as the H1 with an “External test” tag below it, the client ID, and an H2 “Client secrets for external test environment”. The secrets are in a table (Generated on, Client secret as “[Hidden]”, Actions) instead of panels. With one secret the row has “Replace”, with an “Add another secret” button below. With two secrets the older row has “Remove”. Replace and Remove still ask for confirmation first. The sections are spaced further apart. There is a back link to the table." },
+          { text: "Sketch from the interaction designer. The page is expected to grow into a case file. The tag and the H2 both name the environment because there are four environments (Dev, Test, Perf-test, External test and Production) and the user only sees the one for the URL they are on, which is confusing. No research yet." },
+          { html: '<a class="govuk-link" href="/v6/client-credentials/client-1/software-provider-detail">/v6/client-credentials/client-1/software-provider-detail</a>' }
+        ],
+        [
+          { text: "After creating credentials" },
+          { text: "Closing the “Copy the client credentials” page now goes to the software provider page, which lists the new credentials. The copy page only ever shows the one new set of credentials, including after “Add another secret”. The older secret is no longer shown below it." },
+          { text: "The software provider page confirms that the credentials were generated and gives an overview. The copy page is now only for copying. No research yet." },
+          { html: '<a class="govuk-link" href="/v6/software-providers">/v6/software-providers</a>' }
+        ],
+        [
+          { text: "Copy the client credentials" },
+          { text: "The copy page is redesigned. One warning instead of a warning and a line of body text, a plain summary list instead of a grey panel, the client name as the caption, and a primary “Copy credentials” button with a secondary “Close” button. After copying, the Copy button changes to “Credentials copied” for four seconds, with no text beside it, so the Close button does not move. The earlier panel design is kept as an orphan screen." },
+          { text: "The earlier page had a warning, body text, a panel and two buttons that competed for attention, and the “copied” message pushed the other button sideways. The label change follows the MoJ and GOV.UK Design System copy buttons. The MoJ button also removes its background once copied, which is not possible for a primary button outside a panel. No research yet." },
+          { html: '<a class="govuk-link" href="/v6/software-providers">/v6/software-providers</a><br><a class="govuk-link" href="/v6/client-credentials/created-panel">/v6/client-credentials/created-panel</a> (earlier design)' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">Design decisions are the same as in
+      <a class="govuk-link" href="/versions/v5#design-rationale">version 5</a>, except for the changes recorded in the table above.</p>
+
+    <p class="govuk-body">There is no user research behind the credentials changes yet. They are built so that we can learn from them, and will be tested in user research. These are the decisions we most want to test:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Whether the name page needs the label as the H1, as in the GOV.UK question pages pattern.</li>
+      <li>Whether one message on the “Copy the client credentials” page is enough, or people miss the warning.</li>
+      <li>Whether a limit of two secrets, and removing the older one, is what software providers and staff expect.</li>
+      <li>Whether “[Redacted for security]” is clear to people who expect to see the secret.</li>
+    </ul>
+
+    <p class="govuk-body">This version has its own session data. Credentials created in this version are not
+      shown in version 4.4, and the other way round.</p>
+
+  </div>
+</div>
+{% endblock %}

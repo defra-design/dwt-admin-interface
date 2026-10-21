@@ -465,3 +465,11 @@
   align-items: flex-start;
   margin-bottom: 10px;
 }
+
+
+// Copy button whose label changes to "Credentials copied" (v6 copy page). A
+// minimum width stops the button resizing, so the Close button beside it does
+// not move. No GOV.UK class does this.
+.app-copy-button {
+  min-width: 11em;
+}

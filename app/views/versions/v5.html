@@ -13,11 +13,10 @@
     <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
     <h1 class="govuk-heading-l">
       Version 5
-      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
     </h1>
 
     <p class="govuk-body">
-      <span class="govuk-!-font-weight-bold">Date of last change:</span> 12 October 2026<br>
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 15 October 2026<br>
       <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
     </p>
 
@@ -60,8 +59,8 @@
         ],
         [
           { text: "Software providers table" },
-          { text: "One table for Test and Production, with the columns Client ID, Environment, Client secret and Last changed. Removed the Client name column, the Edit link and the Test and Production sub navigation." },
-          { text: "Align with the live service, which has one table." },
+          { text: "One table with the columns Client name, Client ID, Environment and Client secret, matching the DWTA-456 design plus the Client secret column. Removed the Last changed column, the Edit link and the Test and Production sub navigation. Production credentials are hidden, and every row says “External test”. The “Create new credentials” button stays above the table. The Client secret column has a “Manage” link in each row." },
+          { text: "Match the DWTA-456 design reference. The Client secret column and the button are kept for the work in DWTA-458 and DWTA-466. TO CONFIRM: why Production is hidden." },
           { html: '<a class="govuk-link" href="/v5/software-providers">/v5/software-providers</a>' }
         ],
         [
@@ -87,6 +86,42 @@
           { text: "The Client ID, Environment and Last changed columns can be sorted, using the MoJ sortable table pattern. The table loads sorted by Last changed, most recent first, and that heading shows it is sorted. Client secret cannot be sorted." },
           { text: "TO CONFIRM: the research finding or decision behind this change. Suggested wording: users need to find a client quickly, and to see what changed most recently." },
           { html: '<a class="govuk-link" href="/v5/software-providers">/v5/software-providers</a>' }
+        ],
+        [
+          { text: "Sortable columns" },
+          { text: "The Client name, Client ID and Environment columns can be sorted, using the MoJ sortable table pattern. The table loads sorted by Client name, A to Z, and that heading shows it is sorted. Client secret cannot be sorted." },
+          { text: "Match the DWTA-456 design reference. TO CONFIRM: the research finding or decision behind this change. Suggested wording: users need to find a client quickly." },
+          { html: '<a class="govuk-link" href="/v5/software-providers">/v5/software-providers</a>' }
+        ],
+        [
+          { text: "Create new credentials" },
+          { text: "The caption names the task and the environment, for example “Create external test environment credentials”. The heading is “What is the name of the software provider and package?”, with new help text. The page title is the question. Error pages start with “Error: ”." },
+          { text: "The name holds both the software provider and the software package. The “Error: ” prefix is a WCAG 2.2 2.4.2 fix. There is no research yet. TO CONFIRM: the label and the H1 are separate, where the GOV.UK question pages pattern would make the label the H1. This needs research." },
+          { html: '<a class="govuk-link" href="/v5/software-providers">/v5/software-providers (select Create new credentials)</a><br><a class="govuk-link" href="/jira-tickets/dwta-458">DWTA-458</a>' }
+        ],
+        [
+          { text: "Copy the client credentials" },
+          { text: "The heading is “Copy the client credentials”, with the caption “Manage client credentials” and the client name as an H2. The success message is gone, so the warning text under the heading is the only message. The warning moved from below the Copy button to the top. The panel starts with Generated on. The Copy message is “Client credentials copied”. The panel has an accessible name that includes its date and time." },
+          { text: "The page had a success message, a warning, a panel and two buttons all competing for attention. One message is easier to act on. Generated on is first because it is what differs when there are two secrets. There is no research yet." },
+          { html: '<a class="govuk-link" href="/jira-tickets/dwta-458">DWTA-458</a><br><a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a>' }
+        ],
+        [
+          { text: "Manage client credentials" },
+          { text: "New page, reached from “Manage” in the table (it replaces the old Rotate page). The heading is the client name, with the caption “Manage client credentials”. The panel shows Generated on, environment, client ID and the client secret as “[Redacted for security]”. Below it are “Add another secret”, “Replace this secret” and “Cancel”." },
+          { text: "The current secret can never be shown again, so it is redacted. Dots were hard to look at, and a screen reader would read them as symbols. There is no research yet." },
+          { html: '<a class="govuk-link" href="/v5/client-credentials/client-1/rotate">/v5/client-credentials/client-1/rotate</a><br><a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a>' }
+        ],
+        [
+          { text: "Add another secret" },
+          { text: "A client can have two secrets at most. “Add another secret” creates the second secret straight away, with no confirmation, and shows it once on the credentials page, with the existing secret redacted below it. With two secrets the Manage page shows two panels and no “Add another secret” button." },
+          { text: "The software provider can switch to the new secret before the old one stops working. There is no research yet." },
+          { html: '<a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a>' }
+        ],
+        [
+          { text: "Replace or remove a secret" },
+          { text: "With one secret the red button says “Replace this secret”. With two it says “Remove this secret”, and removes the older one. Each goes to a confirmation page using the MoJ interruption card, with an inverse “Yes” button and a link back to Manage client credentials." },
+          { text: "Replacing or removing makes the secret stop working immediately, which can break the software provider’s connection, so it asks first. There is no research yet." },
+          { html: '<a class="govuk-link" href="/v5/client-credentials/client-1/replace">/v5/client-credentials/client-1/replace</a><br><a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a>' }
         ]
       ]
     }) }}
@@ -100,7 +135,16 @@
     <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
 
     <p class="govuk-body">Design decisions are the same as in
-      <a class="govuk-link" href="/versions/v4-4#design-rationale">version 4.4</a>, until changes are recorded here.</p>
+      <a class="govuk-link" href="/versions/v4-4#design-rationale">version 4.4</a>, except for the changes recorded in the table above.</p>
+
+    <p class="govuk-body">There is no user research behind the credentials changes yet. They are built so that we can learn from them, and will be tested in user research. These are the decisions we most want to test:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Whether the name page needs the label as the H1, as in the GOV.UK question pages pattern.</li>
+      <li>Whether one message on the “Copy the client credentials” page is enough, or people miss the warning.</li>
+      <li>Whether a limit of two secrets, and removing the older one, is what software providers and staff expect.</li>
+      <li>Whether “[Redacted for security]” is clear to people who expect to see the secret.</li>
+    </ul>
 
     <p class="govuk-body">This version has its own session data. Credentials created in this version are not
       shown in version 4.4, and the other way round.</p>

@@ -41,8 +41,35 @@
     <div class="govuk-summary-card">
       <div class="govuk-summary-card__title-wrapper">
         <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 5
+          Version 6
           {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+        </h3>
+      </div>
+      <div class="govuk-summary-card__content">
+        <div>
+          {{ govukButton({
+            html: 'View prototype<span class="govuk-visually-hidden"> for version 6</span>',
+            href: "/v6/start",
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+
+        <p class="govuk-body-s">
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 21 October 2026<br>
+          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-body-s">
+          <li><a class="govuk-link" href="/versions/v6">Changes and design rationale for version 6</a></li>
+          <li><a class="govuk-link" href="/v6/client-credentials/created-panel">Earlier design: copy the client credentials with a panel (created-panel)</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
+          Version 5
         </h3>
       </div>
       <div class="govuk-summary-card__content">
@@ -55,7 +82,7 @@
         </div>
 
         <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 12 October 2026<br>
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 15 October 2026<br>
           <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
         </p>
 

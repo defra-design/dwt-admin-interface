@@ -2126,6 +2126,285 @@ function registerV5Routes () {
 
 registerV5Routes()
 
+// --- Version 6 -----------------------------------------------------------
+// A copy of version 5, with no changes yet. It has its own function and its
+// own session data key, so version 5 stays frozen while this is edited.
+function registerV6Routes () {
+  const base = '/v6'
+  const view = (page) => `v6/${page}`
+
+  router.use(base, (req, res, next) => {
+    res.locals.version = 'v6'
+    next()
+  })
+
+  // Credentials created or changed in this session. See data/client-credentials.js.
+  function credentialList (req) {
+    if (!Array.isArray(req.session.data.clientCredentialsV6)) {
+      req.session.data.clientCredentialsV6 = []
+    }
+    return req.session.data.clientCredentialsV6
+  }
+
+  // The environment comes from the URL: /test or /production.
+  function environmentFor (key) {
+    const match = cc.ENVIRONMENTS.find((e) => e.value.toLowerCase() === key)
+    return match ? { key: match.value.toLowerCase(), label: match.value } : null
+  }
+
+  function tablePath (environmentLabel) {
+    return `${base}/software-providers`
+  }
+
+  // --- Reporting (same as version 4.1) -----------------------------------------
+
+  router.get(`${base}/regulators`, (req, res) => {
+    const filtered = hasDateFilter(req.query)
+    const period = filtered ? lenientPeriod(req.query) : emptyPeriod
+    const orgs = filtered
+      ? reg.listRegisteredInPeriod(period.from, period.to)
+      : reg.listAllOrganisations()
+    const { rows, pagination, total } = paginate(mapOrgRows(orgs), req.query.page, {
+      path: `${base}/regulators`,
+      query: req.query,
+      itemName: 'organisations'
+    })
+    res.render(view('regulators/index'), {
+      period,
+      rows,
+      count: total,
+      filtered,
+      periodLabel: filtered ? periodLabel(period) : null,
+      pagination
+    })
+  })
+
+  // --- Software providers --------------------------------------------------
+
+  // One table for all credentials, Test and Production.
+  router.get(`${base}/software-providers`, (req, res) => {
+    // Client name, A to Z. The page marks "Client name" as sorted.
+    // Production credentials are hidden and Test is shown as "External test".
+    // Only the label changes here, so the shared data stays as it is.
+    const credentials = cc.listCredentials(credentialList(req))
+      .filter((c) => c.environment !== 'Production')
+      .map((c) => Object.assign({}, c, { environment: 'External test' }))
+      .sort((a, b) => a.clientName.localeCompare(b.clientName))
+    res.render(view('software-providers/index'), { credentials })
+  })
+
+  // Old per-environment URLs go to the one table.
+  router.get(`${base}/software-providers/:environment`, (req, res) => {
+    res.redirect(`${base}/software-providers`)
+  })
+
+  // --- Client credentials ---------------------------------------------------
+
+  // The create and edit pages share one form. Only the client name is asked for.
+  function renderClientNameForm (res, options) {
+    res.render(view('client-credentials/create'), Object.assign({
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  router.get(`${base}/client-credentials/:environment/create`, (req, res) => {
+    const environment = environmentFor(req.params.environment)
+    if (!environment) return res.redirect(`${base}/software-providers`)
+    renderClientNameForm(res, {
+      environment,
+      mode: 'create',
+      values: { clientName: '' }
+    })
+  })
+
+  router.post(`${base}/client-credentials/:environment/create`, (req, res) => {
+    const environment = environmentFor(req.params.environment)
+    if (!environment) return res.redirect(`${base}/software-providers`)
+    const values = { clientName: (req.body.clientName || '').trim() }
+    const errors = cc.validateClientName(values.clientName, credentialList(req))
+    if (Object.keys(errors).length) {
+      return renderClientNameForm(res, {
+        environment,
+        mode: 'create',
+        values,
+        errors,
+        errorList: cc.clientNameErrorList(errors)
+      })
+    }
+
+    // The environment is set from the page the user started on, not the form.
+    const credential = cc.createCredential({
+      clientName: values.clientName,
+      environment: environment.label
+    })
+    credentialList(req).push(credential)
+    res.redirect(`${base}/client-credentials/${credential.id}/created`)
+  })
+
+  // The edit page is the create page with the current client name filled in.
+  router.get(`${base}/client-credentials/:id/edit`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    renderClientNameForm(res, {
+      environment: environmentFor(credential.environment.toLowerCase()),
+      mode: 'edit',
+      credential,
+      values: { clientName: credential.clientName }
+    })
+  })
+
+  router.post(`${base}/client-credentials/:id/edit`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    const values = { clientName: (req.body.clientName || '').trim() }
+    // The credential's own name does not count as "already exists".
+    const errors = cc.validateClientName(values.clientName, credentialList(req), credential.id)
+    if (Object.keys(errors).length) {
+      return renderClientNameForm(res, {
+        environment: environmentFor(credential.environment.toLowerCase()),
+        mode: 'edit',
+        credential,
+        values,
+        errors,
+        errorList: cc.clientNameErrorList(errors)
+      })
+    }
+
+    // Only a real change counts as a change, so "Last changed" stays put if
+    // the user saves without editing.
+    if (values.clientName !== credential.clientName) {
+      const toChange = cc.credentialToChange(credentialList(req), credential.id)
+      toChange.clientName = values.clientName
+      toChange.lastChanged = new Date().toISOString()
+    }
+    res.redirect(tablePath(credential.environment))
+  })
+
+  // The one-time reveal, for new credentials and for a rotated secret. Once
+  // closed there is nothing left to show, so this sends the user back to the
+  // table rather than showing the secret again.
+  // When each secret was generated, newest first, as text for the page.
+  function secretLabels (credential) {
+    return cc.secretDates(credential)
+      .slice()
+      .sort((a, b) => new Date(b) - new Date(a))
+      .map((d) => formatDateTimeObj(new Date(d)))
+  }
+
+  function renderReveal (res, credential) {
+    res.render(view('client-credentials/created'), {
+      credential,
+      generatedOn: formatDateTimeObj(new Date(credential.lastChanged)),
+      added: credential.pendingAction === 'added',
+      rotated: credential.pendingAction === 'rotated',
+      caption: `${credential.environment} credentials`
+    })
+  }
+
+  router.get(`${base}/client-credentials/:id/created`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    if (!credential.pendingSecret) return res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
+    renderReveal(res, credential)
+  })
+
+  // Orphan screen: the earlier panel design of the copy page (not linked from the journey, only
+  // from the prototype index). Fixed synthetic data, so it opens without a session.
+  router.get(`${base}/client-credentials/created-panel`, (req, res) => {
+    const credential = {
+      id: 'client-1',
+      clientName: 'Kerbside_Collect_Test',
+      clientId: 'b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4',
+      pendingSecret: 'dwt_test_b796d64665f65a16ef1ab2faa5954b25'
+    }
+    res.render(view('client-credentials/created-panel'), {
+      credential,
+      generatedOn: formatDateTimeObj(new Date('2026-10-21T08:14:00'))
+    })
+  })
+
+  // Closing goes to the software provider page, which confirms what was created.
+  router.post(`${base}/client-credentials/:id/created`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    delete credential.pendingSecret
+    delete credential.pendingAction
+    res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
+  })
+
+  // Rotating asks the user to confirm first. Only the POST gives a new secret.
+  // A refresh of the reveal page keeps the same new secret, because it is only
+  // replaced once the user has closed the page.
+  router.get(`${base}/client-credentials/:id/software-provider-detail`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    res.render(view('client-credentials/software-provider-detail'), {
+      credential,
+      secretLabels: secretLabels(credential),
+      canAddSecret: cc.secretDates(credential).length < cc.MAX_SECRETS,
+      caption: `${credential.environment} credentials`
+    })
+  })
+
+  router.post(`${base}/client-credentials/:id/rotate`, (req, res) => {
+    if (!cc.getCredential(credentialList(req), req.params.id)) {
+      return res.redirect(`${base}/software-providers`)
+    }
+    const credential = cc.credentialToChange(credentialList(req), req.params.id)
+    if (credential.pendingAction !== 'rotated') {
+      cc.rotateSecret(credential)
+      // Replacing leaves one secret, generated now.
+      delete credential.secrets
+    }
+    res.redirect(`${base}/client-credentials/${credential.id}/created`)
+  })
+
+  // Adding a secret changes data, so it is a POST. Two secrets at most. Goes
+  // straight to the page where the new secret is shown once.
+  router.post(`${base}/client-credentials/:id/add-secret`, (req, res) => {
+    if (!cc.getCredential(credentialList(req), req.params.id)) {
+      return res.redirect(`${base}/software-providers`)
+    }
+    const credential = cc.credentialToChange(credentialList(req), req.params.id)
+    if (cc.secretDates(credential).length < cc.MAX_SECRETS && credential.pendingAction !== 'added') {
+      cc.addSecret(credential)
+    }
+    res.redirect(`${base}/client-credentials/${credential.id}/created`)
+  })
+
+  // Removing the older of two secrets asks the user to confirm first. The most
+  // recent secret stays. Only the POST removes it, then the user goes back to
+  // the manage page, which now shows one secret.
+  router.get(`${base}/client-credentials/:id/remove`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    const labels = secretLabels(credential)
+    if (labels.length < 2) return res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
+    res.render(view('client-credentials/remove'), { credential, olderSecretDate: labels[1] })
+  })
+
+  router.post(`${base}/client-credentials/:id/remove`, (req, res) => {
+    if (!cc.getCredential(credentialList(req), req.params.id)) {
+      return res.redirect(`${base}/software-providers`)
+    }
+    const credential = cc.credentialToChange(credentialList(req), req.params.id)
+    const dates = cc.secretDates(credential)
+    if (dates.length > 1) credential.secrets = dates.slice(-1)
+    res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
+  })
+
+  // Replacing the secret asks the user to confirm first. The form on this page
+  // posts to the rotate route above, which is what replaces the secret.
+  router.get(`${base}/client-credentials/:id/replace`, (req, res) => {
+    const credential = cc.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    res.render(view('client-credentials/replace'), { credential })
+  })
+}
+
+registerV6Routes()
+
 // --- Design page ------------------------------------------------------------
 //
 // Links out to screens in the versions and the Jira design pages. The list

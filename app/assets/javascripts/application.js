@@ -77,7 +77,9 @@ function initCopyButtons () {
       // earlier versions behave as before.
       const message = button.getAttribute('data-copy-message')
       Promise.resolve(copyText(source.textContent)).then(() => {
-        if (message) {
+        if (button.getAttribute('data-copy-done-label')) {
+          showCopiedLabel(button, message)
+        } else if (message) {
           showCopyStatus(button, message)
         } else {
           flashStatus(button, 'Copied')
@@ -85,6 +87,26 @@ function initCopyButtons () {
       })
     })
   })
+}
+
+// Copy feedback on the button itself (Credentials created page, version 6). The
+// label changes to the `data-copy-done-label` text for four seconds, then goes
+// back, as in the MoJ and GOV.UK Design System copy buttons. The message goes in
+// a visually hidden live region, so nothing appears beside the button and the
+// buttons next to it do not move.
+function showCopiedLabel (button, message) {
+  if (!button.dataset.copyOriginalHtml) button.dataset.copyOriginalHtml = button.innerHTML
+  window.clearTimeout(button.copyResetTimer)
+  button.textContent = button.getAttribute('data-copy-done-label')
+  const status = button.parentNode.querySelector('.app-copy-status')
+  if (status) {
+    status.textContent = ''
+    window.setTimeout(() => { status.textContent = message || button.getAttribute('data-copy-done-label') }, 100)
+  }
+  button.copyResetTimer = window.setTimeout(() => {
+    button.innerHTML = button.dataset.copyOriginalHtml
+    if (status) status.textContent = ''
+  }, 4000)
 }
 
 // Persistent copy feedback. Only one value is on the clipboard at a time, so
