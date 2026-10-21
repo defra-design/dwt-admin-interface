@@ -2324,6 +2324,20 @@ function registerV6Routes () {
     })
   })
 
+  // Orphan screen: design option 3 for the copy page (MoJ warning alert).
+  router.get(`${base}/client-credentials/created-3`, (req, res) => {
+    const credential = {
+      id: 'client-1',
+      clientName: 'Kerbside_Collect_Test',
+      clientId: 'b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4',
+      pendingSecret: 'dwt_test_b796d64665f65a16ef1ab2faa5954b25'
+    }
+    res.render(view('client-credentials/created-3'), {
+      credential,
+      generatedOn: formatDateTimeObj(new Date('2026-10-21T08:14:00'))
+    })
+  })
+
   // Closing goes to the software provider page, which confirms what was created.
   router.post(`${base}/client-credentials/:id/created`, (req, res) => {
     const credential = cc.getCredential(credentialList(req), req.params.id)
