@@ -10,6 +10,7 @@ const patSubmissions = require('./data/pat-submissions')
 const reg = require('./data/regulators-data')
 const sp = require('./data/software-providers')
 const cc = require('./data/client-credentials')
+const ccV6 = require('./data/client-credentials-v6')
 const { paginate } = require('./data/pagination')
 const {
   formatDateObj,
@@ -2148,7 +2149,7 @@ function registerV6Routes () {
 
   // The environment comes from the URL: /test or /production.
   function environmentFor (key) {
-    const match = cc.ENVIRONMENTS.find((e) => e.value.toLowerCase() === key)
+    const match = ccV6.ENVIRONMENTS.find((e) => e.value.toLowerCase() === key)
     return match ? { key: match.value.toLowerCase(), label: match.value } : null
   }
 
@@ -2186,7 +2187,7 @@ function registerV6Routes () {
     // Client name, A to Z. The page marks "Client name" as sorted.
     // Production credentials are hidden and Test is shown as "External test".
     // Only the label changes here, so the shared data stays as it is.
-    const credentials = cc.listCredentials(credentialList(req))
+    const credentials = ccV6.listCredentials(credentialList(req))
       .filter((c) => c.environment !== 'Production')
       .map((c) => Object.assign({}, c, { environment: 'External test' }))
       .sort((a, b) => a.clientName.localeCompare(b.clientName))
@@ -2222,19 +2223,19 @@ function registerV6Routes () {
     const environment = environmentFor(req.params.environment)
     if (!environment) return res.redirect(`${base}/software-providers`)
     const values = { clientName: (req.body.clientName || '').trim() }
-    const errors = cc.validateClientName(values.clientName, credentialList(req))
+    const errors = ccV6.validateClientName(values.clientName, credentialList(req))
     if (Object.keys(errors).length) {
       return renderClientNameForm(res, {
         environment,
         mode: 'create',
         values,
         errors,
-        errorList: cc.clientNameErrorList(errors)
+        errorList: ccV6.clientNameErrorList(errors)
       })
     }
 
     // The environment is set from the page the user started on, not the form.
-    const credential = cc.createCredential({
+    const credential = ccV6.createCredential({
       clientName: values.clientName,
       environment: environment.label
     })
@@ -2244,7 +2245,7 @@ function registerV6Routes () {
 
   // The edit page is the create page with the current client name filled in.
   router.get(`${base}/client-credentials/:id/edit`, (req, res) => {
-    const credential = cc.getCredential(credentialList(req), req.params.id)
+    const credential = ccV6.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     renderClientNameForm(res, {
       environment: environmentFor(credential.environment.toLowerCase()),
@@ -2255,11 +2256,11 @@ function registerV6Routes () {
   })
 
   router.post(`${base}/client-credentials/:id/edit`, (req, res) => {
-    const credential = cc.getCredential(credentialList(req), req.params.id)
+    const credential = ccV6.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     const values = { clientName: (req.body.clientName || '').trim() }
     // The credential's own name does not count as "already exists".
-    const errors = cc.validateClientName(values.clientName, credentialList(req), credential.id)
+    const errors = ccV6.validateClientName(values.clientName, credentialList(req), credential.id)
     if (Object.keys(errors).length) {
       return renderClientNameForm(res, {
         environment: environmentFor(credential.environment.toLowerCase()),
@@ -2267,14 +2268,14 @@ function registerV6Routes () {
         credential,
         values,
         errors,
-        errorList: cc.clientNameErrorList(errors)
+        errorList: ccV6.clientNameErrorList(errors)
       })
     }
 
     // Only a real change counts as a change, so "Last changed" stays put if
     // the user saves without editing.
     if (values.clientName !== credential.clientName) {
-      const toChange = cc.credentialToChange(credentialList(req), credential.id)
+      const toChange = ccV6.credentialToChange(credentialList(req), credential.id)
       toChange.clientName = values.clientName
       toChange.lastChanged = new Date().toISOString()
     }
@@ -2286,7 +2287,7 @@ function registerV6Routes () {
   // table rather than showing the secret again.
   // When each secret was generated, newest first, as text for the page.
   function secretLabels (credential) {
-    return cc.secretDates(credential)
+    return ccV6.secretDates(credential)
       .slice()
       .sort((a, b) => new Date(b) - new Date(a))
       .map((d) => formatDateTimeObj(new Date(d)))
@@ -2303,7 +2304,7 @@ function registerV6Routes () {
   }
 
   router.get(`${base}/client-credentials/:id/created`, (req, res) => {
-    const credential = cc.getCredential(credentialList(req), req.params.id)
+    const credential = ccV6.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     if (!credential.pendingSecret) return res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
     renderReveal(res, credential)
@@ -2315,8 +2316,8 @@ function registerV6Routes () {
     const credential = {
       id: 'client-1',
       clientName: 'Kerbside_Collect_Test',
-      clientId: 'b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4',
-      pendingSecret: 'dwt_test_b796d64665f65a16ef1ab2faa5954b25'
+      clientId: '7b4ll1di9l73m4lpb9iu0b4k2i',
+      pendingSecret: 'k3x9v0m2qz7c1ndw84pbh5ty6fa0ge2ujr9l7s4o1i3x8wc5bn6d'
     }
     res.render(view('client-credentials/created-panel'), {
       credential,
@@ -2329,8 +2330,8 @@ function registerV6Routes () {
     const credential = {
       id: 'client-1',
       clientName: 'Kerbside_Collect_Test',
-      clientId: 'b3f9c41e-2a7d-4c58-9e10-6d8a5f2b71c4',
-      pendingSecret: 'dwt_test_b796d64665f65a16ef1ab2faa5954b25'
+      clientId: '7b4ll1di9l73m4lpb9iu0b4k2i',
+      pendingSecret: 'k3x9v0m2qz7c1ndw84pbh5ty6fa0ge2ujr9l7s4o1i3x8wc5bn6d'
     }
     res.render(view('client-credentials/created-warning'), {
       credential,
@@ -2340,7 +2341,7 @@ function registerV6Routes () {
 
   // Closing goes to the software provider page, which confirms what was created.
   router.post(`${base}/client-credentials/:id/created`, (req, res) => {
-    const credential = cc.getCredential(credentialList(req), req.params.id)
+    const credential = ccV6.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     delete credential.pendingSecret
     delete credential.pendingAction
@@ -2353,7 +2354,7 @@ function registerV6Routes () {
   // A refresh of the reveal page keeps the same new secret, because it is only
   // replaced once the user has closed the page.
   router.get(`${base}/client-credentials/:id/software-provider-detail`, (req, res) => {
-    const credential = cc.getCredential(credentialList(req), req.params.id)
+    const credential = ccV6.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     const showNew = Boolean(credential.showNewTag)
     delete credential.showNewTag
@@ -2361,18 +2362,18 @@ function registerV6Routes () {
       credential,
       showNew,
       secretLabels: secretLabels(credential),
-      canAddSecret: cc.secretDates(credential).length < cc.MAX_SECRETS,
+      canAddSecret: ccV6.secretDates(credential).length < ccV6.MAX_SECRETS,
       caption: `${credential.environment} credentials`
     })
   })
 
   router.post(`${base}/client-credentials/:id/rotate`, (req, res) => {
-    if (!cc.getCredential(credentialList(req), req.params.id)) {
+    if (!ccV6.getCredential(credentialList(req), req.params.id)) {
       return res.redirect(`${base}/software-providers`)
     }
-    const credential = cc.credentialToChange(credentialList(req), req.params.id)
+    const credential = ccV6.credentialToChange(credentialList(req), req.params.id)
     if (credential.pendingAction !== 'rotated') {
-      cc.rotateSecret(credential)
+      ccV6.rotateSecret(credential)
       // Replacing leaves one secret, generated now.
       delete credential.secrets
     }
@@ -2382,12 +2383,12 @@ function registerV6Routes () {
   // Adding a secret changes data, so it is a POST. Two secrets at most. Goes
   // straight to the page where the new secret is shown once.
   router.post(`${base}/client-credentials/:id/add-secret`, (req, res) => {
-    if (!cc.getCredential(credentialList(req), req.params.id)) {
+    if (!ccV6.getCredential(credentialList(req), req.params.id)) {
       return res.redirect(`${base}/software-providers`)
     }
-    const credential = cc.credentialToChange(credentialList(req), req.params.id)
-    if (cc.secretDates(credential).length < cc.MAX_SECRETS && credential.pendingAction !== 'added') {
-      cc.addSecret(credential)
+    const credential = ccV6.credentialToChange(credentialList(req), req.params.id)
+    if (ccV6.secretDates(credential).length < ccV6.MAX_SECRETS && credential.pendingAction !== 'added') {
+      ccV6.addSecret(credential)
     }
     res.redirect(`${base}/client-credentials/${credential.id}/created`)
   })
@@ -2396,7 +2397,7 @@ function registerV6Routes () {
   // recent secret stays. Only the POST removes it, then the user goes back to
   // the manage page, which now shows one secret.
   router.get(`${base}/client-credentials/:id/remove`, (req, res) => {
-    const credential = cc.getCredential(credentialList(req), req.params.id)
+    const credential = ccV6.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     const labels = secretLabels(credential)
     if (labels.length < 2) return res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
@@ -2404,11 +2405,11 @@ function registerV6Routes () {
   })
 
   router.post(`${base}/client-credentials/:id/remove`, (req, res) => {
-    if (!cc.getCredential(credentialList(req), req.params.id)) {
+    if (!ccV6.getCredential(credentialList(req), req.params.id)) {
       return res.redirect(`${base}/software-providers`)
     }
-    const credential = cc.credentialToChange(credentialList(req), req.params.id)
-    const dates = cc.secretDates(credential)
+    const credential = ccV6.credentialToChange(credentialList(req), req.params.id)
+    const dates = ccV6.secretDates(credential)
     if (dates.length > 1) credential.secrets = dates.slice(-1)
     res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
   })
@@ -2416,7 +2417,7 @@ function registerV6Routes () {
   // Replacing the secret asks the user to confirm first. The form on this page
   // posts to the rotate route above, which is what replaces the secret.
   router.get(`${base}/client-credentials/:id/replace`, (req, res) => {
-    const credential = cc.getCredential(credentialList(req), req.params.id)
+    const credential = ccV6.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     res.render(view('client-credentials/replace'), { credential })
   })
