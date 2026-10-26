@@ -2460,48 +2460,52 @@ function registerV7Routes () {
 
   // Waste organisations report. Rows carry the values the MoJ sortable table
   // needs: dates and periods sort on a number, not on the text shown.
-  // The payment period is shown as "Oct to Sep 25" (the cycle always runs Oct to Sep).
+  // The payment year ending is shown as "Sep 2025" (the cycle always ends in September).
   function orgRows (orgs) {
     const byId = new Map(orgs.map((o) => [o.id, o]))
     return mapOrgRows(orgs).map((row) => {
       const match = /(\d{2})$/.exec(row.paymentPeriod)
       return Object.assign({}, row, {
         registeredSort: byId.get(row.id).registeredDate.getTime(),
-        paymentPeriod: match ? `Oct to Sep ${match[1]}` : '',
+        paymentPeriod: match ? `Sep 20${match[1]}` : '',
         paymentPeriodSort: match ? Number(match[1]) : 0
       })
     })
   }
 
-  // Checks one date (day, month, year) from the filter. Messages follow the
-  // GOV.UK dates pattern. Returns { error, href, date }.
+  // Checks one date (day, month, year) from the filter. Messages are the ones
+  // agreed in the Jira ticket. `parts` lists the inputs to highlight: only the
+  // missing or wrong ones, as the GOV.UK dates pattern asks.
+  // Returns { error, href, parts, date }.
   function checkReportDate (query, key, label, today) {
     const prefix = `period-${key}`
     const part = (name) => (query[`${prefix}-${name}`] || '').trim()
-    const day = part('day')
-    const month = part('month')
-    const year = part('year')
-    const missing = [['day', day], ['month', month], ['year', year]]
-      .filter(([, value]) => !value)
-      .map(([name]) => name)
-    const first = (name) => `#${prefix}-${name}`
+    const values = { day: part('day'), month: part('month'), year: part('year') }
+    const all = ['day', 'month', 'year']
+    const missing = all.filter((name) => !values[name])
+    const fail = (error, parts) => ({ error, parts, href: `#${prefix}-${parts[0]}` })
+    const name = `‘${label}’ date`
 
     if (missing.length === 3) {
-      return { error: `Enter a ${key} date`, href: first('day') }
+      return fail(`Enter or select a ${name}`, all)
     }
-    if (missing.length) {
-      const list = missing.length === 2 ? `a ${missing[0]} and ${missing[1]}` : `a ${missing[0]}`
-      return { error: `${label} date must include ${list}`, href: first(missing[0]) }
+    if (missing.length === 2) {
+      return fail(`${name} must include a day, month and year`, all)
     }
-    if (/^\d+$/.test(year) && year.length !== 4) {
-      return { error: `${label} date year must include 4 numbers`, href: first('year') }
+    if (missing.length === 1) {
+      return fail(`${name} must include a ${missing[0]}`, missing)
     }
-    const checked = validateDateParts(day, month, year)
+    // Letters or other characters, or a year that is not 4 numbers (for example 26).
+    const wrong = all.filter((n) => !/^\d+$/.test(values[n]) || (n === 'year' && values[n].length !== 4))
+    if (wrong.length) {
+      return fail(`Enter the ${name} in the correct format`, wrong)
+    }
+    const checked = validateDateParts(values.day, values.month, values.year)
     if (checked.error) {
-      return { error: `${label} date must be a real date`, href: first('day') }
+      return fail(`${name} must be a real date`, all)
     }
     if (checked.date > today) {
-      return { error: `${label} date must be today or in the past`, href: first('day') }
+      return fail(`${name} must be today or in the past`, all)
     }
     return { date: checked.date }
   }
@@ -2516,20 +2520,28 @@ function registerV7Routes () {
       month: (query[`period-${key}-month`] || '').trim(),
       year: (query[`period-${key}-year`] || '').trim()
     })
-    const period = { values: { from: raw('from'), to: raw('to') }, errors: {}, errorList: [] }
+    const period = {
+      values: { from: raw('from'), to: raw('to') },
+      errors: {},
+      errorParts: { from: [], to: [] },
+      errorList: []
+    }
     const from = checkReportDate(query, 'from', 'From', today)
     const to = checkReportDate(query, 'to', 'To', today)
-    if (from.error) {
-      period.errors.from = from.error
-      period.errorList.push({ text: from.error, href: from.href })
+    // The 'To' date error names the 'From' date the user entered.
+    if (!to.error && from.date && from.date > to.date) {
+      Object.assign(to, {
+        error: `‘To’ date must be the same as or after ${formatDateObj(from.date)}`,
+        parts: ['day', 'month', 'year'],
+        href: '#period-to-day'
+      })
     }
-    if (to.error) {
-      period.errors.to = to.error
-      period.errorList.push({ text: to.error, href: to.href })
-    }
-    if (from.date && to.date && from.date > to.date) {
-      period.errors.range = 'From date must be the same as or before the to date'
-      period.errorList.push({ text: period.errors.range, href: '#period-from-day' })
+    for (const [key, result] of [['from', from], ['to', to]]) {
+      if (result.error) {
+        period.errors[key] = result.error
+        period.errorParts[key] = result.parts
+        period.errorList.push({ text: result.error, href: result.href })
+      }
     }
     if (!period.errorList.length) {
       period.from = from.date
@@ -2551,6 +2563,8 @@ function registerV7Routes () {
       period,
       rows,
       count: rows.length,
+      // All registered organisations, shown beside the count for the period.
+      totalCount: reg.listAllOrganisations().length,
       filtered: submitted,
       searched,
       periodLabel: searched ? periodLabel(period) : null

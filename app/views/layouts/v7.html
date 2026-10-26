@@ -16,6 +16,9 @@
   {% if pageName and pageName != "DWT admin portal" %}{{ pageName }} - {% endif %}DWT admin portal
 {% endblock %}
 
+{# Wider page container (1100px) for this version only. See .app-width-wide in application.scss. #}
+{% set bodyClasses = "app-width-wide" %}
+
 {% block govukHeader %}
   {# A div, not a header: the kit already wraps this block in a header, and a
      second one would give the page two banner landmarks. #}

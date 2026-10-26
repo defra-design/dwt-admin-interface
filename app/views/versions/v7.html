@@ -71,6 +71,48 @@
           { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
         ],
         [
+          { text: "Waste organisations report: column order" },
+          { text: "The columns are now: Organisation name and ID, Active API codes, Registered, Payment year ending, Payment status. “Active API codes” and “Registered” swapped places. The table still loads sorted by Registered, oldest first." },
+          { text: "Design change requested by the interaction designer, to try. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
+          { text: "Waste organisations report: Search and Clear" },
+          { text: "The button is now “Search” (was “Show organisations”). The link next to it is now “Clear” (was “Clear filter”). A screen reader reads the link as “Clear search”. The message when there are no results now says “Try a different date range, or select Clear.”. The validation messages do not mention the button or link, so they are unchanged." },
+          { text: "Design change requested by the interaction designer: shorter labels. The message names the link by its visible label, as the GOV.UK style guide asks. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
+          { text: "Waste organisations report: total count" },
+          { text: "The count above the table now shows the total number of registered organisations, for example “Organisations registered in period: 227 out of 578”." },
+          { text: "Design change requested by the interaction designer: it shows how much of the whole list the date range covers. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
+          { text: "Page width and table text size" },
+          { text: "Every v7 page is now 1100px wide (was 960px), including the header, navigation and footer. The waste organisations table text, headings and status tags are 16px (was 19px). All five table headings now fit on one line." },
+          { text: "Design change requested by the interaction designer: an internal service can show more in a table. The DWP design system uses a 1100px container for its wider internal services, and the GOV.UK Design System allows a wider page if content needs it. A trial: the text size and page width will be reviewed when the filter changes in the next iteration. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
+          { text: "Waste organisations report: payment year ending" },
+          { text: "The “Payment period” column is now “Payment year ending”. It shows the month and year the payment year ends, for example “Sep 2025”, instead of “Oct to Sep 25”." },
+          { text: "Design change requested by the interaction designer: the payment year always runs October to September, so the end date is all that is needed. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
+          { text: "Waste organisations report: organisation ID" },
+          { text: "The full organisation ID is now on a second line under the organisation name, in smaller secondary text. The column header is “Organisation name and ID”. There is no separate Organisation ID column. The column sorts by name." },
+          { text: "Design change requested by the interaction designer: it saves a column and keeps the ID with the organisation it belongs to. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
+          { text: "Waste organisations report: validation messages" },
+          { text: "Error messages now use the wording from the Jira ticket, for example “Enter or select a ‘From’ date”, “‘From’ date must include a day, month and year” and “Enter the ‘To’ date in the correct format”. If the to date is before the from date, the error is now on the To date and names the from date, for example “‘To’ date must be the same as or after 3 March 2026”. Only the day, month or year inputs that are wrong are highlighted. A year that is not 4 numbers shows the “correct format” message. The two dates stay side by side. They now sit in one group under the heading “Registration date”. The red line runs down the left of the group, the error messages sit between the heading and the dates, and only the wrong inputs have a red border." },
+          { text: "To match the validation agreed in the Jira ticket. One red line on the left is easier to find when zoomed in or skimming the page than a line between the two dates. Short-term fix: the filter changes in the next iteration. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
           { text: "Waste organisations report: validation" },
           { text: "The filter now shows errors in an error summary and next to the fields, and shows no results until both dates are valid. Errors: a date left blank (“Enter a from date”), a missing day, month or year (“From date must include a year”), a year without four numbers, a date that does not exist, a date in the future, and a from date after the to date. Before, missing dates were filled in, bad dates were ignored and a reversed range was swapped, without telling the user." },
           { text: "The earlier behaviour showed results for dates the user had not entered. Messages follow the GOV.UK dates pattern. Dates before 20 June 2026 are allowed and show the results. No research yet." },

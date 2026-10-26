@@ -12,7 +12,7 @@
   <div class="govuk-button-group">
     {{ govukButton({ text: submitLabel | default("Show results") }) }}
     {% if filtered %}
-      <a class="govuk-link" href="{{ clearHref }}">Clear filter</a>
+      <a class="govuk-link" href="{{ clearHref }}">Clear<span class="govuk-visually-hidden"> search</span></a>
     {% endif %}
   </div>
 </form>

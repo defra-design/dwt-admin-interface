@@ -372,6 +372,51 @@
   white-space: nowrap;
 }
 
+// Wider page container for version 7 (set on the body by layouts/v7.html). The
+// GOV.UK default is 960px; the DWP design system uses 1100px for its wider internal
+// services. The header, navigation, content and footer all use the container, so
+// they stay lined up. The side margins keep a gutter until the screen is wide enough
+// (1100px plus a 30px gutter each side) for the container to centre itself.
+.app-width-wide .govuk-width-container {
+  max-width: 1100px;
+}
+
+@media (min-width: 40.0625em) {
+  .app-width-wide .govuk-width-container {
+    margin-right: 30px;
+    margin-left: 30px;
+  }
+}
+
+@media (min-width: 72.5em) {
+  .app-width-wide .govuk-width-container {
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+
+// Trial: type scale point 16 (1rem, 20px line height) for the headings and cells, so
+// more fits on a row and headings wrap less. The govuk-!-font-size-16 override
+// class only works on an element that has no size of its own, and each th and td
+// sets its own, so it is set here.
+#regulators-registered-table th,
+#regulators-registered-table td,
+#regulators-registered-table .govuk-tag {
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+// MOJ sortable table: the sort button is a flex row, so when a heading wraps onto
+// two lines the icon is squashed narrower than its 22px and pushed to the far
+// edge. Keep the icon full size, next to the text.
+#regulators-registered-table [aria-sort] button {
+  gap: 2px;
+}
+
+#regulators-registered-table [aria-sort] button svg {
+  flex-shrink: 0;
+}
+
 // --- Add a software provider: email address fields ---------------------------
 // MOJ's inline "add another" layout sizes each row to its content
 // (`.moj-add-another__item-row { flex: 1 1 auto }`), which is right for rows of
