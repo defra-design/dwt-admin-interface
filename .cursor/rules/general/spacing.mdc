@@ -1,0 +1,36 @@
+---
+description: Spacing between and within elements on a page, using the GOV.UK spacing scale and the proximity principle
+alwaysApply: true
+---
+
+# Spacing
+
+Things that belong together sit closer than things that don't (the proximity principle). Use the GOV.UK spacing scale only: <https://design-system.service.gov.uk/styles/spacing/>. Check the live page for values. Ask the user how the elements on the page should be grouped if you are in doubt.
+
+## The scale
+
+Spacing units 1 to 9 are 5, 10, 15, 20, 25, 30, 40, 50 and 60px on large screens. Units 4 to 9 are smaller on small screens (15, 15, 20, 25, 30, 40px). Units 1 to 3 stay the same.
+
+Use the responsive override classes (`govuk-!-margin-top-9`), not custom pixel values and not inline styles.
+
+## Three levels
+
+Each level is larger than anything inside it.
+
+1. **Inside a component: units 1 to 2 (5 to 10px).** Label, hint and fields in a date input.
+2. **Between related items in one group: units 4 to 6 (20 to 30px).** E.g. an intro paragraph, date inputs and a button.
+3. **Between groups or sections: units 7 to 9 (40 to 60px).** Prefer unit 9 (60px) between major groups, such as a filter and its results.
+
+## Rules
+
+- Check the GOV.UK default spacing first. Only override it to separate groups or to tighten a heading from the text that belongs with it.
+- Don't override the spacing inside a GOV.UK or MoJ component (date input, table, pagination, and so on).
+- Keep the gap between a heading and the text that belongs with it smaller than the gap between that text and what follows.
+- Margins between stacked elements don't add up. In normal page flow the gap is the larger of the two margins, nsot the sum. Set the gap once, on either a wrapper around the group or the first element of the next group. Flex and grid containers (such as `govuk-button-group`) don't collapse margins, so check the result on the page.
+- Put the gap on the element that only appears with the next group, so no empty space is left when that group isn't shown (for example, results that only show after a search).
+- GOV.UK buttons have their own bottom margin (about 17px). The visible gap after a button is that plus the margin you set, so measure it in the browser.
+- Check spacing on a small screen as well as a large one.
+
+## Jira tickets
+
+When a ticket gives spacing, refer to it by spacing unit and pixel value on large screens, for example "spacing unit 9 (60px) between the filter and the results". Don't give a bare pixel value. See `jira-ticket-writing.mdc`.

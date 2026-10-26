@@ -80,6 +80,7 @@ The design reference page is the source of truth for developers and testers.
 - Fixed heights can clip text when users resize or zoom (WCAG 1.4.4, 1.4.12). Composition keeps text flexible and reuses existing styles, so it avoids new custom CSS.
 - If a total is approximate, say "about". A tester must still check it.
 - Use GOV.UK spacing and type scale where they exist: <https://design-system.service.gov.uk/styles/spacing/>, <https://design-system.service.gov.uk/styles/headings/>.
+- Give spacing as a GOV.UK spacing unit with its large-screen value, for example "spacing unit 9 (60px) between the filter and the results". Never a bare pixel value. Say which group each gap is between. See `spacing.mdc`.
 
 ### Colours
 
