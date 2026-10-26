@@ -48,7 +48,7 @@
     <tbody class="govuk-table__body">
       {% for org in rows %}
         <tr class="govuk-table__row">
-          <th scope="row" class="govuk-table__header" data-sort-value="{{ org.organisationName | default('zzz Not known', true) | lower }}">{% if org.organisationName %}{{ org.organisationName }}{% else %}<em>(Not known)</em>{% endif %}
+          <th scope="row" class="govuk-table__header" data-sort-value="{{ org.organisationName | default('zzz Not known', true) | lower }}">{% if org.organisationName %}{{ org.organisationName }}{% else %}(Not known){% endif %}
             {# The full ID sits on a second line in smaller, secondary text (govuk-hint gives the secondary colour). #}
             <div class="govuk-hint govuk-!-font-size-16 govuk-!-margin-top-1 govuk-!-margin-bottom-0">{{ org.id }}</div>
           </th>

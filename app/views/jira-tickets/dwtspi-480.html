@@ -1,0 +1,270 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTSPI-480: Find waste organisations by registration date" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">DWTSPI-480</span>
+    <h1 class="govuk-heading-l">Find waste organisations by registration date</h1>
+
+    <h2 class="govuk-heading-m">Design reference</h2>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design reference page (results)",
+        href: "/jira-tickets/dwtspi-480/design",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the design reference page (errors)",
+        href: "/jira-tickets/dwtspi-480/design-error",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">User need</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I need</strong> to find the waste organisations that registered in a period, and see their payment status,<br><strong>so that</strong> I can check who has registered and who has paid.</p>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to search by registration date and get a clear message if a date is wrong,<br><strong>so that</strong> I only see the organisations I asked for, and know how to fix a mistake.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">This story changes the Waste organisations page. Nothing shows until someone searches by a From and To registration date. The error messages follow the GOV.UK dates pattern, with the wording below.</p>
+    <p class="govuk-body">The table has a new column order and shows the full organisation ID under the name. Every page in the service is wider, and the table text is smaller, so more fits on screen and the column headings stay on one line.</p>
+    <p class="govuk-body">There is no research behind this design yet. We will test it in user research once it is built.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "Date input" },
+          { text: "GOV.UK Design System" },
+          { html: 'Two, side by side, in one fieldset. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/date-input/">Date input</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/patterns/dates/">Dates</a>.' }
+        ],
+        [
+          { text: "Error summary and error message" },
+          { text: "GOV.UK Design System" },
+          { html: 'The error messages are in one group for both dates, not on each date input. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/error-summary/">Error summary</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/components/error-message/">Error message</a>.' }
+        ],
+        [
+          { text: "Fieldset, button, link and tag" },
+          { text: "GOV.UK Design System" },
+          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/fieldset/">Fieldset</a>, <a class="govuk-link" href="https://design-system.service.gov.uk/components/button/">Button</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/components/tag/">Tag</a>.' }
+        ],
+        [
+          { text: "Sortable table" },
+          { text: "MoJ Design System / MoJ Frontend" },
+          { html: 'Used for the results table. Reason: the GOV.UK table cannot be sorted. Needs <code>@ministryofjustice/frontend</code>. JavaScript: yes. Without JavaScript the table shows in its default order, oldest registered first, and the headings are not buttons. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/sortable-table/">Sortable table</a>. The prototype has <code>rebrand: false</code>, so it does not follow the GOV.UK rebrand.' }
+        ],
+        [
+          { text: "Page width, table text size and sort icon fix" },
+          { html: "Bespoke (<code>app-width-wide</code> and the <code>#regulators-registered-table</code> rules in <code>application.scss</code>)" },
+          { html: 'The container is 1100px wide instead of 960px on every page of the service, like the DWP design system, which uses 1100px for its wider internal services. The table uses type scale point 16. The sort icon rule stops the MoJ icon being squashed when a heading wraps. Contact DesignOps (DesignOps@defra.gov.uk) before building.' }
+        ],
+        [
+          { text: "Headings and spacing" },
+          { text: "GOV.UK Design System" },
+          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/styles/headings/">Headings</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/styles/spacing/">Spacing</a>.' }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Colours</h2>
+    <p class="govuk-body">The colours come from the GOV.UK components. They are listed so the contrast can be checked.</p>
+    {{ govukTable({
+      caption: "Colours used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Name" },
+        { text: "Value" },
+        { text: "Source" },
+        { text: "Used for" }
+      ],
+      rows: [
+        [
+          { text: "Green tag" },
+          { text: "Text #083d29 on #cfe4dc" },
+          { text: "GOV.UK" },
+          { text: "Paid." }
+        ],
+        [
+          { text: "Blue tag" },
+          { text: "Text #0f385c on #d2e2f1" },
+          { text: "GOV.UK" },
+          { text: "In progress." }
+        ],
+        [
+          { text: "Red tag" },
+          { text: "Text #651b1b on #f4d7d7" },
+          { text: "GOV.UK" },
+          { text: "Unpaid." }
+        ],
+        [
+          { text: "Error red" },
+          { text: "#ca3535" },
+          { text: "GOV.UK" },
+          { text: "Error messages, the line down the left of the group, and the borders of the wrong inputs." }
+        ],
+        [
+          { text: "Secondary text" },
+          { text: "#484949" },
+          { text: "GOV.UK" },
+          { text: "The organisation ID, and the hint text under From date and To date." }
+        ]
+      ]
+    }) }}
+    <p class="govuk-body">Contrast: the three tags are about 9:1, and the secondary text on white is about 9:1, which passes for text (4.5:1). Error red on white is about 5.2:1, which passes.</p>
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+
+    <h3 class="govuk-heading-s">The page</h3>
+    <ol class="govuk-list govuk-list--number">
+      <li>The page title is “Waste organisations - DWT admin portal”, and the H1 is “Waste organisations”.</li>
+      <li>On every page of the service, the page container is 1100px wide, including the header, navigation and footer.</li>
+      <li>Under the H1 is a group with the H3 “Registration date”. In it are two date inputs, side by side: “From date” with the hint “For example, 1 4 2025”, then “To date” with the hint “For example, 31 3 2026”. Each has Day, Month and Year fields.</li>
+      <li>Below the group are a primary button, “Search”, and a link, “Clear”, side by side. Given I select “Clear”, then I see the page as it first loads.</li>
+      <li>Given the page loads for the first time, or I have selected “Clear”, then the date fields are empty and no results are shown.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">The results</h3>
+    <ol class="govuk-list govuk-list--number" start="6">
+      <li>Given I enter a valid From date and To date and select “Search”, then the results are shown below the filter. Dates before 20 June 2026 are allowed. The From date can be the same as the To date.</li>
+      <li>The gap between the filter and the results heading is spacing unit 9 (60px). The heading is an H2: “Waste organisations registered from [From date] to [To date]”, for example “Waste organisations registered from 1 January 2026 to 1 October 2026”.</li>
+      <li>Below the H2 is the line “Organisations registered in period: [number] of [total] total”, where [total] is every registered organisation. When there are results, the link “download CSV” is on the same line.</li>
+      <li>The table has five columns, in this order: Organisation name and ID, Active API codes, Registered, Payment year ending, Payment status.</li>
+      <li>The first column shows the organisation name in bold, and the full organisation ID below it on its own line. The ID is in type scale point 16 and the secondary text colour. When the name is not known, the name is “(Not known)”, and the ID is still shown.</li>
+      <li>Registered shows the date as, for example, “1 Jan 2026”. Payment year ending shows the month and year the payment year ends, for example “Sep 2027”, and is empty when there is no payment year. Payment status shows a green “Paid” tag, a blue “In progress” tag or a red “Unpaid” tag.</li>
+      <li>The table text, the column headings and the tags are in type scale point 16 (1rem, with a 20px line height). The column headings stay on one line at a page width of 1100px.</li>
+      <li>The table loads sorted by Registered, with the oldest first. Every column can be sorted. All rows are on one page, with no pagination, so sorting reorders every row.</li>
+      <li>Given no organisations registered in the period, then no table and no download link are shown. The page says “No organisations were registered in this period. Try a different date range, or select Clear.”.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Errors</h3>
+    <ol class="govuk-list govuk-list--number" start="15">
+      <li>Given a date is wrong, when I select “Search”, then no results are shown, and the dates I entered are kept.</li>
+      <li>An error summary with the title “There is a problem” is above the H1. It has one link for each error, in the order From then To. Each link goes to the first wrong input. The page title starts with “Error: ”.</li>
+      <li>The group has a red line down its left, from the H3 down. The error messages are between the H3 and the date inputs, one for each date that is wrong. Only the Day, Month or Year inputs that are wrong have a red border.</li>
+      <li>One message is shown for each date: the first in the table below that applies. The “To before From” error is only shown when the To date has no other error.</li>
+    </ol>
+
+    {{ govukTable({
+      caption: "Error messages",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Error state" },
+        { text: "From date message" },
+        { text: "To date message" },
+        { text: "Inputs with a red border" }
+      ],
+      rows: [
+        [
+          { text: "Nothing entered" },
+          { text: "Enter or select a ‘From’ date" },
+          { text: "Enter or select a ‘To’ date" },
+          { text: "Day, Month and Year" }
+        ],
+        [
+          { text: "Day missing, for example 5/26" },
+          { text: "‘From’ date must include a day" },
+          { text: "‘To’ date must include a day" },
+          { text: "Day" }
+        ],
+        [
+          { text: "Month missing, for example 17/26" },
+          { text: "‘From’ date must include a month" },
+          { text: "‘To’ date must include a month" },
+          { text: "Month" }
+        ],
+        [
+          { text: "Year missing, for example 17/5" },
+          { text: "‘From’ date must include a year" },
+          { text: "‘To’ date must include a year" },
+          { text: "Year" }
+        ],
+        [
+          { text: "More than one part missing" },
+          { text: "‘From’ date must include a day, month and year" },
+          { text: "‘To’ date must include a day, month and year" },
+          { text: "Day, Month and Year" }
+        ],
+        [
+          { text: "Wrong format, for example letters, or a year that is not 4 numbers" },
+          { text: "Enter the ‘From’ date in the correct format" },
+          { text: "Enter the ‘To’ date in the correct format" },
+          { text: "Only the inputs in the wrong format" }
+        ],
+        [
+          { text: "Date cannot exist, for example 31/2/2026 or month 13" },
+          { text: "‘From’ date must be a real date" },
+          { text: "‘To’ date must be a real date" },
+          { text: "Day, Month and Year" }
+        ],
+        [
+          { text: "Date is in the future" },
+          { text: "‘From’ date must be today or in the past" },
+          { text: "‘To’ date must be today or in the past" },
+          { text: "Day, Month and Year" }
+        ],
+        [
+          { text: "To date is before From date" },
+          { text: "Not applicable" },
+          { text: "‘To’ date must be the same as or after [From date], for example “3 March 2026”. The From date is the one entered." },
+          { text: "To date: Day, Month and Year" }
+        ]
+      ]
+    }) }}
+
+    <ol class="govuk-list govuk-list--number" start="19">
+      <li>The page matches the design reference.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">On the Waste organisations page, meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The page has one H1. “Registration date” is an H3 inside the legend of the group, and the results heading is an H2 (1.3.1, 2.4.6).</li>
+      <li>The page title is unique, with the page name then “DWT admin portal”. On an error page it starts with “Error: ” (2.4.2).</li>
+      <li>The error summary is above the H1, and focus moves to it when the page loads with errors. Each link goes to the first wrong input (3.3.1, 2.4.3).</li>
+      <li>The group is a <code>fieldset</code> with the legend “Registration date”. Each date input is a nested <code>fieldset</code> with the legend “From date” or “To date”. The group has <code>aria-describedby</code> pointing to its error messages. Each message starts with the visually hidden text “Error:” (1.3.1, 3.3.1, 4.1.2).</li>
+      <li>Errors are not shown by colour alone. Each has the message text, a red line down the left of the group and a red border on the wrong inputs (1.4.1). Error red on white is about 5.2:1 (1.4.3, 1.4.11).</li>
+      <li>The table has header cells with <code>scope="col"</code>, and the organisation name is a row header with <code>scope="row"</code>. The table is named by the results heading with <code>aria-labelledby</code>. Each sortable heading is a button, and <code>aria-sort</code> shows the sort order (1.3.1, 4.1.2).</li>
+      <li>The sort icons are decorative (<code>aria-hidden="true"</code>) and are 22px wide when a heading wraps (1.1.1).</li>
+      <li>The link “Clear” has the accessible name “Clear search”, which starts with its visible label (2.5.3).</li>
+      <li>Every function works with a keyboard, in an order that matches the page. The focus state is the GOV.UK focus style, with the <code>focus</code> colour (#ffdd00) as the background and <code>focus-text</code> (#0b0c0c) as the text (2.1.1, 2.4.3, 2.4.7).</li>
+      <li>The status tags show the status in words, so the colour is not the only way to tell them apart (1.4.1). Tag text on its background is about 9:1 (1.4.3).</li>
+      <li>The page has no horizontal scrolling at 320px wide or at 200% zoom, except inside the data table (1.4.4, 1.4.10).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE, on the results page and the error page.</li>
+      <li>Try every row of the error messages table, and check the wording and the red borders.</li>
+      <li>Use only a keyboard to search, sort a column and select “Clear”.</li>
+      <li>Check the error summary, the group, the table and the sort order with a screen reader, such as NVDA or VoiceOver.</li>
+      <li>Check the page at 320px wide and at 200% zoom.</li>
+      <li>Turn off JavaScript. Check that the table still shows and the search still works.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Redesigning the filter. It will change in the next iteration.</li>
+      <li>Text above the filter about organisations registered before 20 June 2026. It is not in this design.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

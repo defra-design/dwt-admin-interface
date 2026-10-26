@@ -1,0 +1,70 @@
+{#
+  Design reference for DWTSPI-480: the error state. A copy of the v7 waste
+  organisations page with two errors, using fixed, synthetic data: the From date
+  has no month, and the To date has a year that is not 4 numbers. The filter does
+  nothing and the links go nowhere. No results show while there are errors.
+#}
+{% extends "layouts/jira-dwtspi-480.html" %}
+
+{% set pageName = "Error: Waste organisations" %}
+
+{% block content %}
+{{ govukErrorSummary({
+  titleText: "There is a problem",
+  errorList: [
+    { text: "‘From’ date must include a month", href: "#period-from-month" },
+    { text: "Enter the ‘To’ date in the correct format", href: "#period-to-year" }
+  ]
+}) }}
+
+<h1 class="govuk-heading-l">Waste organisations</h1>
+
+<form method="get" action="#" novalidate>
+  <div class="govuk-form-group govuk-form-group--error">
+    {% call govukFieldset({
+      legend: {
+        html: '<h3 class="govuk-fieldset__heading">Registration date</h3>',
+        classes: "govuk-fieldset__legend--m"
+      },
+      attributes: { "aria-describedby": "period-from-error period-to-error" }
+    }) %}
+      <p id="period-from-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> ‘From’ date must include a month
+      </p>
+      <p id="period-to-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> Enter the ‘To’ date in the correct format
+      </p>
+
+      <div class="app-period-filter app-period-filter--v7">
+        {{ govukDateInput({
+          id: "period-from",
+          namePrefix: "period-from",
+          fieldset: { legend: { text: "From date", classes: "govuk-fieldset__legend--s" } },
+          hint: { text: "For example, 1 4 2025" },
+          items: [
+            { name: "day", classes: "govuk-input--width-2", value: "1" },
+            { name: "month", classes: "govuk-input--width-2 govuk-input--error" },
+            { name: "year", classes: "govuk-input--width-4", value: "2026" }
+          ]
+        }) }}
+
+        {{ govukDateInput({
+          id: "period-to",
+          namePrefix: "period-to",
+          fieldset: { legend: { text: "To date", classes: "govuk-fieldset__legend--s" } },
+          hint: { text: "For example, 31 3 2026" },
+          items: [
+            { name: "day", classes: "govuk-input--width-2", value: "1" },
+            { name: "month", classes: "govuk-input--width-2", value: "10" },
+            { name: "year", classes: "govuk-input--width-4 govuk-input--error", value: "26" }
+          ]
+        }) }}
+      </div>
+    {% endcall %}
+  </div>
+  <div class="govuk-button-group">
+    {{ govukButton({ text: "Search" }) }}
+    <a class="govuk-link" href="#">Clear<span class="govuk-visually-hidden"> search</span></a>
+  </div>
+</form>
+{% endblock %}
