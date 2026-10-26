@@ -1,6 +1,6 @@
 {% extends "layouts/prototype-hub.html" %}
 
-{% set pageName = "Draft Jira ticket: Manage a client’s secrets from its software provider page" %}
+{% set pageName = "Draft Jira ticket: Manage a client’s secrets and copy new credentials" %}
 
 {% block beforeContent %}
   {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
@@ -11,7 +11,7 @@
   <div class="govuk-grid-column-two-thirds">
 
     <span class="govuk-caption-l">Draft Jira ticket, no number yet</span>
-    <h1 class="govuk-heading-l">Manage a client’s secrets from its software provider page</h1>
+    <h1 class="govuk-heading-l">Manage a client’s secrets and copy new credentials</h1>
 
     <h2 class="govuk-heading-m">Design reference</h2>
 
@@ -38,34 +38,37 @@
       }) }}
     </div>
 
-    <h3 class="govuk-heading-s">Confirmation pages</h3>
+    <h3 class="govuk-heading-s">Copy credentials page</h3>
     <div class="govuk-button-group">
       {{ govukButton({
-        text: "View the replace confirmation design",
+        text: "View the copy credentials design",
+        href: "/jira-tickets/copy-credentials-page/design",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">Replace and remove interstitials</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the replace interstitial design",
         href: "/jira-tickets/software-provider-page/design-replace",
         classes: "govuk-button--secondary"
       }) }}
       {{ govukButton({
-        text: "View the remove confirmation design",
+        text: "View the remove interstitial design",
         href: "/jira-tickets/software-provider-page/design-remove",
         classes: "govuk-button--secondary"
       }) }}
     </div>
 
-    <h2 class="govuk-heading-m">User need</h2>
-    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I need</strong> to see a software provider’s client ID and client secrets together,<br><strong>so that</strong> I can check which secrets it has before I change how it connects to the Digital Waste Tracking service.</p>
-
     <h2 class="govuk-heading-m">User story</h2>
-    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to go from a client in the list to one page with its details and secrets, and add, replace or remove a secret from there,<br><strong>so that</strong> I can see when each secret was generated and change the right one.</p>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to go from a client in the list to one page with its details and secrets, add, replace or remove a secret from there, and copy new credentials before I leave the page that shows them,<br><strong>so that</strong> I can see when each secret was generated, change the right one, and send the credentials to the software provider.</p>
 
     <h2 class="govuk-heading-m">Context</h2>
     <p class="govuk-body">This story changes pages built in <a class="govuk-link" href="/jira-tickets/dwta-456">DWTA-456</a>, <a class="govuk-link" href="/jira-tickets/dwta-458">DWTA-458</a> and <a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a>. The Manage client credentials page is replaced by a software provider page, which you reach by selecting the client name in the table. Adding, replacing and removing a secret work as built. What changes is the page they start from and the page they return to.</p>
-    <p class="govuk-body">The earlier version was built quickly and left some usability issues. These changes come from content designer feedback and a sketch by the interaction designer. The content designer said one link per row is clearer than a separate “Manage” column, and that a link with the client name says where it goes. The page is named after the software provider, not the task, because it is expected to grow into a case file for the provider.</p>
-    <p class="govuk-body">Both the tag and the H2 name the environment. There are five environments, and users only see the credentials for the environment they are in, which can be confusing.</p>
-    <p class="govuk-body">The “New” tag shows which secret the user has just created, after they close the page where it was shown once.</p>
-    <p class="govuk-body">There is no research behind this design yet. We are building it so that we can learn from it, and we will test it in user research once it is built.</p>
-    <p class="govuk-body">The content designer gave the wording “[Hidden]”, “Replace secret” and “Remove secret”. The rest of the new wording has not been reviewed by the content designer yet.</p>
-    <p class="govuk-body">The changes to the copy page itself are in <a class="govuk-link" href="/jira-tickets/copy-credentials-page">Make it clear that new client credentials must be copied</a>. This ticket only changes where its Close button goes.</p>
+    <p class="govuk-body">The “Copy the client credentials” page, shown after creating credentials, adding a secret or replacing a secret, is redesigned in the same story. Its Close button goes to the software provider page, so the two pages are built together.</p>
+    <p class="govuk-body">Replacing or removing a secret now goes through an interstitial, which asks the person to confirm the destructive action before it happens.</p>
+    <p class="govuk-body">Both the tag and the H2 name the environment. There are five environments, and people only see the credentials for the environment they are in. The “New” tag shows which secret has just been created, after the copy page is closed.</p>
 
     <h2 class="govuk-heading-m">Components and patterns</h2>
     {{ govukTable({
@@ -79,11 +82,6 @@
       ],
       rows: [
         [
-          { text: "Table and sortable table" },
-          { text: "GOV.UK Design System and MoJ Design System / MoJ Frontend" },
-          { html: 'Built in DWTA-456. The client name in each row is now a link, and the Client secret column from DWTA-466 is removed. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/sortable-table/">Sortable table</a>.' }
-        ],
-        [
           { text: "Back link" },
           { text: "GOV.UK Design System" },
           { html: 'On the software provider page. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/back-link/">Back link</a>.' }
@@ -91,12 +89,12 @@
         [
           { text: "Tag" },
           { text: "GOV.UK Design System" },
-          { html: 'The environment tag uses the default style. The “New” tag uses <code>govuk-tag--green</code>. The colours come from GOV.UK Frontend. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/tag/">Tag</a>.' }
+          { html: 'The environment tag uses the default style. The “New” tag uses <code>govuk-tag--green</code>. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/tag/">Tag</a>.' }
         ],
         [
           { text: "Summary list" },
           { text: "GOV.UK Design System" },
-          { html: 'For the client ID, with <code>govuk-summary-list--no-border</code>. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/summary-list/">Summary list</a>.' }
+          { html: 'For the client ID on the software provider page, with <code>govuk-summary-list--no-border</code>, and for the credentials on the copy page. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/summary-list/">Summary list</a>.' }
         ],
         [
           { text: "Table" },
@@ -104,37 +102,86 @@
           { html: 'For the client secrets. It cannot be sorted. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/table/">Table</a>.' }
         ],
         [
-          { text: "Button" },
+          { text: "Button and button group" },
           { text: "GOV.UK Design System" },
-          { html: '“Add another secret” is a secondary button that submits a form, because it changes data. “Replace secret” and “Remove secret” are now links in the table, not warning buttons. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/button/">Button</a>.' }
+          { html: '“Add another secret” is a secondary button that submits a form, because it changes data. “Replace secret” and “Remove secret” are links in the table, not warning buttons. On the copy page, “Copy credentials” is primary and “Close” is secondary, side by side. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/button/">Button</a>.' }
         ],
         [
-          { text: "Ticket panel" },
+          { text: "Alert (warning)" },
           { text: "MoJ Design System / MoJ Frontend" },
-          { text: "No longer used on this page. The secrets table replaces the panels." }
+          { html: 'On the copy page. Reason: GOV.UK has no component with a heading and text in one message. Needs <code>@ministryofjustice/frontend</code>. JavaScript: the script only moves focus to the alert and lets people dismiss it. Neither is used here: the alert cannot be dismissed and <code>disableAutoFocus</code> is set, so it looks and reads the same without JavaScript. The prototype has <code>rebrand: false</code>, so it does not follow the GOV.UK rebrand. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/alert/">Alert</a>.' }
+        ],
+        [
+          { text: "Copy button" },
+          { html: "Bespoke (<code>app-copy</code> in <code>application.scss</code> and <code>application.js</code>)" },
+          { html: 'Built in DWTA-458, and changed here. The button’s label changes when the credentials are copied, and the message is in a visually hidden <code>role="status"</code> region instead of beside the button. JavaScript: yes. Without JavaScript the button is hidden and the credentials can be selected and copied by hand. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/copy-button/">Copy button</a>.' }
         ],
         [
           { text: "Interruption card" },
           { text: "MoJ Design System / MoJ Frontend" },
-          { html: 'Built in DWTA-466 for the replace and remove confirmation pages. Only the link text and the page the link goes to change. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/interruption-card/">Interruption card</a>.' }
-        ],
-        [
-          { text: "Headings, captions and spacing" },
-          { text: "GOV.UK Design System" },
-          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/styles/headings/">Headings</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/styles/spacing/">Spacing</a>.' }
+          { html: 'Built in DWTA-466 for the replace and remove interstitials. Only the link text and the page the link goes to change. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/interruption-card/">Interruption card</a>.' }
         ]
       ]
     }) }}
 
+    <h2 class="govuk-heading-m">Colours</h2>
+    <p class="govuk-body">The colours come from the components. They are listed so the contrast can be checked.</p>
+    {{ govukTable({
+      caption: "Colours used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Name" },
+        { text: "Value" },
+        { text: "Source" },
+        { text: "Used for" }
+      ],
+      rows: [
+        [
+          { text: "Default tag" },
+          { text: "Text #0f385c on #d2e2f1" },
+          { text: "GOV.UK" },
+          { text: "The environment tag." }
+        ],
+        [
+          { text: "Green tag" },
+          { text: "Text #083d29 on #cfe4dc" },
+          { text: "GOV.UK" },
+          { text: "The “New” tag." }
+        ],
+        [
+          { html: "<code>$moj-warning-colour</code>" },
+          { text: "rgb(235, 97, 28), #eb611c" },
+          { text: "MoJ Frontend" },
+          { text: "Border and icon of the alert." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"black\")</code>" },
+          { text: "#0b0c0c" },
+          { text: "GOV.UK web palette" },
+          { text: "Heading and text in the alert." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"white\")</code>" },
+          { text: "#ffffff" },
+          { text: "GOV.UK web palette" },
+          { text: "Background of the alert." }
+        ]
+      ]
+    }) }}
+    <p class="govuk-body">Contrast: the tags are about 9:1, which passes for text (4.5:1). <code>black</code> on <code>white</code> is about 19:1, which passes. <code>$moj-warning-colour</code> on <code>white</code> is about 3.4:1, which passes for the border and icon (3:1) but would not pass for text. No text uses it.</p>
+
     <h2 class="govuk-heading-m">Acceptance criteria</h2>
 
-    <p class="govuk-body">On the Software providers page. These replace DWTA-466 AC 1 to 3:</p>
+    <h3 class="govuk-heading-s">Software providers page</h3>
+    <p class="govuk-body">These replace DWTA-466 AC 1 to 3:</p>
     <ol class="govuk-list govuk-list--number">
       <li>The table has three columns, in this order: Client name, Client ID, Environment. There is no Client secret column.</li>
       <li>In each row, the client name is a link to the software provider page for that client.</li>
     </ol>
 
-    <p class="govuk-body">On the software provider page, which replaces the Manage client credentials page. These replace DWTA-466 AC 4 to 13:</p>
+    <h3 class="govuk-heading-s">Software provider page</h3>
+    <p class="govuk-body">This page replaces the Manage client credentials page. These replace DWTA-466 AC 4 to 13:</p>
     <ol class="govuk-list govuk-list--number" start="3">
       <li>The page title is the client name followed by “ - DWT admin portal”, for example “Kerbside_Collect_Test - DWT admin portal”.</li>
       <li>At the top of the page is a back link, “Back”, which goes to the Software providers page.</li>
@@ -146,28 +193,43 @@
       <li>Generated on is the date and time the secret was created, for example “21 October 2026 at 8:14am”. Every client secret is shown as “[Hidden]”.</li>
       <li>Given the client has one secret, then its Actions cell has a link, “Replace secret”, and below the table is a secondary button, “Add another secret”.</li>
       <li>Given the client has two secrets, then the older secret’s Actions cell has a link, “Remove secret”, the newest secret’s Actions cell is empty, and “Add another secret” is not shown.</li>
-      <li>Given I select “Add another secret”, then a new secret is created straight away, with no confirmation, and I go to the copy page showing the new secret. The existing secret keeps working.</li>
-      <li>Given I select “Replace secret” or “Remove secret”, then I go to the replace or remove confirmation page.</li>
+      <li>Given I select “Add another secret”, then a new secret is created straight away, with no confirmation, and I go to the copy credentials page showing the new secret. The existing secret keeps working.</li>
+      <li>Given I select “Replace secret” or “Remove secret”, then I go to the replace or remove interstitial.</li>
     </ol>
 
-    <p class="govuk-body">After the copy page. These replace DWTA-458 AC 20 and 21, and DWTA-466 AC 16:</p>
+    <h3 class="govuk-heading-s">Copy credentials page</h3>
+    <p class="govuk-body">Shown after creating credentials, adding a secret or replacing a secret. These replace DWTA-458 AC 13 to 19, and DWTA-466 AC 14 and 15:</p>
     <ol class="govuk-list govuk-list--number" start="15">
-      <li>Given I select “Close” on the copy page after creating credentials, adding a secret or replacing a secret, then I go to the software provider page for that client.</li>
-      <li>Given I have just closed the copy page, then the newest secret has a green “New” tag after its Generated on date. See the design with two secrets.</li>
-      <li>Given I reload the software provider page, or come back to it later, then the “New” tag is not shown.</li>
-      <li>Given I have left the copy page and go back to it, then the secret is not shown and I go to the software provider page.</li>
+      <li>Above the H1 is a caption with the client name, for example “Kerbside_Collect_Test”. The H1 is “Copy the client credentials”.</li>
+      <li>Below the H1 is a warning alert, which replaces the warning text. Its heading is “You must copy the credentials” and its text is “You cannot view the client secret after closing this page.”. The alert cannot be dismissed.</li>
+      <li>Below the alert is a summary list, which replaces the panel and the H2 with the client name. It shows, in this order: Client ID, Client secret, External test environment and Generated on. The client secret is shown in full. The value of External test environment is the API URL.</li>
+      <li>The gap between the H1 and the alert is spacing unit 7 (40px). The gap between the alert and the summary list is spacing unit 9 (60px). The gap between the summary list and the buttons is spacing unit 4 (20px).</li>
+      <li>The page only shows the new credentials. Given I have added another secret, then the existing secret is not shown on this page.</li>
+      <li>Given JavaScript is on, then there is a primary button, “Copy credentials”, with a secondary button, “Close”, beside it. Given JavaScript is off, then only “Close” is shown. There is no back link.</li>
+      <li>Given I select “Copy credentials”, then the client ID, client secret, environment with its API URL, and generated on date are copied as plain text, in the same order as the summary list. Each label is on its own line, followed by its value, with a blank line between each pair.</li>
+      <li>Given I have copied the credentials, then the button label changes to “Credentials copied” for four seconds, then back to “Copy credentials”. No message appears beside the button, and the Close button does not move.</li>
     </ol>
 
-    <p class="govuk-body">On the replace and remove confirmation pages. These replace the link in DWTA-466 AC 20 and 26, and where I go in AC 27:</p>
-    <ol class="govuk-list govuk-list--number" start="19">
+    <h3 class="govuk-heading-s">After the copy credentials page</h3>
+    <p class="govuk-body">These replace DWTA-458 AC 20 and 21, and DWTA-466 AC 16:</p>
+    <ol class="govuk-list govuk-list--number" start="23">
+      <li>Given I select “Close” on the copy credentials page, then I go to the software provider page for that client.</li>
+      <li>Given I have just closed the copy credentials page, then the newest secret has a green “New” tag after its Generated on date. See the design with two secrets.</li>
+      <li>Given I reload the software provider page, or come back to it later, then the “New” tag is not shown.</li>
+      <li>Given I have left the copy credentials page and go back to it, then the secret is not shown and I go to the software provider page.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Replace and remove interstitials</h3>
+    <p class="govuk-body">These replace the link in DWTA-466 AC 20 and 26, and where I go in AC 27:</p>
+    <ol class="govuk-list govuk-list--number" start="27">
       <li>The link on the card is “Go back to software provider”. It goes to the software provider page.</li>
       <li>Given I select “Yes, remove secret”, then the older secret is removed and I go to the software provider page, which shows one secret.</li>
     </ol>
 
-    <p class="govuk-body">On every page in this ticket:</p>
-    <ol class="govuk-list govuk-list--number" start="21">
+    <h3 class="govuk-heading-s">On every page in this ticket</h3>
+    <ol class="govuk-list govuk-list--number" start="29">
       <li>The environment is the one the user is in. In the tag it is capitalised, for example “External test”. In the H2 it is in lower case, for example “external test”. The design reference shows External test.</li>
-      <li>Everything else built in DWTA-456, DWTA-458 and DWTA-466 works as before.</li>
+      <li>Everything else built in DWTA-456, DWTA-458 and DWTA-466 works as before, including the page titles, the date format, the environment and API URL, and not showing the secret again after I have left the copy credentials page.</li>
       <li>The pages match the design references.</li>
     </ol>
 
@@ -175,33 +237,38 @@
     <p class="govuk-body">On every page in this ticket, meets WCAG 2.2 AA:</p>
     <ol class="govuk-list govuk-list--number">
       <li>Each client name link in the table has the client name as its text, so every link has a different name that says where it goes (2.4.4).</li>
-      <li>The software provider page has one H1, the client name. The caption above it is a <code>span</code>, not a heading. The H2 “Client secrets for [environment] environment” comes next, so the headings are in order (1.3.1, 2.4.6).</li>
-      <li>The page title starts with the client name, so it is different for each client (2.4.2).</li>
+      <li>Each page has one H1. The caption above it is a <code>span</code>, not a heading. On the software provider page the H2 “Client secrets for [environment] environment” comes next. On the copy credentials page the alert heading is an H2. So the headings are in order (1.3.1, 2.4.6).</li>
+      <li>The page title is unique. The software provider page title starts with the client name (2.4.2).</li>
       <li>The secrets table has a visually hidden caption, “Client secrets for [environment] environment”, and its column headings are <code>th</code> elements with <code>scope="col"</code> (1.3.1).</li>
       <li>Each “Replace secret” and “Remove secret” link has visually hidden text, so its accessible name includes the date, for example “Replace secret generated on 21 October 2026 at 8:14am” (2.4.4, 4.1.2).</li>
       <li>The environment tag and the “New” tag are text, so neither relies on colour alone. A screen reader reads “New” after the date (1.3.1, 1.4.1).</li>
       <li>“Add another secret” is a <code>button</code> in a form, because it changes data. “Replace secret”, “Remove secret” and the back link are links, because they go to another page (4.1.2).</li>
-      <li>Every link and button can be used with a keyboard, in an order that matches the page, starting with the back link. The focus state is the GOV.UK focus style, with the <code>focus</code> colour (#ffdd00) as the background and <code>focus-text</code> (#0b0c0c) as the text (2.1.1, 2.4.3, 2.4.7).</li>
-      <li>The pages have no horizontal scrolling at 320px wide or at 200% zoom. Testers must confirm the secrets table fits at 320px (1.4.4, 1.4.10).</li>
+      <li>The alert has <code>role="region"</code> and the accessible name “warning: You must copy the credentials”. Its icon is decorative (<code>role="presentation"</code> and <code>focusable="false"</code>), and the warning is given in words, not by the icon or colour alone. Focus is not moved to the alert when the page loads (1.1.1, 1.3.1, 1.4.1, 2.4.3).</li>
+      <li>The credentials on the copy page are in a <code>dl</code>, with each label in a <code>dt</code> and each value in a <code>dd</code>. The client ID and client secret are text that can be selected (1.3.1).</li>
+      <li>The Copy button’s accessible name is “Copy credentials client ID and client secret”, which starts with its visible label (2.5.3).</li>
+      <li>When the credentials are copied, a visually hidden <code>role="status"</code> region with <code>aria-live="polite"</code> announces “Client credentials copied”. Focus stays on the button while its label changes (4.1.3, 3.2.2).</li>
+      <li>Every link and button can be used with a keyboard, in an order that matches the page. The focus state is the GOV.UK focus style, with the <code>focus</code> colour (#ffdd00) as the background and <code>focus-text</code> (#0b0c0c) as the text (2.1.1, 2.4.3, 2.4.7).</li>
+      <li>The alert text is <code>black</code> on <code>white</code>, about 19:1. The border and icon are <code>$moj-warning-colour</code> on <code>white</code>, about 3.4:1. The tags are about 9:1 (1.4.3, 1.4.11).</li>
+      <li>The pages have no horizontal scrolling at 320px wide or at 200% zoom. The client secret and the API URL have no spaces, so they wrap inside the summary list (1.4.4, 1.4.10).</li>
     </ol>
 
     <h3 class="govuk-heading-s">How to test</h3>
     <ul class="govuk-list govuk-list--bullet">
       <li>Run an automated check, such as axe or WAVE, on each page, with one secret and with two.</li>
-      <li>With only a keyboard, go from the table to the software provider page, then add, replace and remove a secret.</li>
-      <li>Check the client name links, the tags, the secrets table and the Replace and Remove links with a screen reader, such as NVDA or VoiceOver.</li>
+      <li>With only a keyboard, go from the table to the software provider page, then create credentials, add, replace and remove a secret, and copy the credentials each time.</li>
+      <li>Check the client name links, the tags, the secrets table, the alert and the “copied” announcement with a screen reader, such as NVDA or VoiceOver.</li>
       <li>Check each page at 320px wide and at 200% zoom.</li>
-      <li>Turn off JavaScript. Check that the client name links, adding, replacing and removing a secret, and the back link still work.</li>
+      <li>Turn off JavaScript. Check that the client name links, adding, replacing and removing a secret, and the back link still work. Check that the Copy button is not shown, Close still works, and the credentials can be selected and copied by hand.</li>
     </ul>
 
     <h2 class="govuk-heading-m">Out of scope</h2>
     <ul class="govuk-list govuk-list--bullet">
-      <li>The design of the copy page. This is in <a class="govuk-link" href="/jira-tickets/copy-credentials-page">Make it clear that new client credentials must be copied</a>.</li>
       <li>A success message after adding, replacing or removing a secret. The “New” tag is the only confirmation for now, so nothing confirms that a secret was removed.</li>
       <li>Choosing which secret to replace or remove when there are two.</li>
       <li>More than two secrets for a client.</li>
       <li>Showing a secret again after it has been created.</li>
       <li>Changing the name of a client after it has been created.</li>
+      <li>The real API URL for each environment.</li>
       <li>Anything else on the software provider page, such as the provider’s contact details or history.</li>
       <li>The Last changed column. See <a class="govuk-link" href="/jira-tickets/last-changed-column">Last changed column</a>.</li>
       <li>The characters allowed in a client name. See <a class="govuk-link" href="/jira-tickets/allowed-characters">Allowed characters in the client name</a>.</li>

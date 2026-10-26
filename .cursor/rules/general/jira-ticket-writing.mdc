@@ -1,5 +1,5 @@
 ---
-description: Writing Jira ticket text (user needs, user stories, acceptance criteria, accessibility criteria, colours, design reference pages, non-GOV.UK components). Use when asked to draft or refine Jira tickets or backlog items.
+description: Writing Jira ticket text (user stories, acceptance criteria, accessibility criteria, colours, design reference pages, non-GOV.UK components). Use when asked to draft or refine Jira tickets or backlog items.
 alwaysApply: false
 ---
 
@@ -20,37 +20,30 @@ If the user, the outcome or the evidence isn't known, ask the designer rather th
 
 1. **Title**: short, action-led, describes the outcome (not the solution).
 2. **Design reference button**: a secondary button under the H1, "View the design reference page". Don't bury the link in a paragraph.
-3. **User need**
-4. **User story**
-5. **Context**: what the story covers, and the reason for the change (see below).
-6. **Components and patterns**
-7. **Colours** (if the ticket specifies colours)
-8. **Acceptance criteria**
-9. **Accessibility acceptance criteria**, then a short **How to test** list
-10. **Out of scope**
+3. **User story**
+4. **Context**: what the story covers, and the reason for the change (see below).
+5. **Components and patterns**
+6. **Colours** (if the ticket specifies colours)
+7. **Acceptance criteria**
+8. **Accessibility acceptance criteria**, then a short **How to test** list
+9. **Out of scope**
 
-## User needs (GDS)
-
-- Format: **As a [user], I need to [do or know something], so that [outcome].**
-- Describe the need, not a solution. No UI words ("click", "dropdown", "page").
-- Name the user specifically (e.g. "member of Defra staff who uses the DWT admin portal", "Defra regulator"), never "the user".
-- Base it on research or evidence. If there is none, don't imply there is. Say the reason in Context (for example, "a branding requirement from Defra's design guidance").
-- One need per statement. Keep it independent of implementation.
-- On the ticket page, bold **As a**, **I need** and **so that**, each starting on a new line (`<strong>` with `<br>`), so the statement is easy to skim. Keep it as one paragraph, and don't use a list.
-- Reference: <https://www.gov.uk/service-manual/user-research/start-by-learning-user-needs>
+Tickets don't have a separate user need for now. We'll add one, and any research evidence, once we have insights.
 
 ## User stories
 
 - Format: **As a [user], I want to [action], so that [benefit].**
-- Lay it out like the user need: bold **As a**, **I want** and **so that**, each on a new line.
-- A story is a deliverable slice of work that meets (part of) a user need. Link it to the need.
+- Name the user specifically (e.g. "member of Defra staff who uses the DWT admin portal", "Defra regulator"), never "the user".
+- On the ticket page, bold **As a**, **I want** and **so that**, each starting on a new line (`<strong>` with `<br>`), so the story is easy to skim. Keep it as one paragraph, and don't use a list.
 - The benefit must be a real user or service outcome (for example trust, speed, fewer errors), not "so that it is familiar".
-- Small enough to complete in a sprint; split by user outcome, not by technical layer.
+- Every ticket must work on its own as a change that could go live. Don't split a journey into tickets that aren't usable alone (for example a page without the page it leads to). A large ticket is fine. Group its acceptance criteria by page or theme instead.
 - Don't prescribe the design in the story.
+- Reference: <https://www.gov.uk/service-manual/agile-delivery/writing-user-stories>
 
 ## Context
 
-- Say what the story covers and why. Include the reason for the change.
+- Say what the story covers and why. Include the reason for the change. Keep it to a few short paragraphs.
+- Leave out internal design workings (who said what, options compared, earlier versions kept) and any mention of user research. That is recorded on the version page. Add research once we have insights.
 - Don't repeat what's in "Out of scope" or the acceptance criteria.
 - Don't put measurements or colours here. They belong in the acceptance criteria.
 
@@ -121,7 +114,7 @@ References: <https://design-system.service.gov.uk/accessibility/>, <https://www.
 
 ## Components and patterns
 
-List every component or pattern used, with its source, so developers know what to install and where to read guidance. Include links to the relevant guidance (for example Spacing and Headings for layout). Check the live documentation for macro names and classes; do not guess.
+List only the components or patterns that this story introduces or changes, with the source, so developers know what to install and where to read guidance. Include a link to the guidance for each. Don't list ones that are unchanged, or general styles such as headings, captions and spacing. Check the live documentation for macro names and classes; do not guess.
 
 - **GOV.UK Design System / govuk-frontend**: <https://design-system.service.gov.uk/components/>. Default choice.
 - **MoJ Design System / `@ministryofjustice/frontend`**: <https://design-patterns.service.justice.gov.uk/>. MoJ publishes its own Frontend kit, built on govuk-frontend, which we can use for components GOV.UK does not offer. It is installed in this prototype (see `app/views/` for `moj*` macros and `moj-*` classes).
@@ -147,8 +140,9 @@ Also flag in the ticket:
 
 ## Writing checks
 
-- Is the user named specifically, and is the evidence (or lack of it) stated honestly?
-- Is the story solution-neutral, with a real benefit, and sized for one sprint?
+- Is the user named specifically?
+- Is the story solution-neutral, with a real benefit, and usable on its own if it went live?
+- Is Context short, with no internal design workings and no mention of research?
 - Is every acceptance criterion numbered, short and testable by someone who didn't write it?
 - Are sizes given as composition and colours given by name, with a colours table (hex and source)?
 - Does each accessibility criterion say exactly how it's met and carry a WCAG number?
