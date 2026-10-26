@@ -1,0 +1,28 @@
+{#
+  "Are you sure?" step before the older of two client secrets is removed, using
+  the MoJ interruption card (written out so the button can post a form, as in
+  replace.html). The most recent secret stays. Only the POST removes the older
+  secret (see routes.js).
+#}
+{% extends "layouts/v7.html" %}
+
+{% set version = "v7" %}
+{% set pageName = "Remove the client secret" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="moj-interruption-card">
+  <div class="moj-interruption-card__content">
+    <h1 class="moj-interruption-card__heading">Are you sure you want to remove this secret?</h1>
+    <div class="moj-interruption-card__body">
+      <p>The secret for {{ credential.clientName }} generated on {{ olderSecretDate }} will stop working immediately. Make sure the software provider is using the newer secret before you continue.</p>
+    </div>
+    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/remove" novalidate>
+      <div class="govuk-button-group moj-interruption-card__actions">
+        {{ govukButton({ text: "Yes, remove secret", classes: "govuk-button--inverse", preventDoubleClick: true }) }}
+        <a class="govuk-link govuk-link--inverse" href="/{{ version }}/client-credentials/{{ credential.id }}/software-provider-detail">Go back to software provider</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

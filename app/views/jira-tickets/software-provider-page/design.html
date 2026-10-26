@@ -1,0 +1,53 @@
+{#
+  Design reference for the software provider page ticket: the Software providers page.
+  The DWTA-456 table, with each client name as a link to the software provider page.
+  The Client secret column from DWTA-466 is removed. A copy of v6/software-providers/index.html.
+  The rows are fixed, synthetic data. Only the first client name links to the design
+  reference for the software provider page. The other links go to #.
+#}
+{% extends "layouts/jira-software-provider-page.html" %}
+
+{% set pageName = "Software providers" %}
+{% set activeSection = "providers" %}
+
+{% set credentials = [
+  { clientName: "Kerbside_Collect_Test", clientId: "7b4ll1di9l73m4lpb9iu0b4k2i", environment: "External test", href: "/jira-tickets/software-provider-page/design-provider" },
+  { clientName: "Skipflow_Test", clientId: "3k9q2m7v1c8x4n6b0p5t2r7w9d", environment: "External test", href: "#" },
+  { clientName: "Wastebase_Manager_Test", clientId: "6h1f8s3j0l5g2a9e4u7y1o3i6z", environment: "External test", href: "#" }
+] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    <p class="govuk-body govuk-!-margin-bottom-7">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+  </div>
+</div>
+
+{{ govukButton({
+  text: "Create new credentials",
+  href: "#",
+  classes: "govuk-button--secondary govuk-!-margin-bottom-7"
+}) }}
+
+{# MoJ sortable table, as in DWTA-456. Rows are sorted by Client name, A to Z. #}
+<table class="govuk-table" data-module="moj-sortable-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">Client credentials</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header" aria-sort="ascending">Client name</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Client ID</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Environment</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for credential in credentials %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell"><a class="govuk-link" href="{{ credential.href }}">{{ credential.clientName }}</a></td>
+        <td class="govuk-table__cell">{{ credential.clientId }}</td>
+        <td class="govuk-table__cell">{{ credential.environment }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

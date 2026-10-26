@@ -1,0 +1,74 @@
+{% extends "layouts/v7.html" %}
+
+{% set version = "v7" %}
+{% set pageName = "Error: Waste organisations" if period.errorList and period.errorList.length else "Waste organisations" %}
+{% set activeSection = "regulators" %}
+
+{% block content %}
+{% if period.errorList and period.errorList.length %}
+  {{ govukErrorSummary({ titleText: "There is a problem", errorList: period.errorList }) }}
+{% endif %}
+
+<h1 class="govuk-heading-l">Waste organisations</h1>
+<p class="govuk-body govuk-!-margin-bottom-6">Search by the date an organisation registered its DefraID. Results for organisations registered before 20 June 2026 will not show a registration date.</p>
+
+{# Date range filter above the list. GOV.UK date inputs (not a date picker),
+   following MOJ filter a list. No results show until a valid date range is
+   submitted. https://design-patterns.service.justice.gov.uk/patterns/filter-a-list/
+   https://design-system.service.gov.uk/patterns/dates/ #}
+{% set submitLabel = "Show organisations" %}
+{% set action = "/" + version + "/regulators" %}
+{% set clearHref = "/" + version + "/regulators" %}
+{% include version + "/regulators/_period-filter.html" %}
+
+{% if searched %}
+  {# Spacing unit 9 (60px) above the heading separates the filter group from the results group. #}
+  <h2 class="govuk-heading-m govuk-!-margin-top-9 govuk-!-margin-bottom-2" id="regulators-table-heading">Waste organisations registered from {{ periodLabel }}</h2>
+
+  {# The download CSV link is not built yet: the link goes to the placeholder page. It only shows
+     when there are results, on the same line as the count. #}
+  <p class="govuk-body">Organisations registered in period: {{ count }}{% if rows.length %}
+    <span class="govuk-!-margin-left-1"><a class="govuk-link" href="/{{ version }}/regulators/download">download CSV</a></span>{% endif %}</p>
+
+{% if rows.length %}
+  {# MoJ sortable table: the MoJ script turns each header with aria-sort into a sort button.
+     Rows arrive sorted by Registered, oldest first. All rows are on one page, so sorting
+     reorders every row. data-sort-value gives the script a value that sorts correctly
+     where the text shown would not. #}
+  <table class="govuk-table" id="regulators-registered-table" data-module="moj-sortable-table" aria-labelledby="regulators-table-heading">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header" aria-sort="none">Organisation name</th>
+        <th scope="col" class="govuk-table__header" aria-sort="none">Organisation ID</th>
+        <th scope="col" class="govuk-table__header" aria-sort="ascending">Registered</th>
+        <th scope="col" class="govuk-table__header govuk-table__header--numeric" aria-sort="none">Active API codes</th>
+        <th scope="col" class="govuk-table__header" aria-sort="none">Payment period</th>
+        <th scope="col" class="govuk-table__header" aria-sort="none">Payment status</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      {% for org in rows %}
+        <tr class="govuk-table__row">
+          <th scope="row" class="govuk-table__header" data-sort-value="{{ org.organisationName | default('zzz Not known', true) | lower }}">{% if org.organisationName %}{{ org.organisationName }}{% else %}<em>(Not known)</em>{% endif %}</th>
+          <td class="govuk-table__cell" data-sort-value="{{ org.id }}"><span aria-hidden="true" title="{{ org.id }}">{{ org.idShort }}</span><span class="govuk-visually-hidden">{{ org.id }}</span></td>
+          <td class="govuk-table__cell" data-sort-value="{{ org.registeredSort }}">{{ org.registered }}</td>
+          <td class="govuk-table__cell govuk-table__cell--numeric">{{ org.apiCodeCount }}</td>
+          <td class="govuk-table__cell" data-sort-value="{{ org.paymentPeriodSort }}">{{ org.paymentPeriod }}</td>
+          <td class="govuk-table__cell" data-sort-value="{{ org.paymentStatus }}">
+            {% if org.paymentStatus === "paid" %}
+              {{ govukTag({ text: "Paid", classes: "govuk-tag--green" }) }}
+            {% elif org.paymentStatus === "in progress" %}
+              {{ govukTag({ text: "In progress", classes: "govuk-tag--blue" }) }}
+            {% else %}
+              {{ govukTag({ text: "Unpaid", classes: "govuk-tag--red" }) }}
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="govuk-body">No organisations were registered in this period. Try a different date range, or clear the filter.</p>
+{% endif %}
+{% endif %}
+{% endblock %}

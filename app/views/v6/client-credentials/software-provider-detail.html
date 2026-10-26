@@ -52,9 +52,9 @@
             <td class="govuk-table__cell">[Hidden]</td>
             <td class="govuk-table__cell">
               {% if canAddSecret %}
-                <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/replace">Replace<span class="govuk-visually-hidden"> client secret generated on {{ generatedOn }}</span></a>
+                <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/replace">Replace secret<span class="govuk-visually-hidden"> generated on {{ generatedOn }}</span></a>
               {% elif not loop.first %}
-                <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/remove">Remove<span class="govuk-visually-hidden"> client secret generated on {{ generatedOn }}</span></a>
+                <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/remove">Remove secret<span class="govuk-visually-hidden"> generated on {{ generatedOn }}</span></a>
               {% endif %}
             </td>
           </tr>

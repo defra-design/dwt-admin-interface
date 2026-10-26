@@ -41,8 +41,38 @@
     <div class="govuk-summary-card">
       <div class="govuk-summary-card__title-wrapper">
         <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 6
+          Version 7
           {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+        </h3>
+      </div>
+      <div class="govuk-summary-card__content">
+        <div>
+          {{ govukButton({
+            html: 'View prototype<span class="govuk-visually-hidden"> for version 7</span>',
+            href: "/v7/start",
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+
+        <p class="govuk-body-s">A copy of version 6, for changes to the Waste organisations reporting page and the software provider page.</p>
+
+        <p class="govuk-body-s">
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 26 October 2026<br>
+          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-body-s">
+          <li><a class="govuk-link" href="/versions/v7">Changes and design rationale for version 7</a></li>
+          <li><a class="govuk-link" href="/v7/client-credentials/created-panel">Earlier design: copy the client credentials with a panel (created-panel)</a></li>
+          <li><a class="govuk-link" href="/v7/client-credentials/created-warning">Earlier design: copy the client credentials with GOV.UK warning text (created-warning)</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
+          Version 6
         </h3>
       </div>
       <div class="govuk-summary-card__content">
@@ -54,8 +84,10 @@
           }) }}
         </div>
 
+        <p class="govuk-body-s">Changes to journeys for credentials and secrets. Demoed to CDP.</p>
+
         <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 21 October 2026<br>
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 26 October 2026<br>
           <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
         </p>
 
@@ -82,9 +114,11 @@
           }) }}
         </div>
 
+        <p class="govuk-body-s">Moved from API keys to client credentials: a Manage client credentials page for each software provider and package. Built to test with users.</p>
+
         <p class="govuk-body-s">
           <span class="govuk-!-font-weight-bold">Date of last change:</span> 15 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+          <span class="govuk-!-font-weight-bold">User research status:</span> Shown in two user research sessions, 20 to 22 October 2026
         </p>
 
         <ul class="govuk-list govuk-list--bullet govuk-body-s">
@@ -100,9 +134,11 @@
         </h3>
       </div>
       <div class="govuk-summary-card__content">
+        <p class="govuk-body-s">Tried variations of the credentials list and the create and rotate journeys (4.1 to 4.4). See the table for the focus of each.</p>
+
         <p class="govuk-body-s">
           <span class="govuk-!-font-weight-bold">Date of last change:</span> 9 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+          <span class="govuk-!-font-weight-bold">User research status:</span> Shown in two user research sessions, 20 to 22 October 2026
         </p>
 
         <table class="govuk-table govuk-body-s">
@@ -160,6 +196,8 @@
           }) }}
         </div>
 
+        <p class="govuk-body-s">Replaced the PAT viewer with software providers: add a provider, manage its email addresses and Test and Production API keys. Dropped service metrics.</p>
+
         <p class="govuk-body-s">
           <span class="govuk-!-font-weight-bold">Date of last change:</span> 23 September 2026<br>
           <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
@@ -187,6 +225,8 @@
           }) }}
         </div>
 
+        <p class="govuk-body-s">Reworked version 1 with the in-service Defra header and navigation. Still the PAT submission viewer, service metrics and waste organisations report.</p>
+
         <p class="govuk-body-s">
           <span class="govuk-!-font-weight-bold">Date of last change:</span> 21 September 2026<br>
           <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
@@ -212,6 +252,8 @@
             classes: "govuk-button--secondary"
           }) }}
         </div>
+
+        <p class="govuk-body-s">First prototype: a PAT (Production Approval Test) submission viewer, service metrics and a waste organisations report.</p>
 
         <p class="govuk-body-s">
           <span class="govuk-!-font-weight-bold">Date of last change:</span> 18 September 2026<br>

@@ -13,11 +13,10 @@
     <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
     <h1 class="govuk-heading-l">
       Version 6
-      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
     </h1>
 
     <p class="govuk-body">
-      <span class="govuk-!-font-weight-bold">Date of last change:</span> 21 October 2026<br>
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 26 October 2026<br>
       <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
     </p>
 
@@ -87,6 +86,12 @@
           { text: "An orphan screen that is not part of the journey, kept for the record. It uses GOV.UK warning text (“You must copy the credentials. You cannot view the client secret after closing this page.”) instead of the MoJ alert. The list order and buttons are the same as the journey page." },
           { text: "To compare against the journey version. No research yet." },
           { html: '<a class="govuk-link" href="/v6/client-credentials/created-warning">/v6/client-credentials/created-warning</a>' }
+        ],
+        [
+          { text: "Software provider page: Replace and Remove links" },
+          { text: "The links are now “Replace secret” and “Remove secret” (were “Replace” and “Remove”). Their visually hidden text is now “generated on [date]”, so a screen reader reads, for example, “Replace secret generated on 21 October 2026 at 8:14am”." },
+          { text: "The new link text is from the content designer. Bug fix: after the rename, screen readers read “Replace secret client secret generated on…”. No research yet." },
+          { html: '<a class="govuk-link" href="/v6/client-credentials/client-1/software-provider-detail">/v6/client-credentials/client-1/software-provider-detail</a>' }
         ]
       ]
     }) }}

@@ -1,0 +1,27 @@
+{#
+  Design reference for the software provider page ticket: confirm before removing the older
+  of two secrets. A copy of v6/client-credentials/remove.html. Only the link text and
+  destination change from DWTA-466.
+#}
+{% extends "layouts/jira-software-provider-page.html" %}
+
+{% set pageName = "Remove the client secret" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="moj-interruption-card">
+  <div class="moj-interruption-card__content">
+    <h1 class="moj-interruption-card__heading">Are you sure you want to remove this secret?</h1>
+    <div class="moj-interruption-card__body">
+      <p>The secret for Kerbside_Collect_Test generated on 21 October 2026 at 8:14am will stop working immediately. Make sure the software provider is using the newer secret before you continue.</p>
+    </div>
+    {# Static design: method="get" so the first action is a real button that goes nowhere. #}
+    <form method="get" action="#" novalidate>
+      <div class="govuk-button-group moj-interruption-card__actions">
+        {{ govukButton({ text: "Yes, remove secret", classes: "govuk-button--inverse", preventDoubleClick: true }) }}
+        <a class="govuk-link govuk-link--inverse" href="/jira-tickets/software-provider-page/design-provider-two">Go back to software provider</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

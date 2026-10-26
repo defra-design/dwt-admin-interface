@@ -1,0 +1,60 @@
+{#
+  Design reference for the software provider page ticket: the software provider page, two
+  secrets, as shown straight after the user closes the copy page having added a secret.
+  The newest secret has the "New" tag. Only the older secret can be removed, and there is no
+  Add another secret button. "Remove secret" goes to the remove confirmation design.
+#}
+{% extends "layouts/jira-software-provider-page.html" %}
+
+{% set pageName = "Kerbside_Collect_Test" %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/jira-tickets/software-provider-page/design" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Software provider</span>
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-4">Kerbside_Collect_Test</h1>
+
+    <p class="govuk-body govuk-!-margin-bottom-8">
+      {{ govukTag({ text: "External test" }) }}
+    </p>
+
+    {{ govukSummaryList({
+      classes: "govuk-summary-list--no-border govuk-!-margin-bottom-8",
+      rows: [
+        { key: { text: "Client ID" }, value: { text: "7b4ll1di9l73m4lpb9iu0b4k2i" } }
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Client secrets for external test environment</h2>
+
+    {{ govukTable({
+      caption: "Client secrets for external test environment",
+      captionClasses: "govuk-visually-hidden",
+      head: [
+        { text: "Generated on" },
+        { text: "Client secret" },
+        { text: "Actions" }
+      ],
+      rows: [
+        [
+          { html: '26 October 2026 at 9:32am ' + govukTag({ text: "New", classes: "govuk-tag--green" }) },
+          { text: "[Hidden]" },
+          { text: "" }
+        ],
+        [
+          { text: "21 October 2026 at 8:14am" },
+          { text: "[Hidden]" },
+          { html: '<a class="govuk-link" href="/jira-tickets/software-provider-page/design-remove">Remove secret<span class="govuk-visually-hidden"> generated on 21 October 2026 at 8:14am</span></a>' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+{% endblock %}

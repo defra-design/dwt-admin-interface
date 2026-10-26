@@ -1,0 +1,66 @@
+{#
+  Orphan screen: the design with GOV.UK warning text, kept for the record. Linked
+  from the prototype index only, and uses fixed example data (see routes.js).
+  Close goes to the detail page. The journey page (created.html) uses the MoJ
+  warning alert instead. The order in the list is Client ID, Client secret,
+  External test environment, Generated on.
+#}
+{% extends "layouts/v7.html" %}
+
+{% set version = "v7" %}
+{% set pageName = "Copy the client credentials" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">{{ credential.clientName }}</span>
+    <h1 class="govuk-heading-l">Copy the client credentials</h1>
+
+    {{ govukWarningText({
+      text: "You must copy the credentials. You cannot view the client secret after closing this page.",
+      iconFallbackText: "Warning"
+    }) }}
+
+    {{ govukSummaryList({
+      classes: "govuk-!-margin-bottom-8",
+      rows: [
+        { key: { text: "Generated on" }, value: { text: generatedOn } },
+        { key: { text: "External test environment" }, value: { text: "http://waste-tracking.integration.api.defra.gov.uk/" } },
+        { key: { text: "Client ID" }, value: { text: credential.clientId } },
+        { key: { text: "Client secret" }, value: { text: credential.pendingSecret } }
+      ]
+    }) }}
+
+    {# Plain text copied by the Copy button. Hidden, so the layout does not affect what is pasted. #}
+    <div id="client-credentials" hidden>Generated on
+{{ generatedOn }}
+
+External test environment
+http://waste-tracking.integration.api.defra.gov.uk/
+
+Client ID
+{{ credential.clientId }}
+
+Client secret
+{{ credential.pendingSecret }}</div>
+
+    <form method="get" action="/{{ version }}/client-credentials/{{ credential.id }}/software-provider-detail" novalidate>
+      <div class="govuk-button-group">
+        <div class="app-copy" hidden>
+          {{ govukButton({
+            html: 'Copy credentials<span class="govuk-visually-hidden"> client ID and client secret</span>',
+            classes: "app-copy-button govuk-!-margin-bottom-0",
+            type: "button",
+            attributes: { "data-copy-target": "client-credentials", "data-copy-done-label": "Credentials copied", "data-copy-message": "Client credentials copied" }
+          }) }}
+          <span class="app-copy-status govuk-visually-hidden" role="status" aria-live="polite"></span>
+        </div>
+        {{ govukButton({ text: "Close", classes: "govuk-button--secondary" }) }}
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

@@ -65,6 +65,13 @@ module.exports = [
     summary: 'The page you reach from “Software providers” in the navigation.',
     variants: [
       {
+        label: 'Software provider page ticket design',
+        source: 'Jira design',
+        href: '/jira-tickets/software-provider-page/design',
+        difference: 'The DWTA-456 table with each client name as a link to the software provider page. The Client secret column from DWTA-466 is removed. Shows External test as an example.',
+        rationaleHref: '/jira-tickets/software-provider-page'
+      },
+      {
         label: 'DWTA-466 design',
         source: 'Jira design',
         href: '/jira-tickets/dwta-466/design',
@@ -330,6 +337,13 @@ module.exports = [
     summary: 'Shown once, after credentials are created or a secret is rotated. Needs session data, so these links open the list.',
     variants: [
       {
+        label: 'Copy credentials page ticket design',
+        source: 'Jira design',
+        href: '/jira-tickets/copy-credentials-page/design',
+        difference: 'The version 6 copy page: the client name as the caption, one MoJ warning alert, the credentials in a summary list, and a primary Copy credentials button beside a secondary Close button. Only the new secret is shown.',
+        rationaleHref: '/jira-tickets/copy-credentials-page'
+      },
+      {
         label: 'DWTA-466 page shown after adding a secret',
         source: 'Jira design',
         href: '/jira-tickets/dwta-466/design-add',
@@ -390,6 +404,42 @@ module.exports = [
     name: 'Rotate client secret',
     summary: 'Reached from the Rotate link in the table.',
     variants: [
+      {
+        label: 'Version 7',
+        source: 'Prototype',
+        href: '/v7/software-providers',
+        linkNote: 'Select Create new credentials, save, then select Close.',
+        difference: 'The version 6 software provider page with a Back link to the Software providers page. The Replace secret and Remove secret links no longer say “secret” twice to screen readers. Matches the software provider page ticket design.',
+        rationaleHref: '/versions/v7'
+      },
+      {
+        label: 'Software provider page ticket remove confirmation design',
+        source: 'Jira design',
+        href: '/jira-tickets/software-provider-page/design-remove',
+        difference: 'The DWTA-466 remove confirmation, with the link “Go back to software provider”.',
+        rationaleHref: '/jira-tickets/software-provider-page'
+      },
+      {
+        label: 'Software provider page ticket replace confirmation design',
+        source: 'Jira design',
+        href: '/jira-tickets/software-provider-page/design-replace',
+        difference: 'The DWTA-466 replace confirmation, with the link “Go back to software provider”.',
+        rationaleHref: '/jira-tickets/software-provider-page'
+      },
+      {
+        label: 'Software provider page ticket design, two secrets',
+        source: 'Jira design',
+        href: '/jira-tickets/software-provider-page/design-provider-two',
+        difference: 'As shown straight after adding a secret: a green “New” tag on the newest secret, “Remove secret” on the older one, and no Add another secret button.',
+        rationaleHref: '/jira-tickets/software-provider-page'
+      },
+      {
+        label: 'Software provider page ticket design, one secret',
+        source: 'Jira design',
+        href: '/jira-tickets/software-provider-page/design-provider',
+        difference: 'Replaces the Manage client credentials page. Back link, caption “Software provider”, client name as the H1, environment tag, client ID, and a table of secrets shown as “[Hidden]” with a “Replace secret” link. Add another secret below the table.',
+        rationaleHref: '/jira-tickets/software-provider-page'
+      },
       {
         label: 'DWTA-466 remove confirmation design',
         source: 'Jira design',
@@ -465,6 +515,13 @@ module.exports = [
     name: 'Waste organisations report',
     summary: 'The report of waste organisations, filtered by date.',
     variants: [
+      {
+        label: 'Version 7',
+        source: 'Prototype',
+        href: '/v7/regulators',
+        difference: 'No table until the user enters a valid from and to date and selects Show organisations. Validation errors for blank, partial, invalid, future and reversed dates. Heading names the date range, then a count with a download CSV link above the table. All rows on one page with sortable columns (MoJ sortable table). Organisation name is the first column and row header, Payment status the last. Payment period reads “Oct to Sep 25”. Navigation item is called Waste organisations.',
+        rationaleHref: '/versions/v7'
+      },
       {
         label: 'Version 5',
         source: 'Prototype',

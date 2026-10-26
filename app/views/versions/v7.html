@@ -1,0 +1,104 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 7" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 7
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 26 October 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 7</span>',
+        href: "/v7/start",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A copy of version 6. This version is for changes to the Waste organisations reporting page, and for changes to the software provider page that match the Jira design references. Changes are recorded here as they are made." },
+          { text: "To iterate on the reporting page without changing version 6, which has been demoed. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
+          { text: "Software provider page" },
+          { text: "There is a “Back” link at the top of the page, which goes to the Software providers page. The hidden text on the “Replace secret” and “Remove secret” links is now “generated on [date]”, so a screen reader reads, for example, “Replace secret generated on 21 October 2026 at 8:14am”. Before, it read “Replace secret client secret generated on…”." },
+          { text: "To match the design reference in the draft Jira ticket. The page had no way back to the list other than the navigation, and the link names said “secret” twice after the links were renamed “Replace secret” and “Remove secret”. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/software-providers">/v7/software-providers</a> (select a client name)<br><a class="govuk-link" href="/jira-tickets/software-provider-page">Draft Jira ticket</a>' }
+        ],
+        [
+          { text: "Waste organisations report" },
+          { text: "Organisation name is now the first column and the row header, and Payment status is the last column. The columns are sortable, using the MoJ sortable table. The table loads sorted by Registered, oldest first. All rows are on one page (no pagination), so sorting reorders every row. There is more space between the filter button and the results." },
+          { text: "Design changes requested by the interaction designer: the name is what people scan for, and sorting helps people find organisations in a long list. Pagination is removed because the MoJ sortable table only sorts the rows on the page it is on. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
+          { text: "Waste organisations report: filter and results" },
+          { text: "No table shows when the page first loads. The user enters a from and to date and selects “Show organisations” (was “Apply filters”). The space around the From and To date inputs is tightened to standard GOV.UK spacing, with more space between the intro text and the date inputs, and between the filter button and the results. The intro text now says to search by the date an organisation registered its DefraID, and that results before 20 June 2026 show no registration date. The results have the heading “Waste organisations registered from [dates]”, then “Organisations registered in period: [number]”, with a “download CSV” link on the same line, then the table. With no results, the page says so and suggests a different date range or clearing the filter, with no download link." },
+          { text: "A report over every organisation is not useful without a period, and the heading and count say what the table holds. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
+          { text: "Waste organisations report: validation" },
+          { text: "The filter now shows errors in an error summary and next to the fields, and shows no results until both dates are valid. Errors: a date left blank (“Enter a from date”), a missing day, month or year (“From date must include a year”), a year without four numbers, a date that does not exist, a date in the future, and a from date after the to date. Before, missing dates were filled in, bad dates were ignored and a reversed range was swapped, without telling the user." },
+          { text: "The earlier behaviour showed results for dates the user had not entered. Messages follow the GOV.UK dates pattern. Dates before 20 June 2026 are allowed and show the results. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ],
+        [
+          { text: "Navigation" },
+          { text: "The “Reporting” navigation item is now called “Waste organisations”." },
+          { text: "To match the page heading. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/regulators">/v7/regulators</a>' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">Design decisions are the same as in
+      <a class="govuk-link" href="/versions/v6#design-rationale">version 6</a>, except for the changes recorded in the table above.</p>
+
+    <p class="govuk-body">This version has its own session data. Credentials created in this version are not
+      shown in version 6, and the other way round.</p>
+
+  </div>
+</div>
+{% endblock %}

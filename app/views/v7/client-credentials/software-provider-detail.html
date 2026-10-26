@@ -1,0 +1,79 @@
+{#
+  Software provider page for one client. It starts with the client name, the
+  client ID and the client secrets, and is expected to grow into a case file.
+  A secret is never shown again, so every secret is "[Hidden]".
+  One secret: "Replace" in its row and an "Add another secret" button. Two
+  secrets: "Remove" on the older row only, and no add button. Replace and Remove
+  go to a confirmation page first. After the user closes the copy page, the newest
+  secret has a "New" tag, once (see routes.js).
+  The back link always goes to the Software providers page, because the copy page
+  the user may have come from cannot be shown again.
+#}
+{% extends "layouts/v7.html" %}
+
+{% set version = "v7" %}
+{% set pageName = credential.clientName %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/" + version + "/software-providers" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Software provider</span>
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{{ credential.clientName }}</h1>
+
+    {# The tag is a status label, so it sits under the heading. Inside the H1 it
+       sat low against the larger text. Default (blue) tag colour: the grey tag means "Inactive". #}
+    <p class="govuk-body govuk-!-margin-bottom-8">
+      {{ govukTag({ text: "External test" }) }}
+    </p>
+
+    {{ govukSummaryList({
+      classes: "govuk-summary-list--no-border govuk-!-margin-bottom-8",
+      rows: [
+        { key: { text: "Client ID" }, value: { text: credential.clientId } }
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Client secrets for external test environment</h2>
+
+    {# Newest first. The older secret is the second row, and the only one that can be removed. #}
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-visually-hidden">Client secrets for external test environment</caption>
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Generated on</th>
+          <th scope="col" class="govuk-table__header">Client secret</th>
+          <th scope="col" class="govuk-table__header">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for generatedOn in secretLabels %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">{{ generatedOn }}{% if showNew and loop.first %} {{ govukTag({ text: "New", classes: "govuk-tag--green" }) }}{% endif %}</td>
+            <td class="govuk-table__cell">[Hidden]</td>
+            <td class="govuk-table__cell">
+              {% if canAddSecret %}
+                <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/replace">Replace secret<span class="govuk-visually-hidden"> generated on {{ generatedOn }}</span></a>
+              {% elif not loop.first %}
+                <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/remove">Remove secret<span class="govuk-visually-hidden"> generated on {{ generatedOn }}</span></a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if canAddSecret %}
+      <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/add-secret" novalidate>
+        {{ govukButton({ text: "Add another secret", classes: "govuk-button--secondary", preventDoubleClick: true }) }}
+      </form>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

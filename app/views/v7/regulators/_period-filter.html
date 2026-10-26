@@ -1,0 +1,18 @@
+{#
+  Reusable from/to period filter (form + submit). Expects `period`:
+    { values: { from:{day,month,year}, to:{day,month,year} },
+      errors: { from, to, range }, errorList: [...] }
+  Optional `submitLabel` (default "Show results") and `action` (form post URL).
+  Optional `filtered` and `clearHref` for a clear-filter link.
+#}
+{# The error summary is at the top of the page, above the h1. See index.html. #}
+
+<form method="get" action="{{ action }}" novalidate>
+  {% include version + "/regulators/_period-fields.html" %}
+  <div class="govuk-button-group">
+    {{ govukButton({ text: submitLabel | default("Show results") }) }}
+    {% if filtered %}
+      <a class="govuk-link" href="{{ clearHref }}">Clear filter</a>
+    {% endif %}
+  </div>
+</form>

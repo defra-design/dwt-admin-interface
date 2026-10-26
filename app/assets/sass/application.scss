@@ -466,6 +466,18 @@
   margin-bottom: 10px;
 }
 
+// v7: standard GOV.UK spacing. The 10px extra margin is removed, so the button
+// sits 30px below the inputs (the form group margin). The last Year input in
+// each group loses its 20px right margin, so the gap between From and To is
+// the 40px gap only (it was 60px). Earlier versions keep the old spacing.
+.app-period-filter--v7 {
+  margin-bottom: 0;
+
+  .govuk-date-input__item:last-child {
+    margin-right: 0;
+  }
+}
+
 
 // Copy button whose label changes to "Credentials copied" (v6 copy page). A
 // minimum width stops the button resizing, so the Close button beside it does

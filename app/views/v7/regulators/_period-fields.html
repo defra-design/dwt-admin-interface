@@ -1,0 +1,37 @@
+{#
+  The two from/to date inputs (no form wrapper, no submit button), so they can
+  be embedded in different forms. Expects `period` (see _period-filter.html).
+#}
+{% if period.errors.range %}
+  <p id="period-range-error" class="govuk-error-message">
+    <span class="govuk-visually-hidden">Error:</span> {{ period.errors.range }}
+  </p>
+{% endif %}
+
+<div class="app-period-filter app-period-filter--v7">
+  {{ govukDateInput({
+    id: "period-from",
+    namePrefix: "period-from",
+    fieldset: { legend: { text: "From date", classes: "govuk-fieldset__legend--s" } },
+    hint: { text: "For example, 1 4 2025" },
+    errorMessage: { text: period.errors.from } if period.errors.from else undefined,
+    items: [
+      { name: "day", classes: "govuk-input--width-2" + (" govuk-input--error" if period.errors.from or period.errors.range), value: period.values.from.day },
+      { name: "month", classes: "govuk-input--width-2" + (" govuk-input--error" if period.errors.from or period.errors.range), value: period.values.from.month },
+      { name: "year", classes: "govuk-input--width-4" + (" govuk-input--error" if period.errors.from or period.errors.range), value: period.values.from.year }
+    ]
+  }) }}
+
+  {{ govukDateInput({
+    id: "period-to",
+    namePrefix: "period-to",
+    fieldset: { legend: { text: "To date", classes: "govuk-fieldset__legend--s" } },
+    hint: { text: "For example, 31 3 2026" },
+    errorMessage: { text: period.errors.to } if period.errors.to else undefined,
+    items: [
+      { name: "day", classes: "govuk-input--width-2" + (" govuk-input--error" if period.errors.to), value: period.values.to.day },
+      { name: "month", classes: "govuk-input--width-2" + (" govuk-input--error" if period.errors.to), value: period.values.to.month },
+      { name: "year", classes: "govuk-input--width-4" + (" govuk-input--error" if period.errors.to), value: period.values.to.year }
+    ]
+  }) }}
+</div>
