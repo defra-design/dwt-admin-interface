@@ -18,7 +18,7 @@
 <div class="govuk-form-group{{ ' govuk-form-group--error' if hasErrors }}">
   {% call govukFieldset({
     legend: {
-      html: '<h3 class="govuk-fieldset__heading">Registration date</h3>',
+      html: '<h2 class="govuk-fieldset__heading">Registration date</h2>',
       classes: "govuk-fieldset__legend--m"
     },
     attributes: { "aria-describedby": describedBy | join(" ") } if hasErrors else {}

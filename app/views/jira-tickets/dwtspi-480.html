@@ -130,7 +130,7 @@
     <ol class="govuk-list govuk-list--number">
       <li>The page title is “Waste organisations - DWT admin portal”, and the H1 is “Waste organisations”.</li>
       <li>On every page of the service, the page container is 1100px wide, including the header, navigation and footer.</li>
-      <li>Under the H1 is a group with the H3 “Registration date”. In it are two date inputs, side by side: “From date” with the hint “For example, 1 4 2025”, then “To date” with the hint “For example, 31 3 2026”. Each has Day, Month and Year fields.</li>
+      <li>Under the H1 is a group with the H2 “Registration date”. In it are two date inputs, side by side: “From date” with the hint “For example, 1 4 2025”, then “To date” with the hint “For example, 31 3 2026”. Each has Day, Month and Year fields.</li>
       <li>Below the group are a primary button, “Search”, and a link, “Clear”, side by side. Given I select “Clear”, then I see the page as it first loads.</li>
       <li>Given the page loads for the first time, or I have selected “Clear”, then the date fields are empty and no results are shown.</li>
     </ol>
@@ -152,7 +152,7 @@
     <ol class="govuk-list govuk-list--number" start="15">
       <li>Given a date is wrong, when I select “Search”, then no results are shown, and the dates I entered are kept.</li>
       <li>An error summary with the title “There is a problem” is above the H1. It has one link for each error, in the order From then To. Each link goes to the first wrong input. The page title starts with “Error: ”.</li>
-      <li>The group has a red line down its left, from the H3 down. The error messages are between the H3 and the date inputs, one for each date that is wrong. Only the Day, Month or Year inputs that are wrong have a red border.</li>
+      <li>The group has a red line down its left, from the H2 down. The error messages are between the H2 and the date inputs, one for each date that is wrong. Only the Day, Month or Year inputs that are wrong have a red border.</li>
       <li>One message is shown for each date: the first in the table below that applies. The “To before From” error is only shown when the To date has no other error.</li>
     </ol>
 
@@ -169,8 +169,8 @@
       rows: [
         [
           { text: "Nothing entered" },
-          { text: "Enter or select a ‘From’ date" },
-          { text: "Enter or select a ‘To’ date" },
+          { text: "Enter a ‘From’ date" },
+          { text: "Enter a ‘To’ date" },
           { text: "Day, Month and Year" }
         ],
         [
@@ -231,7 +231,7 @@
     <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
     <p class="govuk-body">On the Waste organisations page, meets WCAG 2.2 AA:</p>
     <ol class="govuk-list govuk-list--number">
-      <li>The page has one H1. “Registration date” is an H3 inside the legend of the group, and the results heading is an H2 (1.3.1, 2.4.6).</li>
+      <li>The page has one H1. “Registration date” is an H2 inside the legend of the group, and the results heading is an H2 (1.3.1, 2.4.6).</li>
       <li>The page title is unique, with the page name then “DWT admin portal”. On an error page it starts with “Error: ” (2.4.2).</li>
       <li>The error summary is above the H1, and focus moves to it when the page loads with errors. Each link goes to the first wrong input (3.3.1, 2.4.3).</li>
       <li>The group is a <code>fieldset</code> with the legend “Registration date”. Each date input is a nested <code>fieldset</code> with the legend “From date” or “To date”. The group has <code>aria-describedby</code> pointing to its error messages. Each message starts with the visually hidden text “Error:” (1.3.1, 3.3.1, 4.1.2).</li>
