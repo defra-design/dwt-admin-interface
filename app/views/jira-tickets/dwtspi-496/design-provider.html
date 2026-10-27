@@ -1,8 +1,8 @@
 {#
-  Design reference for the software provider page ticket: the software provider page, two
-  secrets, as shown straight after the user closes the copy page having added a secret.
-  The newest secret has the "New" tag. Only the older secret can be removed, and there is no
-  Add another secret button. "Remove secret" goes to the remove confirmation design.
+  Design reference for the software provider page ticket: the software provider page, one secret.
+  A copy of v6/client-credentials/software-provider-detail.html, with a back link added and
+  the visually hidden text on "Replace secret" changed so it does not say "secret" twice.
+  "Replace secret" goes to the replace confirmation design. Add another secret goes nowhere.
 #}
 {% extends "layouts/jira-software-provider-page.html" %}
 
@@ -10,7 +10,7 @@
 {% set activeSection = "providers" %}
 
 {% block beforeContent %}
-  {{ govukBackLink({ text: "Back", href: "/jira-tickets/software-provider-page/design" }) }}
+  {{ govukBackLink({ text: "Back", href: "/jira-tickets/dwtspi-496/design" }) }}
 {% endblock %}
 
 {% block content %}
@@ -43,17 +43,17 @@
       ],
       rows: [
         [
-          { html: '26 October 2026 at 9:32am ' + govukTag({ text: "New", classes: "govuk-tag--green" }) },
-          { text: "[Hidden]" },
-          { text: "" }
-        ],
-        [
           { text: "21 October 2026 at 8:14am" },
           { text: "[Hidden]" },
-          { html: '<a class="govuk-link" href="/jira-tickets/software-provider-page/design-remove">Remove secret<span class="govuk-visually-hidden"> generated on 21 October 2026 at 8:14am</span></a>' }
+          { html: '<a class="govuk-link" href="/jira-tickets/dwtspi-496/design-replace">Replace secret<span class="govuk-visually-hidden"> generated on 21 October 2026 at 8:14am</span></a>' }
         ]
       ]
     }) }}
+
+    {# Static design: method="get" so Add another secret is a real button that goes nowhere. #}
+    <form method="get" action="#" novalidate>
+      {{ govukButton({ text: "Add another secret", classes: "govuk-button--secondary", preventDoubleClick: true }) }}
+    </form>
 
   </div>
 </div>

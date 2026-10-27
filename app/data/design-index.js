@@ -67,9 +67,9 @@ module.exports = [
       {
         label: 'Software provider page ticket design',
         source: 'Jira design',
-        href: '/jira-tickets/software-provider-page/design',
+        href: '/jira-tickets/dwtspi-496/design',
         difference: 'The DWTA-456 table with each client name as a link to the software provider page. The Client secret column from DWTA-466 is removed. Shows External test as an example.',
-        rationaleHref: '/jira-tickets/software-provider-page'
+        rationaleHref: '/jira-tickets/dwtspi-496'
       },
       {
         label: 'DWTA-466 design',
@@ -415,30 +415,30 @@ module.exports = [
       {
         label: 'Software provider page ticket remove confirmation design',
         source: 'Jira design',
-        href: '/jira-tickets/software-provider-page/design-remove',
+        href: '/jira-tickets/dwtspi-496/design-remove',
         difference: 'The DWTA-466 remove confirmation, with the link “Go back to software provider”.',
-        rationaleHref: '/jira-tickets/software-provider-page'
+        rationaleHref: '/jira-tickets/dwtspi-496'
       },
       {
         label: 'Software provider page ticket replace confirmation design',
         source: 'Jira design',
-        href: '/jira-tickets/software-provider-page/design-replace',
+        href: '/jira-tickets/dwtspi-496/design-replace',
         difference: 'The DWTA-466 replace confirmation, with the link “Go back to software provider”.',
-        rationaleHref: '/jira-tickets/software-provider-page'
+        rationaleHref: '/jira-tickets/dwtspi-496'
       },
       {
         label: 'Software provider page ticket design, two secrets',
         source: 'Jira design',
-        href: '/jira-tickets/software-provider-page/design-provider-two',
+        href: '/jira-tickets/dwtspi-496/design-provider-two',
         difference: 'As shown straight after adding a secret: a green “New” tag on the newest secret, “Remove secret” on the older one, and no Add another secret button.',
-        rationaleHref: '/jira-tickets/software-provider-page'
+        rationaleHref: '/jira-tickets/dwtspi-496'
       },
       {
         label: 'Software provider page ticket design, one secret',
         source: 'Jira design',
-        href: '/jira-tickets/software-provider-page/design-provider',
+        href: '/jira-tickets/dwtspi-496/design-provider',
         difference: 'Replaces the Manage client credentials page. Back link, caption “Software provider”, client name as the H1, environment tag, client ID, and a table of secrets shown as “[Hidden]” with a “Replace secret” link. Add another secret below the table.',
-        rationaleHref: '/jira-tickets/software-provider-page'
+        rationaleHref: '/jira-tickets/dwtspi-496'
       },
       {
         label: 'DWTA-466 remove confirmation design',
