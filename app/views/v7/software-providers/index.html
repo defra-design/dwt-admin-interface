@@ -12,6 +12,19 @@
 {% set activeSection = "providers" %}
 
 {% block content %}
+{% if deletedName %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ mojAlert({
+      variant: "success",
+      title: "Software provider deleted",
+      showTitleAsHeading: true,
+      text: deletedName + " has been deleted.",
+      classes: "govuk-!-margin-bottom-7"
+    }) }}
+  </div>
+</div>
+{% endif %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h1 class="govuk-heading-l">Software providers</h1>

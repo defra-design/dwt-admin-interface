@@ -23,8 +23,21 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
+    {% if serviceError %}
+      {{ mojAlert({
+        variant: "error",
+        title: "Sorry, there is a problem with the service",
+        showTitleAsHeading: true,
+        text: serviceError,
+        classes: "govuk-!-margin-bottom-7"
+      }) }}
+    {% endif %}
+
     <span class="govuk-caption-l">Software provider</span>
-    <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{{ credential.clientName }}</h1>
+    <div class="app-heading-with-link govuk-!-margin-bottom-4">
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ credential.clientName }}</h1>
+      <a class="govuk-link govuk-body" href="/{{ version }}/client-credentials/{{ credential.id }}/edit">Edit<span class="govuk-visually-hidden"> client name</span></a>
+    </div>
 
     {# The tag is a status label, so it sits under the heading. Inside the H1 it
        sat low against the larger text. Default (blue) tag colour: the grey tag means "Inactive". #}
@@ -73,6 +86,10 @@
         {{ govukButton({ text: "Add another secret", classes: "govuk-button--secondary", preventDoubleClick: true }) }}
       </form>
     {% endif %}
+
+    <p class="govuk-body govuk-!-margin-top-9">
+      <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/delete">Delete software provider</a>
+    </p>
 
   </div>
 </div>

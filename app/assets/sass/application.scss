@@ -530,3 +530,13 @@
 .app-copy-button {
   min-width: 11em;
 }
+
+// v7 software provider page: the "Edit" link sits on the same line as the H1,
+// aligned to the heading's baseline, and wraps below it on narrow screens. No
+// GOV.UK class puts a heading and a link side by side.
+.app-heading-with-link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 20px;
+}

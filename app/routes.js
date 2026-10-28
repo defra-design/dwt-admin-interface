@@ -2589,9 +2589,41 @@ function registerV7Routes () {
     // Only the label changes here, so the shared data stays as it is.
     const credentials = ccV7.listCredentials(credentialList(req))
       .filter((c) => c.environment !== 'Production')
+      .filter((c) => !deletedIds(req).includes(c.id))
       .map((c) => Object.assign({}, c, { environment: 'External test' }))
       .sort((a, b) => a.clientName.localeCompare(b.clientName))
-    res.render(view('software-providers/index'), { credentials })
+    // The "deleted" message shows once, then is cleared.
+    const deletedName = req.session.data.deletedClientNameV7
+    delete req.session.data.deletedClientNameV7
+    res.render(view('software-providers/index'), { credentials, deletedName })
+  })
+
+  // Deleted software providers. The fixed example rows cannot be removed from
+  // the shared data, so deleted ids are kept in the session and hidden.
+  function deletedIds (req) {
+    if (!Array.isArray(req.session.data.deletedCredentialsV7)) {
+      req.session.data.deletedCredentialsV7 = []
+    }
+    return req.session.data.deletedCredentialsV7
+  }
+
+  router.get(`${base}/client-credentials/:id/delete`, (req, res) => {
+    const credential = ccV7.getCredential(credentialList(req), req.params.id)
+    if (!credential || deletedIds(req).includes(credential.id)) return res.redirect(`${base}/software-providers`)
+    res.render(view('client-credentials/delete'), { credential })
+  })
+
+  router.post(`${base}/client-credentials/:id/delete`, (req, res) => {
+    const credential = ccV7.getCredential(credentialList(req), req.params.id)
+    // Demo failure: the provider is not deleted, for names starting "Error_".
+    if (credential && isDemoError(credential.clientName)) {
+      return renderDetail(res, credential, { serviceError: 'Try again. We have not deleted the software provider.' })
+    }
+    if (credential && !deletedIds(req).includes(credential.id)) {
+      deletedIds(req).push(credential.id)
+      req.session.data.deletedClientNameV7 = credential.clientName
+    }
+    res.redirect(`${base}/software-providers`)
   })
 
   // Old per-environment URLs go to the one table.
@@ -2631,6 +2663,17 @@ function registerV7Routes () {
         values,
         errors,
         errorList: ccV7.clientNameErrorList(errors)
+      })
+    }
+
+    // Demo failure: a client name that starts with "Error_" is not created. The
+    // form is shown again with the alert.
+    if (isDemoError(values.clientName)) {
+      return renderClientNameForm(res, {
+        environment,
+        mode: 'create',
+        values,
+        serviceError: 'Try again. We have not created client credentials.'
       })
     }
 
@@ -2674,12 +2717,23 @@ function registerV7Routes () {
 
     // Only a real change counts as a change, so "Last changed" stays put if
     // the user saves without editing.
+    if (isDemoError(credential.clientName)) {
+      // Demo failure: the name is not saved, for providers starting "Error_".
+      return renderClientNameForm(res, {
+        environment: environmentFor(credential.environment.toLowerCase()),
+        mode: 'edit',
+        credential,
+        values,
+        serviceError: 'Try again. We have not changed the client name.'
+      })
+    }
     if (values.clientName !== credential.clientName) {
       const toChange = ccV7.credentialToChange(credentialList(req), credential.id)
       toChange.clientName = values.clientName
       toChange.lastChanged = new Date().toISOString()
     }
-    res.redirect(tablePath(credential.environment))
+    // Back to the software provider page, where the user started the edit.
+    res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
   })
 
   // The one-time reveal, for new credentials and for a rotated secret. Once
@@ -2758,18 +2812,35 @@ function registerV7Routes () {
     if (!credential) return res.redirect(`${base}/software-providers`)
     const showNew = Boolean(credential.showNewTag)
     delete credential.showNewTag
-    res.render(view('client-credentials/software-provider-detail'), {
+    renderDetail(res, credential, { showNew })
+  })
+
+  // Names that start with "Error_" always fail, so the service error alert can
+  // be shown in research. The example provider Error_Demo_Test is one of them.
+  function isDemoError (clientName) {
+    return /^error_/i.test(clientName || '')
+  }
+
+  function renderDetail (res, credential, extras) {
+    res.render(view('client-credentials/software-provider-detail'), Object.assign({
       credential,
-      showNew,
+      showNew: false,
       secretLabels: secretLabels(credential),
       canAddSecret: ccV7.secretDates(credential).length < ccV7.MAX_SECRETS,
       caption: `${credential.environment} credentials`
-    })
-  })
+    }, extras))
+  }
 
   router.post(`${base}/client-credentials/:id/rotate`, (req, res) => {
     if (!ccV7.getCredential(credentialList(req), req.params.id)) {
       return res.redirect(`${base}/software-providers`)
+    }
+    // Demo failure: the secret is not replaced for a provider whose name starts
+    // with "Error_". The user goes back to the software provider page, which
+    // shows the alert.
+    const target = ccV7.getCredential(credentialList(req), req.params.id)
+    if (isDemoError(target.clientName)) {
+      return renderDetail(res, target, { serviceError: 'Try again. We have not replaced the secret.' })
     }
     const credential = ccV7.credentialToChange(credentialList(req), req.params.id)
     if (credential.pendingAction !== 'rotated') {
@@ -2785,6 +2856,12 @@ function registerV7Routes () {
   router.post(`${base}/client-credentials/:id/add-secret`, (req, res) => {
     if (!ccV7.getCredential(credentialList(req), req.params.id)) {
       return res.redirect(`${base}/software-providers`)
+    }
+    // Demo failure: no secret is added for a provider whose name starts with
+    // "Error_". The page is shown again with the alert.
+    const target = ccV7.getCredential(credentialList(req), req.params.id)
+    if (isDemoError(target.clientName)) {
+      return renderDetail(res, target, { serviceError: 'Try again. We have not added a secret.' })
     }
     const credential = ccV7.credentialToChange(credentialList(req), req.params.id)
     if (ccV7.secretDates(credential).length < ccV7.MAX_SECRETS && credential.pendingAction !== 'added') {
@@ -2807,6 +2884,11 @@ function registerV7Routes () {
   router.post(`${base}/client-credentials/:id/remove`, (req, res) => {
     if (!ccV7.getCredential(credentialList(req), req.params.id)) {
       return res.redirect(`${base}/software-providers`)
+    }
+    // Demo failure: the secret is not removed, for names starting "Error_".
+    const target = ccV7.getCredential(credentialList(req), req.params.id)
+    if (isDemoError(target.clientName)) {
+      return renderDetail(res, target, { serviceError: 'Try again. We have not removed the secret.' })
     }
     const credential = ccV7.credentialToChange(credentialList(req), req.params.id)
     const dates = ccV7.secretDates(credential)

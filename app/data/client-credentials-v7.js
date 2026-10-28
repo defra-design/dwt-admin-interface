@@ -78,6 +78,27 @@ const exampleCredentials = [
     clientId: '2jcg4fq0misvqui9mo6eh18bsb',
     environment: 'Production',
     lastChanged: '2026-10-05T10:15:00'
+  },
+  // Demo provider: adding or replacing a secret always fails, to show the
+  // service error alert. Any new client name starting "Error_" fails on create.
+  {
+    id: 'client-6',
+    softwareProvider: 'Error demo (fails on purpose)',
+    clientName: 'Error_Demo_Test',
+    clientId: '3ndk8a2ptq9v5xwe1hy7rc4mzo',
+    environment: 'Test',
+    lastChanged: '2026-10-06T09:00:00'
+  },
+  // Second demo provider, with two secrets so "Remove secret" shows. Remove,
+  // delete and edit fail for it (and for the first demo provider).
+  {
+    id: 'client-7',
+    softwareProvider: 'Error demo two (fails on purpose)',
+    clientName: 'Error_Demo_Two_Test',
+    clientId: '9wq2m7xdk4ptv1ncy6ahe8rzbg',
+    environment: 'Test',
+    lastChanged: '2026-10-07T09:00:00',
+    secrets: ['2026-10-02T09:00:00', '2026-10-07T09:00:00']
   }
 ]
 

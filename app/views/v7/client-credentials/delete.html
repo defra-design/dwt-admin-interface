@@ -1,0 +1,28 @@
+{#
+  "Are you sure?" step before a software provider is deleted, using the MoJ
+  interruption card (written out so the button can post a form, as in
+  remove.html). Only the POST deletes it (see routes.js), then the user goes to
+  the Software providers page, which confirms the deletion.
+#}
+{% extends "layouts/v7.html" %}
+
+{% set version = "v7" %}
+{% set pageName = "Are you sure you want to delete the software provider?" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="moj-interruption-card">
+  <div class="moj-interruption-card__content">
+    <h1 class="moj-interruption-card__heading">Are you sure you want to delete the software provider?</h1>
+    <div class="moj-interruption-card__body">
+      <p>You will delete the entire record for {{ credential.clientName }} including all the credentials.</p>
+    </div>
+    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/delete" novalidate>
+      <div class="govuk-button-group moj-interruption-card__actions">
+        {{ govukButton({ text: "Yes, delete software provider", classes: "govuk-button--inverse", preventDoubleClick: true }) }}
+        <a class="govuk-link govuk-link--inverse" href="/{{ version }}/client-credentials/{{ credential.id }}/software-provider-detail">Go back to software provider</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

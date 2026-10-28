@@ -18,13 +18,25 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
+    {% if serviceError %}
+      {{ mojAlert({
+        variant: "error",
+        title: "Sorry, there is a problem with the service",
+        showTitleAsHeading: true,
+        text: serviceError,
+        classes: "govuk-!-margin-bottom-7"
+      }) }}
+    {% endif %}
+
     {% if errorList.length %}
       {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
     {% endif %}
 
 
-    <span class="govuk-caption-l">{{ "Edit" if editing else "Create" }} external test environment credentials</span>
-    <h1 class="govuk-heading-l">What is the name of the software provider and package?</h1>
+    {% if not editing %}
+      <span class="govuk-caption-l">Create external test environment credentials</span>
+    {% endif %}
+    <h1 class="govuk-heading-l">{{ "Edit client name" if editing else "What is the name of the software provider and package?" }}</h1>
 
     <form method="post" action="/{{ version }}/client-credentials/{{ credential.id + '/edit' if editing else environment.key + '/create' }}" novalidate>
 
@@ -32,7 +44,7 @@
         id: "clientName",
         name: "clientName",
         label: { text: "Client name", classes: "govuk-label--s" },
-        hint: { text: "Enter the name of the software provider and software package, using letters and underscores only. For example, Waste_Technologies_Software." },
+        hint: { text: "Enter the name of the software provider and software package, using letters and underscores only. For example, Waste_Technologies_Software" + ("" if editing else ".") },
         classes: "govuk-!-width-two-thirds",
         value: values.clientName,
         errorMessage: { text: errors.clientName } if errors.clientName else undefined,
@@ -42,7 +54,7 @@
 
       <div class="govuk-button-group">
         {{ govukButton({ text: "Save" if editing else "Generate credentials" }) }}
-        <a class="govuk-link" href="/{{ version }}/software-providers">Cancel</a>
+        <a class="govuk-link" href="/{{ version }}/{{ 'client-credentials/' + credential.id + '/software-provider-detail' if editing else 'software-providers' }}">Cancel</a>
       </div>
 
     </form>
