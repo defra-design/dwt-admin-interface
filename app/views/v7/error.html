@@ -1,0 +1,23 @@
+{#
+  Orphan error page in the GOV.UK pattern ("Sorry, there is a problem with the
+  service"), in the v7 Defra styling. Not linked from the journey: open it at
+  /v7/error.
+#}
+{% extends "layouts/v7.html" %}
+
+{% set version = "v7" %}
+{% set pageName = "Sorry, there is a problem with the service" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">Sorry, there is a problem with the service</h1>
+
+    <p class="govuk-body">Try again later.</p>
+
+    <p class="govuk-body">Your information has not been saved.</p>
+
+  </div>
+</div>
+{% endblock %}
