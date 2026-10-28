@@ -65,6 +65,13 @@ module.exports = [
     summary: 'The page you reach from “Software providers” in the navigation.',
     variants: [
       {
+        label: 'DWTSPI-469 deleted design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-469/design-deleted',
+        difference: 'The table after a software provider is deleted, with a MoJ success alert above the heading: “Software provider deleted” and “[Client name] has been deleted.”',
+        rationaleHref: '/jira-tickets/dwtspi-469'
+      },
+      {
         label: 'Software provider page ticket design',
         source: 'Jira design',
         href: '/jira-tickets/dwtspi-496/design',
@@ -241,6 +248,27 @@ module.exports = [
     summary: 'The question page for the client name, reached from the Create credentials button.',
     variants: [
       {
+        label: 'DWTSPI-493 edit client name error design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-493/design-edit',
+        difference: 'The edit page with a MoJ error alert: “Sorry, there is a problem with the service” and “Try again. We have not changed the client name.”',
+        rationaleHref: '/jira-tickets/dwtspi-493'
+      },
+      {
+        label: 'DWTSPI-493 generate credentials error design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-493/design-generate',
+        difference: 'The create page with a MoJ error alert: “Sorry, there is a problem with the service” and “Try again. We have not created client credentials.”',
+        rationaleHref: '/jira-tickets/dwtspi-493'
+      },
+      {
+        label: 'DWTSPI-502 edit client name design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-502/design-edit',
+        difference: 'The create page used to edit the name. No caption, heading “Edit client name”, the current name filled in, no full stop at the end of the example, and the button “Save”.',
+        rationaleHref: '/jira-tickets/dwtspi-502'
+      },
+      {
         label: 'Allowed characters invalid characters error design',
         source: 'Jira design',
         href: '/jira-tickets/allowed-characters/design-name-error-characters',
@@ -404,6 +432,34 @@ module.exports = [
     name: 'Rotate client secret',
     summary: 'Reached from the Rotate link in the table.',
     variants: [
+      {
+        label: 'DWTSPI-493 software provider page error design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-493/design-provider',
+        difference: 'The software provider page with a MoJ error alert above the caption, for a failed add, replace, remove or delete. The design shows “Try again. We have not added a secret.”',
+        rationaleHref: '/jira-tickets/dwtspi-493'
+      },
+      {
+        label: 'DWTSPI-469 delete confirmation design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-469/design-confirm',
+        difference: 'A MoJ interruption card: “Are you sure you want to delete the software provider?” and “You will delete the entire record for [client name] including all the credentials.”, with the button “Yes, delete software provider”.',
+        rationaleHref: '/jira-tickets/dwtspi-469'
+      },
+      {
+        label: 'DWTSPI-469 software provider page design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-469/design-provider',
+        difference: 'The software provider page with a “Delete software provider” link at the bottom.',
+        rationaleHref: '/jira-tickets/dwtspi-469'
+      },
+      {
+        label: 'DWTSPI-502 software provider page design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-502/design-provider',
+        difference: 'The software provider page with an “Edit” link on the same line as the heading.',
+        rationaleHref: '/jira-tickets/dwtspi-502'
+      },
       {
         label: 'Version 7',
         source: 'Prototype',

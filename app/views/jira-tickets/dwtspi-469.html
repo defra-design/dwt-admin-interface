@@ -1,0 +1,177 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTSPI-469: Delete a software provider" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">DWTSPI-469</span>
+    <h1 class="govuk-heading-l">Delete a software provider</h1>
+
+    <h2 class="govuk-heading-m">Design reference</h2>
+
+    <h3 class="govuk-heading-s">Software provider page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design reference page",
+        href: "/jira-tickets/dwtspi-469/design-provider",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">Confirmation page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the confirmation design",
+        href: "/jira-tickets/dwtspi-469/design-confirm",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">Software providers page after deleting</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design with the success alert",
+        href: "/jira-tickets/dwtspi-469/design-deleted",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to delete a software provider, including all of its credentials,<br><strong>so that</strong> the portal does not hold a record for a software provider we no longer work with.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">This story changes the software provider page built in <a class="govuk-link" href="/jira-tickets/dwtspi-496">DWTSPI-496</a> and the Software providers page built in <a class="govuk-link" href="/jira-tickets/dwta-456">DWTA-456</a>. Today there is no way to remove a software provider once it has been created.</p>
+    <p class="govuk-body">Deleting removes the whole record for the client, including its secrets, and cannot be undone. So the link goes to a confirmation page first, in the same way as replacing or removing a secret in <a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a>. After the deletion the person returns to the list, which shows an alert, because the only other sign that it worked is a missing row.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "Alert (success)" },
+          { text: "MoJ Design System / MoJ Frontend" },
+          { html: 'On the Software providers page after a deletion. Reason: GOV.UK has no component with a heading and text in one message. Needs <code>@ministryofjustice/frontend</code>, which is already installed. The warning alert is already used on the copy credentials page (DWTSPI-496), so only the <code>success</code> variant is new. JavaScript: the script only focuses an alert that has <code>role="alert"</code>, and lets people dismiss it. This alert keeps the default <code>role="region"</code> and cannot be dismissed, so it looks and reads the same without JavaScript. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/alert/">Alert</a>.' }
+        ],
+        [
+          { text: "Interruption card" },
+          { text: "MoJ Design System / MoJ Frontend" },
+          { html: 'Built in DWTA-466 for the replace and remove confirmations. Reused for the delete confirmation, with new content. The card is written out in the page, not used as a macro, so that “Yes, delete software provider” can submit a form, as on the replace and remove pages. The prototype has <code>rebrand: false</code>, so it does not follow the GOV.UK rebrand. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/interruption-card/">Interruption card</a>.' }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Colours</h2>
+    <p class="govuk-body">The colours come from the components. They are listed so the contrast can be checked.</p>
+    {{ govukTable({
+      caption: "Colours used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Name" },
+        { text: "Value" },
+        { text: "Source" },
+        { text: "Used for" }
+      ],
+      rows: [
+        [
+          { html: "<code>govuk-colour(\"green\")</code>" },
+          { text: "#0f7a52" },
+          { text: "GOV.UK web palette" },
+          { text: "Border and icon of the success alert." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"black\")</code>" },
+          { text: "#0b0c0c" },
+          { text: "GOV.UK web palette" },
+          { text: "Heading and text in the success alert." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"white\")</code>" },
+          { text: "#ffffff" },
+          { text: "GOV.UK web palette" },
+          { text: "Background of the success alert." }
+        ]
+      ]
+    }) }}
+    <p class="govuk-body">Contrast: <code>black</code> on <code>white</code> is about 19:1, which passes for text (4.5:1). <code>green</code> on <code>white</code> is about 5.3:1, which passes for the border and icon (3:1). No text uses <code>green</code>.</p>
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+
+    <h3 class="govuk-heading-s">Software provider page</h3>
+    <ol class="govuk-list govuk-list--number">
+      <li>At the bottom of the page is a link, “Delete software provider”. It is below the secrets table and, when it is shown, the “Add another secret” button.</li>
+      <li>The gap between the table or button above and the link is spacing unit 9 (60px).</li>
+      <li>Given I select “Delete software provider”, then I go to the confirmation page for that client.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Confirmation page</h3>
+    <ol class="govuk-list govuk-list--number" start="4">
+      <li>The page title is “Are you sure you want to delete the software provider? - DWT admin portal”.</li>
+      <li>The page has an interruption card as its only content. Its H1 is “Are you sure you want to delete the software provider?”.</li>
+      <li>The text in the card is “You will delete the entire record for [client name] including all the credentials.”, with the name of the client I came from, for example “Kerbside_Collect_Test”.</li>
+      <li>The card has a button, “Yes, delete software provider”, and a link, “Go back to software provider”, side by side. The link goes to the software provider page for that client. Nothing is deleted.</li>
+      <li>Given I select “Yes, delete software provider”, then the client and all of its secrets are deleted, and I go to the Software providers page.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Software providers page after deleting</h3>
+    <ol class="govuk-list govuk-list--number" start="9">
+      <li>Above the H1 is a success alert. Its heading is “Software provider deleted” and its text is “[client name] has been deleted.”, with the name of the client I deleted, and a full stop at the end. The alert cannot be dismissed.</li>
+      <li>The gap between the alert and the H1 is spacing unit 7 (40px).</li>
+      <li>The deleted client is not in the table.</li>
+      <li>The alert is only shown straight after a deletion. Given I reload the page, or come back to it later, then the alert is not shown.</li>
+      <li>Given the client has been deleted, then going to its software provider page or its confirmation page takes me to the Software providers page.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">On every page in this ticket</h3>
+    <ol class="govuk-list govuk-list--number" start="14">
+      <li>Everything else on these pages works as before.</li>
+      <li>The pages match the design references.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">On every page in this ticket, meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>“Delete software provider” is a link, because it goes to another page. “Yes, delete software provider” is a <code>button</code> in a form, because it changes data (4.1.2).</li>
+      <li>Deleting needs a second step, the confirmation page, so a mistaken selection can be undone before any data is deleted (3.3.4).</li>
+      <li>The confirmation page has one H1, which is the card heading. Its page title is unique and matches the H1 (1.3.1, 2.4.2, 2.4.6).</li>
+      <li>On the Software providers page the alert heading is an H2, which comes before the H1 in the page. The alert has <code>role="region"</code> and the accessible name “success: Software provider deleted”. Its icon is decorative (<code>role="presentation"</code> and <code>focusable="false"</code>). Success is given in words, not by the icon or colour alone (1.1.1, 1.3.1, 1.4.1).</li>
+      <li>Focus is not moved to the success alert when the page loads. It is the first content after the navigation, so a screen reader reads it before the H1 (2.4.3).</li>
+      <li>Every link and button can be used with a keyboard, in an order that matches the page. The focus state is the GOV.UK focus style, with the <code>focus</code> colour (#ffdd00) as the background and <code>focus-text</code> (#0b0c0c) as the text. On the card, the link and button use the inverse style, and keep a visible focus state (2.1.1, 2.4.3, 2.4.7).</li>
+      <li>The alert text is <code>black</code> on <code>white</code>, about 19:1. The border and icon are <code>green</code> on <code>white</code>, about 5.3:1 (1.4.3, 1.4.11).</li>
+      <li>The pages have no horizontal scrolling at 320px wide or at 200% zoom. A long client name wraps in the card and in the alert (1.4.4, 1.4.10).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE, on each page.</li>
+      <li>With only a keyboard, go from the software provider page to the confirmation page, delete the client, and check where focus goes.</li>
+      <li>Check the link, the card and the alert with a screen reader, such as NVDA or VoiceOver. Check that the alert is read, and that it names the client.</li>
+      <li>Check each page at 320px wide and at 200% zoom, with a long client name.</li>
+      <li>Turn off JavaScript. Check that the link, the confirmation and the alert still work.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Undoing a deletion, or a way to recover a deleted client.</li>
+      <li>What happens to software providers that are already using the deleted credentials, or telling them.</li>
+      <li>Deleting a single secret. See <a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a>.</li>
+      <li>What the Software providers page shows when the last client is deleted.</li>
+      <li>A message if the deletion fails. See <a class="govuk-link" href="/jira-tickets/dwtspi-493">DWTSPI-493</a>.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

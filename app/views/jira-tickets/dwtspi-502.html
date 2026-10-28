@@ -1,0 +1,134 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTSPI-502: Change the client name" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">DWTSPI-502</span>
+    <h1 class="govuk-heading-l">Change the client name</h1>
+
+    <h2 class="govuk-heading-m">Design reference</h2>
+
+    <h3 class="govuk-heading-s">Software provider page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design reference page",
+        href: "/jira-tickets/dwtspi-502/design-provider",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">Edit client name page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the edit client name design",
+        href: "/jira-tickets/dwtspi-502/design-edit",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to change the name of a client after it has been created,<br><strong>so that</strong> I can correct a mistake in the name, or update it when the software provider’s product changes name, without creating new credentials.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">This story changes the software provider page built in <a class="govuk-link" href="/jira-tickets/dwtspi-496">DWTSPI-496</a>. The client name is entered once, when the credentials are created in <a class="govuk-link" href="/jira-tickets/dwta-458">DWTA-458</a>, and cannot be changed afterwards.</p>
+    <p class="govuk-body">Changing the name changes only the name. The client ID and the secrets stay the same, so the software provider does not need to change anything. The edit page is the create page with the current name filled in, so the rules for a valid name are the ones already built.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "Heading with a link beside it" },
+          { html: "Bespoke (<code>app-heading-with-link</code> in <code>application.scss</code>)" },
+          { html: 'On the software provider page. Reason: GOV.UK, MoJ and Defra have no pattern that puts a link on the same line as a page heading, such as the summary list “Change” link, which sits beside a value, not a heading. The class is a flex row that lines up the baselines, leaves a gap of spacing unit 4 (20px), and wraps the link below the heading on narrow screens or with a long name. DesignOps (DesignOps@defra.gov.uk) has not been contacted yet. No JavaScript.' }
+        ],
+        [
+          { text: "Text input and button" },
+          { html: 'GOV.UK Design System. Built in DWTA-458. Reused on the edit page with the current name filled in and the button label “Save”. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/text-input/">Text input</a>.' },
+          { text: "The error summary and field error are the ones already built in DWTA-458." }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+
+    <h3 class="govuk-heading-s">Software provider page</h3>
+    <ol class="govuk-list govuk-list--number">
+      <li>Beside the H1 is a link, “Edit”, on the same line as the client name, after it. The text of the link and the H1 line up on their baseline.</li>
+      <li>The gap between the H1 and the link is 20px, which is spacing unit 4. The gap between the heading and the tag below it is still spacing unit 4 (20px).</li>
+      <li>Given the client name is long, or the screen is narrow, then the link wraps below the H1.</li>
+      <li>Given I select “Edit”, then I go to the edit client name page for that client.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Edit client name page</h3>
+    <ol class="govuk-list govuk-list--number" start="5">
+      <li>The page title is “Edit client name - DWT admin portal”. When there is an error it starts with “Error: ”.</li>
+      <li>There is no caption above the H1. The H1 is “Edit client name”.</li>
+      <li>There is one text input, with the label “Client name” in the small bold label style, and the current client name filled in.</li>
+      <li>The hint is “Enter the name of the software provider and software package, using letters and underscores only. For example, Waste_Technologies_Software”, with no full stop at the end.</li>
+      <li>Below the input is a button, “Save”, with a link, “Cancel”, beside it. “Cancel” goes to the software provider page for that client without saving.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Saving</h3>
+    <ol class="govuk-list govuk-list--number" start="10">
+      <li>Given I enter a valid name and select “Save”, then the name is changed and I go to the software provider page. The H1, the page title and the row in the Software providers table show the new name.</li>
+      <li>Given I select “Save” without changing the name, then I go to the software provider page and nothing changes.</li>
+      <li>Changing the name does not change the client ID, the secrets, or the date and time each secret was generated.</li>
+      <li>Given the name is not valid, then the page shows the error summary and field error built in DWTA-458, and keeps what I entered. The client’s own current name is not treated as “already exists”.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">On every page in this ticket</h3>
+    <ol class="govuk-list govuk-list--number" start="14">
+      <li>Everything else on these pages works as before.</li>
+      <li>The pages match the design references.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">On every page in this ticket, meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The “Edit” link has visually hidden text after it, “ client name”, so its accessible name is “Edit client name” and it makes sense out of context (2.4.4).</li>
+      <li>The H1 and the link are separate elements. The link is not inside the H1, so the H1 is still only the client name (1.3.1, 2.4.6).</li>
+      <li>The link is after the H1 in the page, so the reading order and the tab order match what people see, including when the link wraps below the heading (1.3.2, 2.4.3).</li>
+      <li>The input has a visible label, linked to it with <code>for</code> and <code>id</code>. The hint is linked with <code>aria-describedby</code>. The input has <code>autocomplete="off"</code>, because the name is not about the person (1.3.1, 3.3.2).</li>
+      <li>Given there is an error, then an error summary is at the top of the page, focus moves to it, and each error links to the input. The field error is linked with <code>aria-describedby</code> (3.3.1, 4.1.3).</li>
+      <li>Given I have a name in the input and save with an error, then the input still holds what I entered, so I do not have to enter it again (3.3.7).</li>
+      <li>The edit page has one H1. The page title is unique and matches the H1 (1.3.1, 2.4.2).</li>
+      <li>Every link and button can be used with a keyboard, in an order that matches the page. The focus state is the GOV.UK focus style, with the <code>focus</code> colour (#ffdd00) as the background and <code>focus-text</code> (#0b0c0c) as the text (2.1.1, 2.4.3, 2.4.7).</li>
+      <li>The pages have no horizontal scrolling at 320px wide or at 200% zoom. A long client name wraps in the H1 and in the input (1.4.4, 1.4.10).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE, on both pages, and on the edit page with an error.</li>
+      <li>With only a keyboard, go from the software provider page to the edit page, change the name and save.</li>
+      <li>Check the link, the input and the error with a screen reader, such as NVDA or VoiceOver. Check that the link is read as “Edit client name”.</li>
+      <li>Check both pages at 320px wide and at 200% zoom, with a long client name.</li>
+      <li>Turn off JavaScript. Check that editing and saving still work.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Changing the environment, the client ID or the secrets.</li>
+      <li>A message to confirm the name was changed.</li>
+      <li>Telling the software provider about the new name.</li>
+      <li>A message if saving fails. See <a class="govuk-link" href="/jira-tickets/dwtspi-493">DWTSPI-493</a>.</li>
+      <li>The characters allowed in a client name. See <a class="govuk-link" href="/jira-tickets/allowed-characters">Allowed characters in the client name</a>.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

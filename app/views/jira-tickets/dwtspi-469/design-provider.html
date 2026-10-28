@@ -1,0 +1,61 @@
+{#
+  Design reference for DWTSPI-469: the software provider page with the “Delete software provider” link. A copy of v7/client-credentials/software-provider-detail.html with fixed content. The link goes to the confirmation design.
+#}
+{% extends "layouts/jira-software-provider-changes.html" %}
+
+{% set pageName = "Kerbside_Collect_Test" %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "#" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Software provider</span>
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-4">Kerbside_Collect_Test</h1>
+
+    <p class="govuk-body govuk-!-margin-bottom-8">
+      {{ govukTag({ text: "External test" }) }}
+    </p>
+
+    {{ govukSummaryList({
+      classes: "govuk-summary-list--no-border govuk-!-margin-bottom-8",
+      rows: [
+        { key: { text: "Client ID" }, value: { text: "7b4ll1di9l73m4lpb9iu0b4k2i" } }
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Client secrets for external test environment</h2>
+
+    {{ govukTable({
+      caption: "Client secrets for external test environment",
+      captionClasses: "govuk-visually-hidden",
+      head: [
+        { text: "Generated on" },
+        { text: "Client secret" },
+        { text: "Actions" }
+      ],
+      rows: [
+        [
+          { text: "21 October 2026 at 8:14am" },
+          { text: "[Hidden]" },
+          { html: '<a class="govuk-link" href="#">Replace secret<span class="govuk-visually-hidden"> generated on 21 October 2026 at 8:14am</span></a>' }
+        ]
+      ]
+    }) }}
+
+    {# Static design: method="get" so Add another secret is a real button that goes nowhere. #}
+    <form method="get" action="#" novalidate>
+      {{ govukButton({ text: "Add another secret", classes: "govuk-button--secondary", preventDoubleClick: true }) }}
+    </form>
+
+    <p class="govuk-body govuk-!-margin-top-9">
+      <a class="govuk-link" href="/jira-tickets/dwtspi-469/design-confirm">Delete software provider</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

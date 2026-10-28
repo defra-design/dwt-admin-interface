@@ -1,0 +1,60 @@
+{#
+  Design reference for DWTSPI-469: the Software providers page after a software provider is
+  deleted. A copy of v7/software-providers/index.html with fixed content. The deleted
+  provider, Kerbside_Collect_Test, is no longer in the table.
+#}
+{% extends "layouts/jira-software-provider-changes.html" %}
+
+{% set pageName = "Software providers" %}
+{% set activeSection = "providers" %}
+
+{% set credentials = [
+  { clientName: "Skipflow_Test", clientId: "3k9q2m7v1c8x4n6b0p5t2r7w9d", environment: "External test" },
+  { clientName: "Wastebase_Manager_Test", clientId: "6h1f8s3j0l5g2a9e4u7y1o3i6z", environment: "External test" }
+] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ mojAlert({
+      variant: "success",
+      title: "Software provider deleted",
+      showTitleAsHeading: true,
+      text: "Kerbside_Collect_Test has been deleted.",
+      classes: "govuk-!-margin-bottom-7"
+    }) }}
+  </div>
+</div>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    <p class="govuk-body govuk-!-margin-bottom-7">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+  </div>
+</div>
+
+{{ govukButton({
+  text: "Create new credentials",
+  href: "#",
+  classes: "govuk-button--secondary govuk-!-margin-bottom-7"
+}) }}
+
+<table class="govuk-table" data-module="moj-sortable-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">Client credentials</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header" aria-sort="ascending">Client name</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Client ID</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Environment</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for credential in credentials %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell"><a class="govuk-link" href="#">{{ credential.clientName }}</a></td>
+        <td class="govuk-table__cell">{{ credential.clientId }}</td>
+        <td class="govuk-table__cell">{{ credential.environment }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

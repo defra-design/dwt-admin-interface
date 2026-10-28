@@ -1,0 +1,212 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTSPI-493: Show an error when nothing was created or changed" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">DWTSPI-493</span>
+    <h1 class="govuk-heading-l">Show an error when nothing was created or changed</h1>
+
+    <h2 class="govuk-heading-m">Design reference</h2>
+
+    <h3 class="govuk-heading-s">On the software provider page</h3>
+    <p class="govuk-body">Shown after replace, add another, remove or delete fails. The design shows add another.</p>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design reference page",
+        href: "/jira-tickets/dwtspi-493/design-provider",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">On the create credentials page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the generate credentials design",
+        href: "/jira-tickets/dwtspi-493/design-generate",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">On the edit client name page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the edit client name design",
+        href: "/jira-tickets/dwtspi-493/design-edit",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to be told when the service could not create or change credentials,<br><strong>so that</strong> I know nothing has changed and I can try again, instead of thinking the action worked.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">Creating credentials, adding, replacing or removing a secret, deleting a software provider and changing a client name all change data. Today the pages only handle a person entering an invalid name. If the service itself fails, there is nothing to say so.</p>
+    <p class="govuk-body">The alert goes on the page the person can try the action from again. Replace, remove and delete are confirmed on a page that is only a card, so after a failure the person goes back to the software provider page, where the alert is shown.</p>
+    <p class="govuk-body">Build this after <a class="govuk-link" href="/jira-tickets/dwtspi-469">DWTSPI-469</a> and <a class="govuk-link" href="/jira-tickets/dwtspi-502">DWTSPI-502</a>, because the delete and edit errors need those journeys.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "Alert (error)" },
+          { text: "MoJ Design System / MoJ Frontend" },
+          { html: 'On the pages in the table below. Reason: GOV.UK has no component for a problem with the service that is not about something the person entered. The error summary is only for errors in the form. Needs <code>@ministryofjustice/frontend</code>, which is already installed. Only the <code>error</code> variant is new. The alert has <code>role="alert"</code>, so it is announced and focused when the page loads. JavaScript: the script does the focus and lets people dismiss the alert. Dismissing is not used. Without JavaScript the alert is still the first content in the page and is read in order. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/alert/">Alert</a>.' }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Colours</h2>
+    <p class="govuk-body">The colours come from the component. They are listed so the contrast can be checked.</p>
+    {{ govukTable({
+      caption: "Colours used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Name" },
+        { text: "Value" },
+        { text: "Source" },
+        { text: "Used for" }
+      ],
+      rows: [
+        [
+          { html: "<code>govuk-colour(\"red\")</code>" },
+          { text: "#ca3535" },
+          { text: "GOV.UK web palette" },
+          { text: "Border and icon of the error alert." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"black\")</code>" },
+          { text: "#0b0c0c" },
+          { text: "GOV.UK web palette" },
+          { text: "Heading and text in the error alert." }
+        ],
+        [
+          { html: "<code>govuk-colour(\"white\")</code>" },
+          { text: "#ffffff" },
+          { text: "GOV.UK web palette" },
+          { text: "Background of the error alert." }
+        ]
+      ]
+    }) }}
+    <p class="govuk-body">Contrast: <code>black</code> on <code>white</code> is about 19:1, which passes for text (4.5:1). <code>red</code> on <code>white</code> is about 5.2:1, which passes for the border and icon (3:1). No text uses <code>red</code>.</p>
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+
+    <h3 class="govuk-heading-s">The alert</h3>
+    <p class="govuk-body">The heading is the same each time, and the text depends on what failed:</p>
+    {{ govukTable({
+      caption: "Where the alert is shown, and its text",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "What failed" },
+        { text: "Page the alert is shown on" },
+        { text: "Heading" },
+        { text: "Text" }
+      ],
+      rows: [
+        [
+          { text: "Generate credentials" },
+          { text: "Create credentials page" },
+          { text: "Sorry, there is a problem with the service" },
+          { text: "Try again. We have not created client credentials." }
+        ],
+        [
+          { text: "Replace secret" },
+          { text: "Software provider page" },
+          { text: "Sorry, there is a problem with the service" },
+          { text: "Try again. We have not replaced the secret." }
+        ],
+        [
+          { text: "Add another secret" },
+          { text: "Software provider page" },
+          { text: "Sorry, there is a problem with the service" },
+          { text: "Try again. We have not added a secret." }
+        ],
+        [
+          { text: "Remove secret" },
+          { text: "Software provider page" },
+          { text: "Sorry, there is a problem with the service" },
+          { text: "Try again. We have not removed the secret." }
+        ],
+        [
+          { text: "Delete software provider" },
+          { text: "Software provider page" },
+          { text: "Sorry, there is a problem with the service" },
+          { text: "Try again. We have not deleted the software provider." }
+        ],
+        [
+          { text: "Save client name" },
+          { text: "Edit client name page" },
+          { text: "Sorry, there is a problem with the service" },
+          { text: "Try again. We have not changed the client name." }
+        ]
+      ]
+    }) }}
+
+    <ol class="govuk-list govuk-list--number">
+      <li>The alert is a MoJ alert in the error variant. Its heading is an H2 and it has no dismiss button.</li>
+      <li>The alert is the first content in the main part of the page, above the caption and the H1. The gap between the alert and the next content is spacing unit 7 (40px).</li>
+      <li>The page title is the same as when there is no alert.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">When it is shown</h3>
+    <ol class="govuk-list govuk-list--number" start="4">
+      <li>Given I select “Generate credentials” and the credentials cannot be created, then the create credentials page is shown again with the alert, the name I entered is still in the input, and no credentials exist.</li>
+      <li>Given I select “Save” and the name cannot be changed, then the edit client name page is shown again with the alert, the name I entered is still in the input, and the client keeps its old name.</li>
+      <li>Given I select “Yes, replace secret”, “Yes, remove secret” or “Yes, delete software provider” and it fails, then I go to the software provider page with the alert, and the secret or the client is as it was.</li>
+      <li>Given I select “Add another secret” and it fails, then the software provider page is shown again with the alert and no secret is added.</li>
+      <li>Given I try again and it works, then the journey carries on as built, and the alert is not shown.</li>
+      <li>The alert is not shown for a name that is not valid. That still shows the error summary and field error built in DWTA-458.</li>
+      <li>The pages match the design references.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">On every page that can show the alert, meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The alert has <code>role="alert"</code>, so a screen reader reads it when the page loads. The accessible name is “error: Sorry, there is a problem with the service” (4.1.3).</li>
+      <li>Focus moves to the alert when the page loads, and the focus state is the GOV.UK focus style, with the <code>focus</code> colour (#ffdd00). The alert does not have <code>disableAutoFocus</code> (2.4.3, 2.4.7).</li>
+      <li>The icon is decorative (<code>role="presentation"</code> and <code>focusable="false"</code>). The error is given in words, not by the icon or colour alone (1.1.1, 1.4.1).</li>
+      <li>The alert heading is an H2, which comes before the H1 in the page, in the same way as the error summary. There is one H1 (1.3.1, 2.4.6).</li>
+      <li>The alert text is <code>black</code> on <code>white</code>, about 19:1. The border and icon are <code>red</code> on <code>white</code>, about 5.2:1 (1.4.3, 1.4.11).</li>
+      <li>When the page is shown again, what I entered is still in the input, so I do not have to enter it again (3.3.7).</li>
+      <li>Every link and button can be used with a keyboard, in an order that matches the page. The alert has no dismiss button to tab to (2.1.1, 2.4.3).</li>
+      <li>The pages have no horizontal scrolling at 320px wide or at 200% zoom. A long client name wraps in the alert text and the page (1.4.4, 1.4.10).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE, on each page with the alert.</li>
+      <li>With only a keyboard, cause each failure, and check that focus lands on the alert and that the next Tab goes to the first control after it.</li>
+      <li>Check the alert with a screen reader, such as NVDA or VoiceOver. Check that it is read when the page loads, and that the name and text are read.</li>
+      <li>Check each page at 320px wide and at 200% zoom.</li>
+      <li>Turn off JavaScript. Check that the alert is still shown first in the page and the action can be tried again.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>What causes the failure, and what the service does to recover.</li>
+      <li>A link to contact the team, or a reference number for the failure.</li>
+      <li>Errors on other pages, such as loading the Software providers page or the Waste organisations report.</li>
+      <li>The error summary for a name that is not valid. See <a class="govuk-link" href="/jira-tickets/dwta-458">DWTA-458</a>.</li>
+      <li>A success message after adding, replacing or removing a secret, or changing the client name.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

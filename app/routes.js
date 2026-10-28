@@ -2730,7 +2730,8 @@ function registerV7Routes () {
     if (values.clientName !== credential.clientName) {
       const toChange = ccV7.credentialToChange(credentialList(req), credential.id)
       toChange.clientName = values.clientName
-      toChange.lastChanged = new Date().toISOString()
+      // lastChanged is not updated: with one secret it is also the date that secret was
+      // generated, which a rename must not change.
     }
     // Back to the software provider page, where the user started the edit.
     res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)

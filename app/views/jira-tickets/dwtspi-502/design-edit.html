@@ -1,0 +1,38 @@
+{#
+  Design reference for DWTSPI-502: the edit client name page. A copy of v7/client-credentials/create.html in edit mode, with fixed content. The input is filled in with the current client name.
+#}
+{% extends "layouts/jira-software-provider-changes.html" %}
+
+{% set pageName = "Edit client name" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">Edit client name</h1>
+
+    {# Static design: method="get" and action="#" so the button is a real submit button that goes nowhere. #}
+    <form method="get" action="#" novalidate>
+
+      {{ govukInput({
+        id: "clientName",
+        name: "clientName",
+        label: { text: "Client name", classes: "govuk-label--s" },
+        hint: { text: "Enter the name of the software provider and software package, using letters and underscores only. For example, Waste_Technologies_Software" },
+        classes: "govuk-!-width-two-thirds",
+        value: "Kerbside_Collect_Test",
+        autocomplete: "off",
+        spellcheck: false
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Save" }) }}
+        <a class="govuk-link" href="/jira-tickets/dwtspi-502/design-provider">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

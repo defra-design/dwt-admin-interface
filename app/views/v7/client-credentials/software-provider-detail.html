@@ -26,6 +26,7 @@
     {% if serviceError %}
       {{ mojAlert({
         variant: "error",
+        role: "alert",
         title: "Sorry, there is a problem with the service",
         showTitleAsHeading: true,
         text: serviceError,
