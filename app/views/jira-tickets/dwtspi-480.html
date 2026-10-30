@@ -123,7 +123,7 @@
     <ol class="govuk-list govuk-list--number" start="6">
       <li>Given I enter a valid From date and To date and select “Search”, then the results are shown below the filter. Dates before 20 June 2026 are allowed. The From date can be the same as the To date.</li>
       <li>The gap between the filter and the results heading is spacing unit 9 (60px). The heading is an H2: “Waste organisations registered from [From date] to [To date]”, for example “Waste organisations registered from 1 January 2026 to 1 October 2026”.</li>
-      <li>Below the H2 is the line “Organisations registered in period: [number] of [total] total”, where [total] is every registered organisation. When there are results, the link “download CSV” is on the same line.</li>
+      <li>Below the H2 is the line “Organisations registered in period: [number] of [total] total”, where [total] is every registered organisation. When there are results, the link “download CSV” is on the same line. In the CSV file, the organisation name and the organisation ID are in separate columns (“Organisation name” and “Organisation ID”), not combined as they are in the table.</li>
       <li>The table has four columns, in this order: Organisation name and ID, Local authority, Active API codes, Registered.</li>
       <li>The first column shows the organisation name in bold, and the full organisation ID below it on its own line. The ID is in type scale point 16 and the secondary text colour. When the name is not known, the name is “(Not known)”, and the ID is still shown.</li>
       <li>Local authority shows “Yes”, “No” or “Not known”, as plain text. Registered shows the date as, for example, “1 Jan 2026”.</li>
