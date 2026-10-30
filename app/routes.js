@@ -3252,12 +3252,12 @@ function registerV8Routes () {
   function detailGroups (credential) {
     const secrets = (newer, older) => [newer, older].map((d) => formatDateTimeObj(new Date(d)))
     const environments = (software, shift, dates) => [
-      { name: 'Test environment', clientName: `Kerbside_${software}_Test`, clientId: clientIdVariant(credential.clientId, shift), secrets: secrets(dates[0], dates[1]) },
-      { name: 'Production environment', clientName: `Kerbside_${software}_Production`, clientId: clientIdVariant(credential.clientId, shift + 7), secrets: secrets(dates[2], dates[3]) }
+      { name: 'Test environment', hasCredentials: true, clientName: `Kerbside_${software}_Test`, clientId: clientIdVariant(credential.clientId, shift), secrets: secrets(dates[0], dates[1]) },
+      { name: 'Production environment', hasCredentials: software !== 'Trackmate', clientName: `Kerbside_${software}_Production`, clientId: clientIdVariant(credential.clientId, shift + 7), secrets: secrets(dates[2], dates[3]) }
     ]
     return [
-      { id: 'receipt', heading: 'Receipt of waste software', environments: environments('Receipt', 0, ['2026-10-21T08:14:00', '2026-09-14T09:32:00', '2026-10-05T10:15:00', '2026-08-18T13:40:00']) },
-      { id: 'collection', heading: 'Collection of waste software', environments: environments('Collection', 11, ['2026-10-12T15:02:00', '2026-09-02T11:20:00', '2026-09-29T14:05:00', '2026-07-30T09:05:00']) }
+      { id: 'receipt', heading: 'Trackmate software', environments: environments('Trackmate', 0, ['2026-10-21T08:14:00', '2026-09-14T09:32:00', '2026-10-05T10:15:00', '2026-08-18T13:40:00']) },
+      { id: 'collection', heading: 'Skipwaste software', environments: environments('Skipwaste', 11, ['2026-10-12T15:02:00', '2026-09-02T11:20:00', '2026-09-29T14:05:00', '2026-07-30T09:05:00']) }
     ]
   }
 
@@ -3277,8 +3277,8 @@ function registerV8Routes () {
     return {
       // One status for each type of software.
       statuses: [
-        { software: 'Receipt of waste software', status: 'In production', classes: 'govuk-tag--green' },
-        { software: 'Collection of waste software', status: 'In test', classes: '' }
+        { software: 'Trackmate software', status: 'In production', classes: 'govuk-tag--green' },
+        { software: 'Skipwaste software', status: 'In test', classes: '' }
       ],
       emails: [
         { address: 'priya.nair@kerbside-solutions.example.com', primary: true },

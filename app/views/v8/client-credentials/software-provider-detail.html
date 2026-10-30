@@ -27,7 +27,12 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <span class="govuk-caption-l">Software provider</span>
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-8">{{ providerName }}</h1>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">{{ providerName }}</h1>
+    {{ govukButton({
+      text: "Add software product",
+      href: "/" + version + "/client-credentials/" + credential.id + "/not-built",
+      classes: "govuk-button--secondary govuk-!-margin-bottom-8"
+    }) }}
   </div>
 </div>
 
@@ -42,6 +47,7 @@
           <div{% if not loop.last %} class="govuk-!-margin-bottom-8"{% endif %}>
             <h3 class="govuk-heading-m govuk-!-margin-bottom-3">{{ environment.name }}</h3>
 
+            {% if environment.hasCredentials %}
             {{ govukSummaryList({
               classes: "govuk-summary-list--no-border govuk-!-margin-bottom-4",
               rows: [
@@ -74,17 +80,25 @@
                 {% endfor %}
               </tbody>
             </table>
+            {% else %}
+              {{ govukButton({
+                text: "Add production credentials",
+                href: "/" + version + "/client-credentials/" + credential.id + "/not-built",
+                classes: "govuk-button--secondary govuk-!-margin-bottom-0",
+                attributes: { "aria-describedby": group.id + "-heading" }
+              }) }}
+            {% endif %}
           </div>
         {% endfor %}
       </section>
       {% if not loop.last %}
-        {# A visible line, with spacing unit 8 (40px) above and below, separates the two groups. #}
-        <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+        {# Spacing unit 9 (60px) above and below, with no visible line, separates the two software products. #}
+        <hr class="govuk-section-break govuk-!-margin-top-9 govuk-!-margin-bottom-9">
       {% endif %}
     {% endfor %}
 
-    {# A visible line, with spacing unit 8 (40px) above and below, separates the notes from the credentials. #}
-    <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+    {# Space, with no visible line, separates the notes from the credentials. #}
+    <hr class="govuk-section-break govuk-section-break--xl">
 
     <section aria-labelledby="notes-heading">
       <h2 class="govuk-heading-l govuk-!-margin-bottom-2" id="notes-heading">Notes</h2>
