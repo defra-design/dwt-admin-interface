@@ -1,0 +1,90 @@
+{#
+  Orphan screen: the earlier design of the copy page, with a grey panel, kept for the
+  record. It is linked from the prototype index only and uses fixed example
+  data (see routes.js). Close goes to the detail page.
+
+  The one-time reveal of a client secret, for new credentials, a replaced secret
+  and an added secret. It only ever shows the one new set of credentials. Closing
+  goes to the software provider page, which lists all the secrets. Not a confirmation page: the
+  important things here are the values to copy and a warning that the secret
+  will not be shown again, so there is no "success" panel. No back link: the
+  credentials are already saved and the secret cannot be shown a second time.
+
+  The Client ID and Client secret sit together in one grey block, labels
+  included, with one Copy button. The user copies the whole block at once and
+  pastes it into an email. The block holds exactly the text that is copied, so
+  keep the lines as they are, with no extra spaces. The warning is GOV.UK
+  warning text, under the heading and above the credentials, so it is read first.
+
+  The Copy button is hidden until JavaScript runs (see application.js), so
+  without JavaScript the text is still on the page to select and copy by hand.
+#}
+{% extends "layouts/v8.html" %}
+
+{% set version = "v8" %}
+{% set pageName = "Copy the client credentials" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">Copy the client credentials</h1>
+
+    {{ govukWarningText({
+      text: "You cannot view the client secret after closing this page.",
+      iconFallbackText: "Warning",
+      classes: "govuk-!-margin-top-6"
+    }) }}
+
+    <p class="govuk-body">You must copy the client secret and other credentials.</p>
+
+    {% set credentialsHtml %}
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Generated on</p>
+      <p class="govuk-body">{{ generatedOn }}</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">External test environment</p>
+      <p class="govuk-body">http://waste-tracking.integration.api.defra.gov.uk/</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client ID</p>
+      <p class="govuk-body">{{ credential.clientId }}</p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Client secret</p>
+      <p class="govuk-body govuk-!-margin-bottom-0">{{ credential.pendingSecret }}</p>
+    {% endset %}
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">{{ credential.clientName }}</h2>
+    <div>
+      {{ mojTicketPanel({
+        attributes: { "aria-label": "Client credentials generated on " + generatedOn },
+        items: [{ html: credentialsHtml, classes: "moj-ticket-panel__content--blue" }]
+      }) }}
+    </div>
+
+    {# Plain text copied by the Copy button. Hidden, so the panel's layout does not affect what is pasted. #}
+    <div id="client-credentials" hidden>Generated on
+{{ generatedOn }}
+
+External test environment
+http://waste-tracking.integration.api.defra.gov.uk/
+
+Client ID
+{{ credential.clientId }}
+
+Client secret
+{{ credential.pendingSecret }}</div>
+
+    <div class="app-copy govuk-!-margin-top-4 govuk-!-margin-bottom-0" hidden>
+      {{ govukButton({
+        html: 'Copy<span class="govuk-visually-hidden"> client ID and client secret</span>',
+        classes: "govuk-button--secondary govuk-!-margin-bottom-0",
+        type: "button",
+        attributes: { "data-copy-target": "client-credentials", "data-copy-message": "Client credentials copied" }
+      }) }}
+      <span class="app-copy-status govuk-body govuk-!-margin-bottom-0" role="status" aria-live="polite"></span>
+    </div>
+
+    <form method="get" action="/{{ version }}/client-credentials/{{ credential.id }}/software-provider-detail" class="govuk-!-margin-top-6" novalidate>
+      {{ govukButton({ text: "Close" }) }}
+    </form>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,141 @@
+{#
+  Software provider page for one client. Version 8 concept, for a technical
+  discussion with another team (not based on research).
+  The heading sizes step down: page heading 48px, group headings 36px, environment
+  headings 24px, so the environment headings stand out from the table column headings (19px).
+  Two groups of client secrets: receipt of waste software and collection of
+  waste software. Each group has a test and a production environment, each with
+  its own client ID and two secrets. The data is mocked (see routes.js). Notes use the MoJ timeline, as in version 3.
+  Each environment has two secrets, so only the older one can be removed, as in
+  earlier versions. The links go to a placeholder page, because changing secrets
+  is not designed in this concept. A secret is never shown again, so every secret
+  is "[Hidden]".
+  A grey column on the right gives an overview: a status for each type of software, and the email addresses, one of them primary.
+  The back link goes to the Software providers page.
+#}
+{% extends "layouts/v8.html" %}
+
+{% set version = "v8" %}
+{% set pageName = providerName %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/" + version + "/software-providers" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <span class="govuk-caption-l">Software provider</span>
+    <h1 class="govuk-heading-xl govuk-!-margin-bottom-8">{{ providerName }}</h1>
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% for group in groups %}
+      <section aria-labelledby="{{ group.id }}-heading">
+        <h2 class="govuk-heading-l govuk-!-margin-bottom-6" id="{{ group.id }}-heading">{{ group.heading }}</h2>
+
+        {% for environment in group.environments %}
+          <div{% if not loop.last %} class="govuk-!-margin-bottom-8"{% endif %}>
+            <h3 class="govuk-heading-m govuk-!-margin-bottom-3">{{ environment.name }}</h3>
+
+            {{ govukSummaryList({
+              classes: "govuk-summary-list--no-border govuk-!-margin-bottom-4",
+              rows: [
+                { key: { text: "Client name" }, value: { text: environment.clientName } },
+                { key: { text: "Client ID" }, value: { text: environment.clientId } }
+              ]
+            }) }}
+
+            {# Newest first. The older secret is the second row, and the only one that can be removed. #}
+            <table class="govuk-table govuk-!-margin-bottom-0">
+              <caption class="govuk-table__caption govuk-visually-hidden">Client secrets for {{ group.heading | lower }}, {{ environment.name | lower }}</caption>
+              <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">Generated on</th>
+                  <th scope="col" class="govuk-table__header">Client secret</th>
+                  <th scope="col" class="govuk-table__header">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="govuk-table__body">
+                {% for generatedOn in environment.secrets %}
+                  <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">{{ generatedOn }}</td>
+                    <td class="govuk-table__cell">[Hidden]</td>
+                    <td class="govuk-table__cell">
+                      {% if not loop.first %}
+                        <a class="govuk-link" href="/{{ version }}/client-credentials/{{ credential.id }}/not-built">Remove secret<span class="govuk-visually-hidden"> generated on {{ generatedOn }} for {{ group.heading | lower }}, {{ environment.name | lower }}</span></a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endfor %}
+      </section>
+      {% if not loop.last %}
+        {# A visible line, with spacing unit 8 (40px) above and below, separates the two groups. #}
+        <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+      {% endif %}
+    {% endfor %}
+
+    {# A visible line, with spacing unit 8 (40px) above and below, separates the notes from the credentials. #}
+    <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+    <section aria-labelledby="notes-heading">
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-2" id="notes-heading">Notes</h2>
+      <p class="govuk-hint govuk-!-margin-bottom-6">Notes cannot be changed or deleted after they are saved.</p>
+
+      {# Dated, append-only history, newest first. MoJ timeline, as in version 3.
+         https://design-patterns.service.justice.gov.uk/components/timeline/ #}
+      <div class="moj-timeline">
+        {% for note in notes %}
+          <div class="moj-timeline__item">
+            <div class="moj-timeline__header">
+              <h3 class="moj-timeline__title">Note added</h3>
+            </div>
+            <p class="moj-timeline__date">
+              <time>{{ note.addedLabel }}</time>
+            </p>
+            <div class="moj-timeline__description">
+              <p class="govuk-body">{{ note.text }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+
+  </div>
+
+  {# Overview of the software provider, in a column on the right. Example data (see routes.js). #}
+  <div class="govuk-grid-column-one-third">
+    <section class="app-overview" aria-labelledby="overview-heading">
+      <h2 class="govuk-heading-m govuk-!-margin-bottom-4" id="overview-heading">Overview</h2>
+
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Status</h3>
+      <ul class="govuk-list govuk-!-margin-bottom-6">
+        {% for item in overview.statuses %}
+          <li class="govuk-!-margin-bottom-3">
+            <span class="govuk-!-display-block govuk-!-margin-bottom-1">{{ item.software }}</span>
+            {{ govukTag({ text: item.status, classes: item.classes }) }}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Email addresses</h3>
+      <ul class="govuk-list govuk-!-margin-bottom-0">
+        {% for email in overview.emails %}
+          <li class="govuk-!-margin-bottom-3">
+            <span class="govuk-!-display-block app-break-word{% if email.primary %} govuk-!-margin-bottom-1{% endif %}">{{ email.address }}</span>
+            {% if email.primary %}{{ govukTag({ text: "Primary", classes: "govuk-tag--purple" }) }}{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

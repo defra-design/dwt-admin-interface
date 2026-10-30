@@ -1,0 +1,29 @@
+{#
+  "Are you sure?" step before the client secret is replaced, using the MoJ
+  interruption card. The card is the only body content on the page, as MoJ
+  guidance asks. The macro's primary action is a link, so the card is written
+  out here to let "Yes, replace secret" post a form. Only the POST replaces the
+  secret (see routes.js). Buttons and links use the inverse style.
+#}
+{% extends "layouts/v8.html" %}
+
+{% set version = "v8" %}
+{% set pageName = "Replace the client secret" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="moj-interruption-card">
+  <div class="moj-interruption-card__content">
+    <h1 class="moj-interruption-card__heading">Are you sure you want to replace the current secret?</h1>
+    <div class="moj-interruption-card__body">
+      <p>The current secret for {{ credential.clientName }} will stop working immediately. Make sure the software provider knows before you continue.</p>
+    </div>
+    <form method="post" action="/{{ version }}/client-credentials/{{ credential.id }}/rotate" novalidate>
+      <div class="govuk-button-group moj-interruption-card__actions">
+        {{ govukButton({ text: "Yes, replace secret", classes: "govuk-button--inverse", preventDoubleClick: true }) }}
+        <a class="govuk-link govuk-link--inverse" href="/{{ version }}/client-credentials/{{ credential.id }}/software-provider-detail">Go back to software provider</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

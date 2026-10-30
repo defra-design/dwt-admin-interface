@@ -1,0 +1,92 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 8" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 8
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 29 October 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 8</span>',
+        href: "/v8/start",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A copy of version 7. This version is for a concept of the software provider detail page. Changes are recorded here as they are made." },
+          { text: "A concept to support an internal technical discussion with another team. It is not based on research or design improvements." },
+          { html: '<a class="govuk-link" href="/v8/software-providers">/v8/software-providers</a> (select a client name)' }
+        ],
+        [
+          { text: "Software provider page: four sets of client secrets" },
+          { text: "The “External test” tag is removed. The page now has two groups, “Receipt of waste software” and “Collection of waste software”. Each group has a test environment and a production environment, so there are four tables of client secrets. Each environment has its own client name and client ID, between its heading and its table, and two secrets (the older one has a “Remove secret” link). The page heading is now the software provider’s name (an example, “Kerbside Software Solutions”), not a client name. The headings are larger: the page heading is 48px, the group headings are 36px and the environment headings are 24px (they were 36px, 24px and 19px). A visible line with more space around it separates the two groups. The data is mocked. The links go to a placeholder page, and “Add another secret” and “Replace secret” are not on the page." },
+          { text: "A concept to help a technical discussion with another team about how a software provider holds credentials for more than one type of software and for both environments. It is not based on research or design improvements. Two secrets in each table keeps the concept simple. The environment headings were the same size as the table column headings, which made the page hard to scan with four tables, so each level is now one step larger. A client name and client ID belong together, so they sit together under each environment." },
+          { html: '<a class="govuk-link" href="/v8/software-providers">/v8/software-providers</a> (select a client name)' }
+        ],
+        [
+          { text: "Software provider page: notes" },
+          { text: "A “Notes” section at the bottom of the page, below a dividing line, with four example notes (for example credentials sent, and a request from the software provider to rotate a secret). It uses the MoJ timeline, newest first, with the hint that notes cannot be changed or deleted. Notes cannot be added in this concept." },
+          { text: "The notes from version 3 are part of the case record, so a team member can see what has happened with a software provider’s credentials. The notes are example text only. No research yet." },
+          { html: '<a class="govuk-link" href="/v8/software-providers">/v8/software-providers</a> (select a client name)' }
+        ],
+        [
+          { text: "Software provider page: overview" },
+          { text: "A column on the right with an “Overview” heading, on a light grey background. It has a status for each type of software (receipt of waste software is “In production” and collection of waste software is “In test”) and three example email addresses, one with a “Primary” tag. The page heading and the first row of content now sit in separate rows, so the overview lines up with the first group of secrets. On a small screen the overview moves below the notes." },
+          { text: "Concept for the technical discussion: a case worker sees where each type of software has reached and how to contact the provider, next to their credentials. The grey background sets the overview apart from the credentials and notes. Text on it meets the 4.5:1 contrast minimum. The status values and which email is primary are example data. No research yet." },
+          { html: '<a class="govuk-link" href="/v8/software-providers">/v8/software-providers</a> (select a client name)' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">This version is a concept for discussion with another team, so it is not tested with users. Other design decisions are the same as in
+      <a class="govuk-link" href="/versions/v7#design-rationale">version 7</a>, except for the changes recorded in the table above.</p>
+
+    <p class="govuk-body">This version has its own session data. Credentials created in this version are not
+      shown in version 7, and the other way round.</p>
+
+  </div>
+</div>
+{% endblock %}

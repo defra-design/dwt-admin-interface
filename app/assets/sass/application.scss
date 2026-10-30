@@ -540,3 +540,26 @@
   align-items: baseline;
   gap: 0 20px;
 }
+
+// v8: long email addresses in the narrow overview column. They wrap at any
+// character if they do not fit, so they never run into the page edge. No GOV.UK
+// class does this.
+.app-break-word {
+  overflow-wrap: anywhere;
+}
+
+// v8: grey panel for the overview column, to set it apart from the page. GOV.UK
+// light grey (#f3f2f1) with the standard text colour (#0b0c0c) is about 17:1, well
+// above the 4.5:1 AA minimum. Use the standard text colour on this panel.
+// Padding is spacing unit 3 (15px) on small screens and unit 4 (20px) on larger ones.
+// No GOV.UK class gives a grey panel.
+.app-overview {
+  padding: 15px;
+  background-color: #f3f2f1;
+}
+
+@media (min-width: 40.0625em) {
+  .app-overview {
+    padding: 20px;
+  }
+}

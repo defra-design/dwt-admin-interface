@@ -433,6 +433,14 @@ module.exports = [
     summary: 'Reached from the Rotate link in the table.',
     variants: [
       {
+        label: 'Version 8',
+        source: 'Prototype',
+        href: '/v8/software-providers',
+        linkNote: 'Select a client name.',
+        difference: 'Concept for a technical discussion. Four sets of secrets on one page: receipt of waste software and collection of waste software, each with a test and a production environment. Each has its own client name, client ID and two secrets. The page heading is the software provider name. No External test tag. Grey overview column with a status for each type of software and email addresses. Notes in an MoJ timeline. Mocked data. Remove goes to a placeholder page.',
+        rationaleHref: '/versions/v8'
+      },
+      {
         label: 'DWTSPI-493 software provider page error design',
         source: 'Jira design',
         href: '/jira-tickets/dwtspi-493/design-provider',

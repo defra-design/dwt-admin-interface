@@ -1,0 +1,63 @@
+{#
+  The two from/to date inputs (no form wrapper, no submit button), so they can
+  be embedded in different forms. Expects `period` (see _period-filter.html).
+  `period.errorParts` lists which inputs (day, month, year) to highlight.
+
+  Short-term design: the two dates sit side by side, as in the live service. The
+  error messages and the red line belong to the group, under the "Registration date"
+  heading, so the line runs down the left of the page. Each date input has no
+  error message of its own, only red borders on the inputs that are wrong.
+#}
+{% set fromParts = period.errorParts.from if period.errorParts else [] %}
+{% set toParts = period.errorParts.to if period.errorParts else [] %}
+{% set hasErrors = period.errors.from or period.errors.to %}
+{% set describedBy = [] %}
+{% if period.errors.from %}{% set describedBy = (describedBy.push("period-from-error"), describedBy) %}{% endif %}
+{% if period.errors.to %}{% set describedBy = (describedBy.push("period-to-error"), describedBy) %}{% endif %}
+
+<div class="govuk-form-group{{ ' govuk-form-group--error' if hasErrors }}">
+  {% call govukFieldset({
+    legend: {
+      html: '<h2 class="govuk-fieldset__heading">Registration date</h2>',
+      classes: "govuk-fieldset__legend--m"
+    },
+    attributes: { "aria-describedby": describedBy | join(" ") } if hasErrors else {}
+  }) %}
+    {% if period.errors.from %}
+      <p id="period-from-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ period.errors.from }}
+      </p>
+    {% endif %}
+    {% if period.errors.to %}
+      <p id="period-to-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ period.errors.to }}
+      </p>
+    {% endif %}
+
+    <div class="app-period-filter app-period-filter--v7">
+      {{ govukDateInput({
+        id: "period-from",
+        namePrefix: "period-from",
+        fieldset: { legend: { text: "From date", classes: "govuk-fieldset__legend--s" } },
+        hint: { text: "For example, 1 4 2025" },
+        items: [
+          { name: "day", classes: "govuk-input--width-2" + (" govuk-input--error" if "day" in fromParts), value: period.values.from.day },
+          { name: "month", classes: "govuk-input--width-2" + (" govuk-input--error" if "month" in fromParts), value: period.values.from.month },
+          { name: "year", classes: "govuk-input--width-4" + (" govuk-input--error" if "year" in fromParts), value: period.values.from.year }
+        ]
+      }) }}
+
+      {{ govukDateInput({
+        id: "period-to",
+        namePrefix: "period-to",
+        fieldset: { legend: { text: "To date", classes: "govuk-fieldset__legend--s" } },
+        hint: { text: "For example, 31 3 2026" },
+        items: [
+          { name: "day", classes: "govuk-input--width-2" + (" govuk-input--error" if "day" in toParts), value: period.values.to.day },
+          { name: "month", classes: "govuk-input--width-2" + (" govuk-input--error" if "month" in toParts), value: period.values.to.month },
+          { name: "year", classes: "govuk-input--width-4" + (" govuk-input--error" if "year" in toParts), value: period.values.to.year }
+        ]
+      }) }}
+    </div>
+  {% endcall %}
+</div>
