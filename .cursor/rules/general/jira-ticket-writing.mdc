@@ -19,14 +19,15 @@ If the user, the outcome or the evidence isn't known, ask the designer rather th
 ## Ticket structure
 
 1. **Title**: short, action-led, describes the outcome (not the solution).
-2. **Design reference button**: a secondary button under the H1, "View the design reference page". Don't bury the link in a paragraph.
-3. **User story**
-4. **Context**: what the story covers, and the reason for the change (see below).
-5. **Components and patterns**
-6. **Colours** (if the ticket specifies colours)
-7. **Acceptance criteria**
-8. **Accessibility acceptance criteria**, then a short **How to test** list
-9. **Out of scope**
+2. **Prototype version line**: a short paragraph directly under the H1, before the button, saying which prototype version shows a clickable flow of the ticket work, linked to the page where the flow starts. For example: `<p class="govuk-body"><strong>Clickable prototype:</strong> <a class="govuk-link" href="/v5/software-providers">Version 5</a>. Select Create new credentials.</p>`. Add a short "how to reach it" sentence if the link isn't the screen itself. Use the version whose flow matches the ticket's design reference. If no version shows it (for example out-of-scope work), say "No prototype version shows this yet." Update it when a new version changes the flow. Check `app/data/design-index.js` for entry points.
+3. **Design reference button**: a secondary button under the prototype version line, "View the design reference page". Don't bury the link in a paragraph.
+4. **User story**
+5. **Context**: what the story covers, and the reason for the change (see below).
+6. **Components and patterns**
+7. **Colours** (if the ticket specifies colours)
+8. **Acceptance criteria**
+9. **Accessibility acceptance criteria**, then a short **How to test** list
+10. **Out of scope**
 
 Tickets don't have a separate user need for now. We'll add one, and any research evidence, once we have insights.
 
