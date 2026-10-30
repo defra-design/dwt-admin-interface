@@ -55,9 +55,9 @@
           { html: 'The error messages are in one group for both dates, not on each date input. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/error-summary/">Error summary</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/components/error-message/">Error message</a>.' }
         ],
         [
-          { text: "Fieldset, button, link and tag" },
+          { text: "Fieldset, button and link" },
           { text: "GOV.UK Design System" },
-          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/fieldset/">Fieldset</a>, <a class="govuk-link" href="https://design-system.service.gov.uk/components/button/">Button</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/components/tag/">Tag</a>.' }
+          { html: 'Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/fieldset/">Fieldset</a>, <a class="govuk-link" href="https://design-system.service.gov.uk/components/button/">Button</a> and <a class="govuk-link" href="https://design-system.service.gov.uk/styles/links/">Links</a>.' }
         ],
         [
           { text: "Sortable table" },
@@ -67,7 +67,7 @@
         [
           { text: "Page width, table text size and sort icon fix" },
           { html: "Bespoke (<code>app-width-wide</code> and the <code>#regulators-registered-table</code> rules in <code>application.scss</code>)" },
-          { html: 'The container is 1100px wide instead of 960px on every page of the service, like the DWP design system, which uses 1100px for its wider internal services. The table uses type scale point 16. The sort icon rule stops the MoJ icon being squashed when a heading wraps. Contact DesignOps (DesignOps@defra.gov.uk) before building.' }
+          { html: 'The container is 1100px wide instead of 960px on every page of the service, like the DWP design system, which uses 1100px for its wider internal services. The table uses type scale point 16. The sort icon rule stops the MoJ icon being squashed when a heading wraps.' }
         ],
         [
           { text: "Headings and spacing" },
@@ -91,24 +91,6 @@
       ],
       rows: [
         [
-          { text: "Green tag" },
-          { text: "Text #083d29 on #cfe4dc" },
-          { text: "GOV.UK" },
-          { text: "Paid." }
-        ],
-        [
-          { text: "Blue tag" },
-          { text: "Text #0f385c on #d2e2f1" },
-          { text: "GOV.UK" },
-          { text: "In progress." }
-        ],
-        [
-          { text: "Red tag" },
-          { text: "Text #651b1b on #f4d7d7" },
-          { text: "GOV.UK" },
-          { text: "Unpaid." }
-        ],
-        [
           { text: "Error red" },
           { text: "#ca3535" },
           { text: "GOV.UK" },
@@ -122,7 +104,7 @@
         ]
       ]
     }) }}
-    <p class="govuk-body">Contrast: the three tags are about 9:1, and the secondary text on white is about 9:1, which passes for text (4.5:1). Error red on white is about 5.2:1, which passes.</p>
+    <p class="govuk-body">Contrast: the secondary text on white is about 9:1, which passes for text (4.5:1). Error red on white is about 5.2:1, which passes.</p>
 
     <h2 class="govuk-heading-m">Acceptance criteria</h2>
 
@@ -140,10 +122,10 @@
       <li>Given I enter a valid From date and To date and select “Search”, then the results are shown below the filter. Dates before 20 June 2026 are allowed. The From date can be the same as the To date.</li>
       <li>The gap between the filter and the results heading is spacing unit 9 (60px). The heading is an H2: “Waste organisations registered from [From date] to [To date]”, for example “Waste organisations registered from 1 January 2026 to 1 October 2026”.</li>
       <li>Below the H2 is the line “Organisations registered in period: [number] of [total] total”, where [total] is every registered organisation. When there are results, the link “download CSV” is on the same line.</li>
-      <li>The table has five columns, in this order: Organisation name and ID, Active API codes, Registered, Payment year ending, Payment status.</li>
+      <li>The table has four columns, in this order: Organisation name and ID, Local authority, Active API codes, Registered.</li>
       <li>The first column shows the organisation name in bold, and the full organisation ID below it on its own line. The ID is in type scale point 16 and the secondary text colour. When the name is not known, the name is “(Not known)”, and the ID is still shown.</li>
-      <li>Registered shows the date as, for example, “1 Jan 2026”. Payment year ending shows the month and year the payment year ends, for example “Sep 2027”, and is empty when there is no payment year. Payment status shows a green “Paid” tag, a blue “In progress” tag or a red “Unpaid” tag.</li>
-      <li>The table text, the column headings and the tags are in type scale point 16 (1rem, with a 20px line height). The column headings stay on one line at a page width of 1100px.</li>
+      <li>Local authority shows “Yes”, “No” or “Not known”, as plain text. Registered shows the date as, for example, “1 Jan 2026”.</li>
+      <li>The table text and the column headings are in type scale point 16 (1rem, with a 20px line height). The column headings stay on one line at a page width of 1100px.</li>
       <li>The table loads sorted by Registered, with the oldest first. Every column can be sorted. All rows are on one page, with no pagination, so sorting reorders every row.</li>
       <li>Given no organisations registered in the period, then no table and no download link are shown. The page says “No organisations were registered in this period. Try a different date range, or select Clear.”.</li>
     </ol>
@@ -240,7 +222,6 @@
       <li>The sort icons are decorative (<code>aria-hidden="true"</code>) and are 22px wide when a heading wraps (1.1.1).</li>
       <li>The link “Clear” has the accessible name “Clear search”, which starts with its visible label (2.5.3).</li>
       <li>Every function works with a keyboard, in an order that matches the page. The focus state is the GOV.UK focus style, with the <code>focus</code> colour (#ffdd00) as the background and <code>focus-text</code> (#0b0c0c) as the text (2.1.1, 2.4.3, 2.4.7).</li>
-      <li>The status tags show the status in words, so the colour is not the only way to tell them apart (1.4.1). Tag text on its background is about 9:1 (1.4.3).</li>
       <li>The page has no horizontal scrolling at 320px wide or at 200% zoom, except inside the data table (1.4.4, 1.4.10).</li>
     </ol>
 

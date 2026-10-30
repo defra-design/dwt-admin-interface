@@ -119,7 +119,7 @@ List only the components or patterns that this story introduces or changes, with
 - **GOV.UK Design System / govuk-frontend**: <https://design-system.service.gov.uk/components/>. Default choice.
 - **MoJ Design System / `@ministryofjustice/frontend`**: <https://design-patterns.service.justice.gov.uk/>. MoJ publishes its own Frontend kit, built on govuk-frontend, which we can use for components GOV.UK does not offer. It is installed in this prototype (see `app/views/` for `moj*` macros and `moj-*` classes).
 - **Defra patterns**: <https://digital.defra.gov.uk/design/components-and-patterns>. Check after GOV.UK and before anything bespoke.
-- **Bespoke (`app-*`)**: only where nothing above fits. Note why, and that DesignOps (DesignOps@defra.gov.uk) was contacted.
+- **Bespoke (`app-*`)**: only where nothing above fits. Note why.
 
 For each non-GOV.UK component, add a line in the ticket:
 

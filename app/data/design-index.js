@@ -572,6 +572,13 @@ module.exports = [
     summary: 'The report of waste organisations, filtered by date.',
     variants: [
       {
+        label: 'DWTSPI-480 design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-480/design',
+        difference: 'The version 7 results table with the Payment year ending and Payment status columns removed, and a Local authority column (Yes, No or Not known) added after Organisation name and ID.',
+        rationaleHref: '/jira-tickets/dwtspi-480'
+      },
+      {
         label: 'Version 7',
         source: 'Prototype',
         href: '/v7/regulators',

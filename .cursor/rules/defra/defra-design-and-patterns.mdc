@@ -6,7 +6,6 @@ alwaysApply: true
 # Defra design and patterns
 
 - Check the GOV.UK Design System first. If it doesn't cover the need, check Defra's own components and patterns before building anything bespoke: <https://digital.defra.gov.uk/design/components-and-patterns>
-- Contact DesignOps before building a bespoke component or pattern: **DesignOps@defra.gov.uk**
 - Follow Defra branding guidance: <https://digital.defra.gov.uk/design/branding>
 - Internal services and case-management tools must be visually and functionally consistent across Defra, not just within this service.
 - `DEFRA/pattern-library` on GitHub is archived (since 2019) — do not use it as a source.
