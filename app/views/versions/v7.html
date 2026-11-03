@@ -16,7 +16,7 @@
     </h1>
 
     <p class="govuk-body">
-      <span class="govuk-!-font-weight-bold">Date of last change:</span> 27 October 2026<br>
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 3 November 2026<br>
       <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
     </p>
 
@@ -56,6 +56,12 @@
           { text: "There is a “Back” link at the top of the page, which goes to the Software providers page. The hidden text on the “Replace secret” and “Remove secret” links is now “generated on [date]”, so a screen reader reads, for example, “Replace secret generated on 21 October 2026 at 8:14am”. Before, it read “Replace secret client secret generated on…”." },
           { text: "To match the design reference in the draft Jira ticket. The page had no way back to the list other than the navigation, and the link names said “secret” twice after the links were renamed “Replace secret” and “Remove secret”. No research yet." },
           { html: '<a class="govuk-link" href="/v7/software-providers">/v7/software-providers</a> (select a client name)<br><a class="govuk-link" href="/jira-tickets/dwtspi-496">Draft Jira ticket</a>' }
+        ],
+        [
+          { text: "Replace and remove secret pages: exposed credentials" },
+          { text: "Both confirmation pages now say “If credentials have been exposed, email security.team@defra.gov.uk.” The address is a link that opens a new email to the Security Team. It copies in Chris Knight and Steve Wilson, has the subject “API credentials exposed”, and has body text to replace with the user’s own message. The body text says they can ask the Security Team to contact them on Microsoft Teams instead of giving full details by email." },
+          { text: "Service team members need to know how to report exposed credentials when they replace or remove a secret. Pre-filling the email saves them finding the right people. No research yet." },
+          { html: '<a class="govuk-link" href="/v7/software-providers">/v7/software-providers</a> (select a client name, then “Replace secret” or “Remove secret”)<br><a class="govuk-link" href="/jira-tickets/dwtspi-505">Draft Jira ticket</a>' }
         ],
         [
           { text: "Software provider page: delete, edit and service error" },

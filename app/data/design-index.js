@@ -433,6 +433,20 @@ module.exports = [
     summary: 'Reached from the Rotate link in the table.',
     variants: [
       {
+        label: 'DWTSPI-505 replace secret design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-505/design-replace',
+        difference: 'The replace confirmation card with an extra line: “If credentials have been exposed, email security.team@defra.gov.uk.” The address opens a pre-filled email.',
+        rationaleHref: '/jira-tickets/dwtspi-505'
+      },
+      {
+        label: 'DWTSPI-505 remove secret design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-505/design-remove',
+        difference: 'The remove confirmation card with the same extra line about exposed credentials and the pre-filled email link.',
+        rationaleHref: '/jira-tickets/dwtspi-505'
+      },
+      {
         label: 'Version 8',
         source: 'Prototype',
         href: '/v8/software-providers',

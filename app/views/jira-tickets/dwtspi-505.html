@@ -1,0 +1,117 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTSPI-505: Tell users how to report exposed credentials" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">DWTSPI-505</span>
+    <h1 class="govuk-heading-l">Tell users how to report exposed credentials</h1>
+
+    <p class="govuk-body"><strong>Clickable prototype:</strong> <a class="govuk-link" href="/v7/software-providers">Version 7</a>. Select a client name, then “Replace secret” or “Remove secret”.</p>
+
+    <h2 class="govuk-heading-m">Design reference</h2>
+
+    <h3 class="govuk-heading-s">Replace secret page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the replace secret design",
+        href: "/jira-tickets/dwtspi-505/design-replace",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h3 class="govuk-heading-s">Remove secret page</h3>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the remove secret design",
+        href: "/jira-tickets/dwtspi-505/design-remove",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to know how to report exposed credentials when I replace or remove a secret,<br><strong>so that</strong> the Security Team hears about it quickly and I do not have to find who to contact.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">People replace or remove a secret when it may have been exposed. The confirmation pages built in <a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a> do not say who to tell.</p>
+    <p class="govuk-body">The email link fills in who to copy in, the subject and a starting message. This saves time, and it lets the user ask the Security Team to call them on Microsoft Teams instead of putting details in an email.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "Interruption card" },
+          { text: "MoJ Design System / MoJ Frontend" },
+          { html: 'Already built in DWTA-466. A paragraph is added to the card body, with a link in the inverse style. Guidance: <a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/components/interruption-card/">Interruption card</a>.' }
+        ],
+        [
+          { text: "Link" },
+          { text: "GOV.UK Design System" },
+          { html: 'An inverse link, <code>govuk-link--inverse</code>, because the card is dark. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/styles/links/">Links</a>. No JavaScript.' }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Design acceptance criteria</h2>
+    <p class="govuk-body">The same change is made on both pages.</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>Under the existing paragraph in the card is a new paragraph: “If credentials have been exposed, email security.team@defra.gov.uk.”</li>
+      <li>The email address is the link text, in the inverse link style.</li>
+      <li>The heading, the first paragraph, the button and the “Go back to software provider” link do not change.</li>
+      <li>The pages match the design references.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+    <ol class="govuk-list govuk-list--number">
+      <li>Given I select the email address on the replace secret page or the remove secret page, then my email application opens a new message.</li>
+      <li>The message is to security.team@defra.gov.uk.</li>
+      <li>The Cc field has chris.knight@defra.gov.uk and steve.wilson@defra.gov.uk.</li>
+      <li>The subject is “API credentials exposed”.</li>
+      <li>The body is “Replace this text with your message to the Security Team. You can request they contact you on Microsoft Teams if you do not want to give full details by email.”</li>
+      <li>Given I select the email address, then the confirmation page stays as it is and no secret is replaced or removed.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">On both pages, meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The link text is the email address, so its accessible name says where it goes. It is not “click here” (2.4.4).</li>
+      <li>The link is inside the card, after the first paragraph and before the button, so the reading order and the tab order match what people see (1.3.2, 2.4.3).</li>
+      <li>The link is not shown by colour alone. It is underlined, as GOV.UK links are (1.4.1).</li>
+      <li>The link works with a keyboard. The focus state is the GOV.UK focus style, with the <code>focus</code> colour (#ffdd00) as the background and <code>focus-text</code> (#0b0c0c) as the text (2.1.1, 2.4.7).</li>
+      <li>The address is shown as text, so a user without an email application set up can copy it (3.3.2).</li>
+      <li>The page has no horizontal scrolling at 320px wide or at 200% zoom (1.4.4, 1.4.10).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE, on both pages.</li>
+      <li>Select the link and check the To, Cc, subject and body of the new email. Check it in Outlook and in a browser-based email service.</li>
+      <li>With only a keyboard, tab to the link and open it.</li>
+      <li>Check the link with a screen reader, such as NVDA or VoiceOver.</li>
+      <li>Check both pages at 320px wide and at 200% zoom.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Sending the email from the service, or recording that it was sent.</li>
+      <li>Adding the same text to other pages, such as the page for deleting a software provider.</li>
+      <li>A way to report exposed credentials for users without an email application.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

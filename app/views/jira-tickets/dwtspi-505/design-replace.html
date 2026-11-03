@@ -1,0 +1,25 @@
+{#
+  Design reference for DWTSPI-505: confirm before replacing a secret. A copy of
+  v7/client-credentials/replace.html with fixed content. The buttons and links go to #
+  because the pages they lead to are not part of this ticket.
+#}
+{% extends "layouts/jira-software-provider-changes.html" %}
+
+{% set pageName = "Replace the client secret" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="moj-interruption-card">
+  <div class="moj-interruption-card__content">
+    <h1 class="moj-interruption-card__heading">Are you sure you want to replace the current secret?</h1>
+    <div class="moj-interruption-card__body">
+      <p>The current secret for Kerbside_Collect_Test will stop working immediately. Make sure the software provider knows before you continue.</p>
+      <p>If credentials have been exposed, email <a class="govuk-link govuk-link--inverse" href="mailto:security.team@defra.gov.uk?cc=chris.knight@defra.gov.uk,steve.wilson@defra.gov.uk&amp;subject=API%20credentials%20exposed&amp;body=Replace%20this%20text%20with%20your%20message%20to%20the%20Security%20Team.%20You%20can%20request%20they%20contact%20you%20on%20Microsoft%20Teams%20if%20you%20do%20not%20want%20to%20give%20full%20details%20by%20email.">security.team@defra.gov.uk</a>.</p>
+    </div>
+    <div class="govuk-button-group moj-interruption-card__actions">
+      {{ govukButton({ text: "Yes, replace secret", href: "#", classes: "govuk-button--inverse" }) }}
+      <a class="govuk-link govuk-link--inverse" href="#">Go back to software provider</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
