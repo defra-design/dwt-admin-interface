@@ -465,7 +465,7 @@ module.exports = [
         label: 'DWTSPI-469 delete confirmation design',
         source: 'Jira design',
         href: '/jira-tickets/dwtspi-469/design-confirm',
-        difference: 'A MoJ interruption card: “Are you sure you want to delete the software provider?” and “You will delete the entire record for [client name] including all the credentials.”, with the button “Yes, delete software provider”.',
+        difference: 'A MoJ interruption card: “Are you sure you want to delete the software provider?” and “You will delete the entire record for [client name], including all the credentials, in [environment] only.”, with the button “Yes, delete software provider”.',
         rationaleHref: '/jira-tickets/dwtspi-469'
       },
       {

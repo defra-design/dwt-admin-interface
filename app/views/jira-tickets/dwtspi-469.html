@@ -121,7 +121,7 @@
     <ol class="govuk-list govuk-list--number" start="4">
       <li>The page title is “Are you sure you want to delete the software provider? - DWT admin portal”.</li>
       <li>The page has an interruption card as its only content. Its H1 is “Are you sure you want to delete the software provider?”.</li>
-      <li>The text in the card is “You will delete the entire record for [client name] including all the credentials.”, with the name of the client I came from, for example “Kerbside_Collect_Test”.</li>
+      <li>The text in the card is “You will delete the entire record for [client name], including all the credentials, in [environment] only.”, with the name of the client I came from and its environment, for example “You will delete the entire record for Kerbside_Collect_Test, including all the credentials, in the external test environment only.”</li>
       <li>The card has a button, “Yes, delete software provider”, and a link, “Go back to software provider”, side by side. The link goes to the software provider page for that client. Nothing is deleted.</li>
       <li>Given I select “Yes, delete software provider”, then the client and all of its secrets are deleted, and I go to the Software providers page.</li>
     </ol>
