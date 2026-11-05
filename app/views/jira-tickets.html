@@ -8,33 +8,92 @@
 
 {% block content %}
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
+  <div class="govuk-grid-column-full">
 
     <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
     <h1 class="govuk-heading-l">Jira tickets</h1>
 
     <p class="govuk-body">Ticket text drafted from the prototype, ready to copy into Jira.</p>
 
-    <ul class="govuk-list">
-      <li><a class="govuk-link" href="/jira-tickets/dwta-455">DWTA-455: Update branding to a Defra internal service</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/dwta-456">DWTA-456: Build the Software providers page and client credentials table</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/dwta-458">DWTA-458: Create new credentials</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466: Replace or remove secrets</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/dwtspi-480">DWTSPI-480: Find waste organisations by registration date</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/dwtspi-496">DWTSPI-496: Manage a client’s secrets and copy new credentials</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/dwtspi-469">DWTSPI-469: Delete a software provider</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/dwtspi-502">DWTSPI-502: Change the client name</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/dwtspi-493">DWTSPI-493: Show an error when nothing was created or changed</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/dwtspi-505">DWTSPI-505: Tell users how to report exposed credentials</a></li>
-    </ul>
-
-    <h2 class="govuk-heading-m">Out of scope</h2>
-    <p class="govuk-body">Work taken out of a ticket that has no ticket yet.</p>
-    <ul class="govuk-list">
-      <li><a class="govuk-link" href="/jira-tickets/allowed-characters">Allowed characters in the client name</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/last-changed-column">Last changed column</a></li>
-      <li><a class="govuk-link" href="/jira-tickets/separate-credential-urls">Separate URLs for production and test credentials</a></li>
-    </ul>
+    {# MoJ sortable table: the MoJ script turns each header with aria-sort into a sort button.
+       The rows arrive in ticket order, so no header starts as sorted. #}
+    <table class="govuk-table" data-module="moj-sortable-table">
+      <caption class="govuk-table__caption govuk-visually-hidden">Jira tickets</caption>
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header" aria-sort="none">DWTSPI</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Ticket summary</th>
+          <th scope="col" class="govuk-table__header" aria-sort="none">Status</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">DWTSPI-455</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/dwta-455">Update branding to a Defra internal service</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag">Ready</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">DWTSPI-456</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/dwta-456">Build the Software providers page and client credentials table</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag">Ready</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">DWTSPI-458</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/dwta-458">Create new credentials</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag">Ready</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">DWTSPI-466</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/dwta-466">Replace or remove secrets</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag">Ready</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">DWTSPI-480</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/dwtspi-480">Find waste organisations by registration date</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag">Ready</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">DWTSPI-496</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/dwtspi-496">Manage a client’s secrets and copy new credentials</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag">Ready</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">DWTSPI-469</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/dwtspi-469">Delete a software provider</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag">Ready</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">DWTSPI-502</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/dwtspi-502">Change the client name</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--red">Blocked</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">DWTSPI-493</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/dwtspi-493">Show an error when nothing was created or changed</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag">Ready</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">DWTSPI-505</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/dwtspi-505">Tell users how to report exposed credentials</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag">Ready</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">No ticket yet</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/allowed-characters">Allowed characters in the client name</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--grey">Out of scope</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">No ticket yet</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/last-changed-column">Last changed column</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--grey">Out of scope</strong></td>
+        </tr>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">No ticket yet</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="/jira-tickets/separate-credential-urls">Separate URLs for production and test credentials</a></td>
+          <td class="govuk-table__cell"><strong class="govuk-tag govuk-tag--grey">Out of scope</strong></td>
+        </tr>
+      </tbody>
+    </table>
 
   </div>
 </div>

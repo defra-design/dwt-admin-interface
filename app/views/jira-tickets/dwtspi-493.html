@@ -34,22 +34,13 @@
       }) }}
     </div>
 
-    <h3 class="govuk-heading-s">On the edit client name page</h3>
-    <div class="govuk-button-group">
-      {{ govukButton({
-        text: "View the edit client name design",
-        href: "/jira-tickets/dwtspi-493/design-edit",
-        classes: "govuk-button--secondary"
-      }) }}
-    </div>
-
     <h2 class="govuk-heading-m">User story</h2>
     <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to be told when the service could not create or change credentials,<br><strong>so that</strong> I know nothing has changed and I can try again, instead of thinking the action worked.</p>
 
     <h2 class="govuk-heading-m">Context</h2>
-    <p class="govuk-body">Creating credentials, adding, replacing or removing a secret, deleting a software provider and changing a client name all change data. Today the pages only handle a person entering an invalid name. If the service itself fails, there is nothing to say so.</p>
+    <p class="govuk-body">Creating credentials, adding, replacing or removing a secret, deleting a software provider and all change data. Today the pages only handle a person entering an invalid name. If the service itself fails, there is nothing to say so.</p>
     <p class="govuk-body">The alert goes on the page the person can try the action from again. Replace, remove and delete are confirmed on a page that is only a card, so after a failure the person goes back to the software provider page, where the alert is shown.</p>
-    <p class="govuk-body">Build this after <a class="govuk-link" href="/jira-tickets/dwtspi-469">DWTSPI-469</a> and <a class="govuk-link" href="/jira-tickets/dwtspi-502">DWTSPI-502</a>, because the delete and edit errors need those journeys.</p>
+    <p class="govuk-body">Build this after <a class="govuk-link" href="/jira-tickets/dwtspi-469">DWTSPI-469</a>, because the delete error needs that journey.</p>
 
     <h2 class="govuk-heading-m">Components and patterns</h2>
     {{ govukTable({
@@ -149,12 +140,6 @@
           { text: "Software provider page" },
           { text: "Sorry, there is a problem with the service" },
           { text: "Try again. We have not deleted the software provider." }
-        ],
-        [
-          { text: "Save client name" },
-          { text: "Edit client name page" },
-          { text: "Sorry, there is a problem with the service" },
-          { text: "Try again. We have not changed the client name." }
         ]
       ]
     }) }}
@@ -168,7 +153,6 @@
     <h3 class="govuk-heading-s">When it is shown</h3>
     <ol class="govuk-list govuk-list--number" start="4">
       <li>Given I select “Generate credentials” and the credentials cannot be created, then the create credentials page is shown again with the alert, the name I entered is still in the input, and no credentials exist.</li>
-      <li>Given I select “Save” and the name cannot be changed, then the edit client name page is shown again with the alert, the name I entered is still in the input, and the client keeps its old name.</li>
       <li>Given I select “Yes, replace secret”, “Yes, remove secret” or “Yes, delete software provider” and it fails, then I go to the software provider page with the alert, and the secret or the client is as it was.</li>
       <li>Given I select “Add another secret” and it fails, then the software provider page is shown again with the alert and no secret is added.</li>
       <li>Given I try again and it works, then the journey carries on as built, and the alert is not shown.</li>
@@ -205,6 +189,7 @@
       <li>Errors on other pages, such as loading the Software providers page or the Waste organisations report.</li>
       <li>The error summary for a name that is not valid. See <a class="govuk-link" href="/jira-tickets/dwta-458">DWTA-458</a>.</li>
       <li>A success message after adding, replacing or removing a secret, or changing the client name.</li>
+      <li>The error for changing a client name. This depends on <a class="govuk-link" href="/jira-tickets/dwtspi-502">DWTSPI-502</a>, which is blocked. When the journey is built, the alert is shown on the edit client name page when “Save” fails. The page is shown again with the alert, the name I entered is still in the input, and the client keeps its old name. The text is “Try again. We have not changed the client name.” The design is on the <a class="govuk-link" href="/jira-tickets/dwtspi-493/design-edit">edit client name design reference</a> page.</li>
     </ul>
 
   </div>

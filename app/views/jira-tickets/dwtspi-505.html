@@ -40,7 +40,7 @@
 
     <h2 class="govuk-heading-m">Context</h2>
     <p class="govuk-body">People replace or remove a secret when it may have been exposed. The confirmation pages built in <a class="govuk-link" href="/jira-tickets/dwta-466">DWTA-466</a> do not say who to tell.</p>
-    <p class="govuk-body">The email link fills in who to copy in, the subject and a starting message. This saves time, and it lets the user ask the Security Team to call them on Microsoft Teams instead of putting details in an email.</p>
+    <p class="govuk-body">The email link opens a new message to the Security Team, so the user does not have to find the address.</p>
 
     <h2 class="govuk-heading-m">Components and patterns</h2>
     {{ govukTable({
@@ -79,10 +79,6 @@
     <ol class="govuk-list govuk-list--number">
       <li>Given I select the email address on the replace secret page or the remove secret page, then my email application opens a new message.</li>
       <li>The message is to security.team@defra.gov.uk.</li>
-      <li>The Cc field has chris.knight@defra.gov.uk and steve.wilson@defra.gov.uk.</li>
-      <li>The subject is “API credentials exposed”.</li>
-      <li>The body is “Replace this text with your message to the Security Team. You can request they contact you on Microsoft Teams if you do not want to give full details by email.”</li>
-      <li>Given I select the email address, then the confirmation page stays as it is and no secret is replaced or removed.</li>
     </ol>
 
     <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
@@ -99,7 +95,7 @@
     <h3 class="govuk-heading-s">How to test</h3>
     <ul class="govuk-list govuk-list--bullet">
       <li>Run an automated check, such as axe or WAVE, on both pages.</li>
-      <li>Select the link and check the To, Cc, subject and body of the new email. Check it in Outlook and in a browser-based email service.</li>
+      <li>Select the link and check that a new email to the Security Team opens. Check it in Outlook and in a browser-based email service.</li>
       <li>With only a keyboard, tab to the link and open it.</li>
       <li>Check the link with a screen reader, such as NVDA or VoiceOver.</li>
       <li>Check both pages at 320px wide and at 200% zoom.</li>
@@ -107,6 +103,7 @@
 
     <h2 class="govuk-heading-m">Out of scope</h2>
     <ul class="govuk-list govuk-list--bullet">
+      <li>Filling in the Cc field, subject and body of the email. This will be done in a later ticket.</li>
       <li>Sending the email from the service, or recording that it was sent.</li>
       <li>Adding the same text to other pages, such as the page for deleting a software provider.</li>
       <li>A way to report exposed credentials for users without an email application.</li>

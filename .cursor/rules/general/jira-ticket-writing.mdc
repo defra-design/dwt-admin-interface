@@ -25,9 +25,10 @@ If the user, the outcome or the evidence isn't known, ask the designer rather th
 5. **Context**: what the story covers, and the reason for the change (see below).
 6. **Components and patterns**
 7. **Colours** (if the ticket specifies colours)
-8. **Acceptance criteria**
-9. **Accessibility acceptance criteria**, then a short **How to test** list
-10. **Out of scope**
+8. **Design acceptance criteria**: what the page looks like (layout, content, measurements, colours). Only what has changed (see below).
+9. **Acceptance criteria**: how it behaves (Given / When / Then).
+10. **Accessibility acceptance criteria**, then a short **How to test** list
+11. **Out of scope**
 
 Tickets don't have a separate user need for now. We'll add one, and any research evidence, once we have insights.
 
@@ -55,16 +56,30 @@ The design reference page is the source of truth for developers and testers.
 - Build it as a subpage of the ticket, e.g. `app/views/jira-tickets/dwta-NNN/design.html` (URL `/jira-tickets/dwta-NNN/design`), as a copy of the real prototype page.
 - Give it its own layout (e.g. `app/views/layouts/jira-dwta-NNN.html`), copied from the version layout. Never edit the version layout for this.
 - Only include what is in scope. Remove navigation items and pages that aren't part of the ticket. Where a link must stay for the design to look right, use `#` (the one exception to the "no dead links" rule, and only on a design reference page) so nobody lands in the full prototype by accident.
-- Before handing over, check the page against the acceptance criteria. Fetch the rendered HTML and check the landmarks, headings, page title, `alt` text and `aria-*` attributes. Report what fails.
+- Before handing over, check the page against the design and behavioural acceptance criteria. Fetch the rendered HTML and check the landmarks, headings, page title, `alt` text and `aria-*` attributes. Report what fails.
+
+## Design acceptance criteria
+
+Describe what the page looks like. Keep these apart from the behavioural criteria below.
+
+- **Write criteria only for what has changed** since the version currently built. Don't describe anything unchanged.
+- To find the changes cheaply, don't read both versions in full. Run a diff of the files instead (for example `diff -u app/views/vN-1/<path>/<page>.html app/views/vN/<path>/<page>.html`, plus the two layouts if the header, navigation or footer changed). Work from the diff lines only. Use `git diff` if the earlier version is in history rather than a folder.
+- Which version is "built"? Ask the designer if it isn't clear. Check `app/data/design-index.js` and the version pages for hints.
+- A new page has no built version, so describe the whole page.
+- If nothing on a page changed, write no design criteria for it. Say "No design changes" under that page.
+- **Numbered** (D1, D2, ...), one visible change per criterion, a plain statement a tester can pass or fail. Group by page or area.
+- Include measurements and colours (see below) and exact content when agreed (for example the footer text).
+- Add "The page matches the design reference" as the last criterion.
+- Avoid vague words ("easy", "intuitive", "quickly", "appropriate", "clearly").
 
 ## Acceptance criteria
 
 - A short **numbered** list under "On every page:" (or the relevant scope). Numbered so people can refer to "AC 4".
-- One behaviour per criterion, written as a plain statement that a tester can pass or fail. Don't repeat "Given I am on any page" on every line.
+- Behaviour only. Use **Given / When / Then**, for example "Given a user has entered an invalid email address, when they select Continue, then…". Anything about how the page looks belongs in the design criteria.
+- Say "user", never "person".
+- One behaviour per criterion, a plain statement that a tester can pass or fail. Don't repeat "Given a user is on any page" on every line.
 - Keep it simple and concise. Say what to build, not how. Don't over-specify.
-- Add "The page matches the design reference" as the last criterion.
-- Include the exact page title and key content when agreed (for example the footer text).
-- Use **Given / When / Then** only for interactions (forms, errors, journeys), not for static layout or branding.
+- Include the exact page title when agreed.
 - Avoid vague words ("easy", "intuitive", "quickly", "appropriate", "clearly").
 - Include "works without JavaScript" only where the feature uses JavaScript.
 
@@ -78,11 +93,11 @@ The design reference page is the source of truth for developers and testers.
 
 ### Colours
 
-- Whenever a ticket specifies colour, add a **Colours** table before the acceptance criteria: name, value (hex, or rgba and the resulting hex), source, and what it's used for.
+- Whenever a ticket specifies colour, add a **Colours** table before the design acceptance criteria: name, value (hex, or rgba and the resulting hex), source, and what it's used for.
 - Mark the source as **GOV.UK** (in <https://design-system.service.gov.uk/styles/colour/>), **GOV.UK (earlier palette)** if the value is no longer in the current palette, or **Defra** (Defra-specific).
 - Refer to colours by name in the acceptance criteria (in `<code>`), for example `defra-green-dark`, so developers don't have to look the hex up elsewhere.
 - Names are labels for the ticket unless the Sass defines variables. Read the values from `app/assets/sass/application.scss`. Don't guess them.
-- Flag contrast. Text needs 4.5:1; large text (18.66px bold or 24px regular and over) and UI components need 3:1. Work it out, and say if it passes only because the text is large. Don't add instructions to testers (for example "testers must confirm"). The team knows to check.
+- Don't mention contrast checks or ratios. Standard design system components have already been checked.
 
 ## Accessibility acceptance criteria
 
@@ -96,7 +111,7 @@ Include on every ticket that changes UI. Target **WCAG 2.2 AA** and the GOV.UK S
 - **Headings:** one H1, in order (1.3.1, 2.4.6).
 - **Page title:** unique and descriptive, page name then service name, prefixed with "Error:" on error pages (2.4.2).
 - **Keyboard and focus:** every function works with a keyboard, in a logical order, with a visible focus state. Name the GOV.UK focus style, with `yellow` and `black` (2.1.1, 2.4.3, 2.4.7).
-- **Contrast and colour:** give the ratios (1.4.3, 1.4.11) and don't rely on colour alone (1.4.1).
+- **Colour:** don't rely on colour alone (1.4.1). Don't give contrast ratios.
 - **Resize and reflow:** no horizontal scrolling at 320px wide or at 200% zoom (1.4.4, 1.4.10).
 - **Forms and errors** (when relevant): labels linked to inputs, hints and errors linked with `aria-describedby`, error summary at the top with focus moved to it (3.3.1, 3.3.2, 1.3.1).
 - **Dynamic updates** (when relevant): announced with `aria-live`, without moving focus unexpectedly (4.1.3).
@@ -144,8 +159,9 @@ Also flag in the ticket:
 - Is the user named specifically?
 - Is the story solution-neutral, with a real benefit, and usable on its own if it went live?
 - Is Context short, with no internal design workings and no mention of research?
-- Is every acceptance criterion numbered, short and testable by someone who didn't write it?
-- Are sizes given as composition and colours given by name, with a colours table (hex and source)?
+- Are design criteria kept separate from Given / When / Then criteria, and written only for what changed since the built version (found by diff)?
+- Is every acceptance criterion numbered, short, testable by someone who didn't write it, and does it say "user" not "person"?
+- Are sizes given as composition and colours given by name, with a colours table (hex and source), and no contrast ratios?
 - Does each accessibility criterion say exactly how it's met and carry a WCAG number?
 - Has the design reference page been checked against the criteria, and does the ticket link to it prominently?
 - Are Context, Components, Colours and Out of scope each used for their own purpose, with no repetition?
