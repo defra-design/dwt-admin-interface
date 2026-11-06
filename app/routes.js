@@ -13,6 +13,7 @@ const cc = require('./data/client-credentials')
 const ccV6 = require('./data/client-credentials-v6')
 const ccV7 = require('./data/client-credentials-v7')
 const ccV8 = require('./data/client-credentials-v8')
+const ccV9 = require('./data/client-credentials-v9')
 const { paginate } = require('./data/pagination')
 const {
   formatDateObj,
@@ -3366,6 +3367,481 @@ function registerV8Routes () {
 }
 
 registerV8Routes()
+
+// --- Version 9 -----------------------------------------------------------
+// A copy of version 7, with no changes yet. It has its own function and its
+// own session data key, so version 7 stays frozen while this is edited.
+function registerV9Routes () {
+  const base = '/v9'
+  const view = (page) => `v9/${page}`
+
+  router.use(base, (req, res, next) => {
+    res.locals.version = 'v9'
+    next()
+  })
+
+  // Credentials created or changed in this session. See data/client-credentials.js.
+  function credentialList (req) {
+    if (!Array.isArray(req.session.data.clientCredentialsV9)) {
+      req.session.data.clientCredentialsV9 = []
+    }
+    return req.session.data.clientCredentialsV9
+  }
+
+  // The environment comes from the URL: /test or /production.
+  function environmentFor (key) {
+    const match = ccV9.ENVIRONMENTS.find((e) => e.value.toLowerCase() === key)
+    return match ? { key: match.value.toLowerCase(), label: match.value } : null
+  }
+
+  function tablePath (environmentLabel) {
+    return `${base}/software-providers`
+  }
+
+  // --- Reporting (same as version 4.1) -----------------------------------------
+
+  // Waste organisations report. Rows carry the values the MoJ sortable table
+  // needs: dates and periods sort on a number, not on the text shown.
+  // The payment year ending is shown as "Sep 2025" (the cycle always ends in September).
+  function orgRows (orgs) {
+    const byId = new Map(orgs.map((o) => [o.id, o]))
+    return mapOrgRows(orgs).map((row) => {
+      const match = /(\d{2})$/.exec(row.paymentPeriod)
+      return Object.assign({}, row, {
+        registeredSort: byId.get(row.id).registeredDate.getTime(),
+        paymentPeriod: match ? `Sep 20${match[1]}` : '',
+        paymentPeriodSort: match ? Number(match[1]) : 0
+      })
+    })
+  }
+
+  // Checks one date (day, month, year) from the filter. Messages are the ones
+  // agreed in the Jira ticket. `parts` lists the inputs to highlight: only the
+  // missing or wrong ones, as the GOV.UK dates pattern asks.
+  // Returns { error, href, parts, date }.
+  function checkReportDate (query, key, label, today) {
+    const prefix = `period-${key}`
+    const part = (name) => (query[`${prefix}-${name}`] || '').trim()
+    const values = { day: part('day'), month: part('month'), year: part('year') }
+    const all = ['day', 'month', 'year']
+    const missing = all.filter((name) => !values[name])
+    const fail = (error, parts) => ({ error, parts, href: `#${prefix}-${parts[0]}` })
+    const name = `‘${label}’ date`
+
+    if (missing.length === 3) {
+      return fail(`Enter or select a ${name}`, all)
+    }
+    if (missing.length === 2) {
+      return fail(`${name} must include a day, month and year`, all)
+    }
+    if (missing.length === 1) {
+      return fail(`${name} must include a ${missing[0]}`, missing)
+    }
+    // Letters or other characters, or a year that is not 4 numbers (for example 26).
+    const wrong = all.filter((n) => !/^\d+$/.test(values[n]) || (n === 'year' && values[n].length !== 4))
+    if (wrong.length) {
+      return fail(`Enter the ${name} in the correct format`, wrong)
+    }
+    const checked = validateDateParts(values.day, values.month, values.year)
+    if (checked.error) {
+      return fail(`${name} must be a real date`, all)
+    }
+    if (checked.date > today) {
+      return fail(`${name} must be today or in the past`, all)
+    }
+    return { date: checked.date }
+  }
+
+  // The filter is shown first. Results only appear once both dates are valid.
+  // Nothing is filled in or swapped for the user.
+  function checkReportPeriod (query) {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const raw = (key) => ({
+      day: (query[`period-${key}-day`] || '').trim(),
+      month: (query[`period-${key}-month`] || '').trim(),
+      year: (query[`period-${key}-year`] || '').trim()
+    })
+    const period = {
+      values: { from: raw('from'), to: raw('to') },
+      errors: {},
+      errorParts: { from: [], to: [] },
+      errorList: []
+    }
+    const from = checkReportDate(query, 'from', 'From', today)
+    const to = checkReportDate(query, 'to', 'To', today)
+    // The 'To' date error names the 'From' date the user entered.
+    if (!to.error && from.date && from.date > to.date) {
+      Object.assign(to, {
+        error: `‘To’ date must be the same as or after ${formatDateObj(from.date)}`,
+        parts: ['day', 'month', 'year'],
+        href: '#period-to-day'
+      })
+    }
+    for (const [key, result] of [['from', from], ['to', to]]) {
+      if (result.error) {
+        period.errors[key] = result.error
+        period.errorParts[key] = result.parts
+        period.errorList.push({ text: result.error, href: result.href })
+      }
+    }
+    if (!period.errorList.length) {
+      period.from = from.date
+      period.to = to.date
+    }
+    return period
+  }
+
+  router.get(`${base}/regulators`, (req, res) => {
+    const submitted = [
+      'period-from-day', 'period-from-month', 'period-from-year',
+      'period-to-day', 'period-to-month', 'period-to-year'
+    ].some((key) => key in req.query)
+    const period = submitted ? checkReportPeriod(req.query) : emptyPeriod
+    // Every row is shown on one page, so sorting reorders all of them.
+    const searched = submitted && !period.errorList.length
+    const rows = searched ? orgRows(reg.listRegisteredInPeriod(period.from, period.to)) : []
+    res.render(view('regulators/index'), {
+      period,
+      rows,
+      count: rows.length,
+      // All registered organisations, shown beside the count for the period.
+      totalCount: reg.listAllOrganisations().length,
+      filtered: submitted,
+      searched,
+      periodLabel: searched ? periodLabel(period) : null
+    })
+  })
+
+  // Download CSV is not built yet — goes to the placeholder page.
+  router.get(`${base}/regulators/download`, (req, res) => {
+    res.render(view('placeholder'), {
+      heading: 'Download CSV',
+      activeSection: 'regulators',
+      backHref: `${base}/regulators`
+    })
+  })
+
+  // --- Software providers --------------------------------------------------
+
+  // One table for all credentials, Test and Production.
+  router.get(`${base}/software-providers`, (req, res) => {
+    // Client name, A to Z. The page marks "Client name" as sorted.
+    // Production credentials are hidden and Test is shown as "External test".
+    // Only the label changes here, so the shared data stays as it is.
+    const credentials = ccV9.listCredentials(credentialList(req))
+      .filter((c) => c.environment !== 'Production')
+      .filter((c) => !deletedIds(req).includes(c.id))
+      .map((c) => Object.assign({}, c, { environment: 'External test' }))
+      .sort((a, b) => a.clientName.localeCompare(b.clientName))
+    // The "deleted" message shows once, then is cleared.
+    const deletedName = req.session.data.deletedClientNameV9
+    delete req.session.data.deletedClientNameV9
+    res.render(view('software-providers/index'), { credentials, deletedName })
+  })
+
+  // Deleted software providers. The fixed example rows cannot be removed from
+  // the shared data, so deleted ids are kept in the session and hidden.
+  function deletedIds (req) {
+    if (!Array.isArray(req.session.data.deletedCredentialsV9)) {
+      req.session.data.deletedCredentialsV9 = []
+    }
+    return req.session.data.deletedCredentialsV9
+  }
+
+  router.get(`${base}/software-providers/:id/delete`, (req, res) => {
+    const credential = ccV9.getCredential(credentialList(req), req.params.id)
+    if (!credential || deletedIds(req).includes(credential.id)) return res.redirect(`${base}/software-providers`)
+    res.render(view('client-credentials/delete'), { credential })
+  })
+
+  router.post(`${base}/software-providers/:id/delete`, (req, res) => {
+    const credential = ccV9.getCredential(credentialList(req), req.params.id)
+    // Demo failure: the provider is not deleted, for names starting "Error_".
+    if (credential && isDemoError(credential.clientName)) {
+      return renderDetail(res, credential, { serviceError: 'Try again. We have not deleted the software provider.' })
+    }
+    if (credential && !deletedIds(req).includes(credential.id)) {
+      deletedIds(req).push(credential.id)
+      req.session.data.deletedClientNameV9 = credential.clientName
+    }
+    res.redirect(`${base}/software-providers`)
+  })
+
+  // --- Client credentials ---------------------------------------------------
+
+  // The create and edit pages share one form. Only the client name is asked for.
+  function renderClientNameForm (res, options) {
+    res.render(view('client-credentials/create'), Object.assign({
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  router.get(`${base}/software-providers/create`, (req, res) => {
+    const environment = environmentFor('test')
+    renderClientNameForm(res, {
+      environment,
+      mode: 'create',
+      values: { clientName: '' }
+    })
+  })
+
+  router.post(`${base}/software-providers/create`, (req, res) => {
+    const environment = environmentFor('test')
+    const values = { clientName: (req.body.clientName || '').trim() }
+    const errors = ccV9.validateClientName(values.clientName, credentialList(req))
+    if (Object.keys(errors).length) {
+      return renderClientNameForm(res, {
+        environment,
+        mode: 'create',
+        values,
+        errors,
+        errorList: ccV9.clientNameErrorList(errors)
+      })
+    }
+
+    // Demo failure: a client name that starts with "Error_" is not created. The
+    // form is shown again with the alert.
+    if (isDemoError(values.clientName)) {
+      return renderClientNameForm(res, {
+        environment,
+        mode: 'create',
+        values,
+        serviceError: 'Try again. We have not created client credentials.'
+      })
+    }
+
+    // The environment is set from the page the user started on, not the form.
+    const credential = ccV9.createCredential({
+      clientName: values.clientName,
+      environment: environment.label
+    })
+    credentialList(req).push(credential)
+    res.redirect(`${base}/software-providers/${credential.id}/created`)
+  })
+
+  // The edit page is the create page with the current client name filled in.
+  router.get(`${base}/software-providers/:id/edit`, (req, res) => {
+    const credential = ccV9.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    renderClientNameForm(res, {
+      environment: environmentFor(credential.environment.toLowerCase()),
+      mode: 'edit',
+      credential,
+      values: { clientName: credential.clientName }
+    })
+  })
+
+  router.post(`${base}/software-providers/:id/edit`, (req, res) => {
+    const credential = ccV9.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    const values = { clientName: (req.body.clientName || '').trim() }
+    // The credential's own name does not count as "already exists".
+    const errors = ccV9.validateClientName(values.clientName, credentialList(req), credential.id)
+    if (Object.keys(errors).length) {
+      return renderClientNameForm(res, {
+        environment: environmentFor(credential.environment.toLowerCase()),
+        mode: 'edit',
+        credential,
+        values,
+        errors,
+        errorList: ccV9.clientNameErrorList(errors)
+      })
+    }
+
+    // Only a real change counts as a change, so "Last changed" stays put if
+    // the user saves without editing.
+    if (isDemoError(credential.clientName)) {
+      // Demo failure: the name is not saved, for providers starting "Error_".
+      return renderClientNameForm(res, {
+        environment: environmentFor(credential.environment.toLowerCase()),
+        mode: 'edit',
+        credential,
+        values,
+        serviceError: 'Try again. We have not changed the client name.'
+      })
+    }
+    if (values.clientName !== credential.clientName) {
+      const toChange = ccV9.credentialToChange(credentialList(req), credential.id)
+      toChange.clientName = values.clientName
+      // lastChanged is not updated: with one secret it is also the date that secret was
+      // generated, which a rename must not change.
+    }
+    // Back to the software provider page, where the user started the edit.
+    res.redirect(`${base}/software-providers/${credential.id}`)
+  })
+
+  // The one-time reveal, for new credentials and for a rotated secret. Once
+  // closed there is nothing left to show, so this sends the user back to the
+  // table rather than showing the secret again.
+  // When each secret was generated, newest first, as text for the page.
+  function secretLabels (credential) {
+    return ccV9.secretDates(credential)
+      .slice()
+      .sort((a, b) => new Date(b) - new Date(a))
+      .map((d) => formatDateTimeObj(new Date(d)))
+  }
+
+  function renderReveal (res, credential) {
+    res.render(view('client-credentials/created'), {
+      credential,
+      generatedOn: formatDateTimeObj(new Date(credential.lastChanged)),
+      added: credential.pendingAction === 'added',
+      rotated: credential.pendingAction === 'rotated',
+      caption: `${credential.environment} credentials`
+    })
+  }
+
+  router.get(`${base}/software-providers/:id/created`, (req, res) => {
+    const credential = ccV9.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    if (!credential.pendingSecret) return res.redirect(`${base}/software-providers/${credential.id}`)
+    renderReveal(res, credential)
+  })
+
+  // Orphan screen: the earlier panel design of the copy page (not linked from the journey, only
+  // from the prototype index). Fixed synthetic data, so it opens without a session.
+  router.get(`${base}/software-providers/example/created-panel`, (req, res) => {
+    const credential = {
+      id: '7b4ll1di9l73m4lpb9iu0b4k2i',
+      clientName: 'Kerbside_Collect_Test',
+      clientId: '7b4ll1di9l73m4lpb9iu0b4k2i',
+      pendingSecret: 'k3x9v0m2qz7c1ndw84pbh5ty6fa0ge2ujr9l7s4o1i3x8wc5bn6d'
+    }
+    res.render(view('client-credentials/created-panel'), {
+      credential,
+      generatedOn: formatDateTimeObj(new Date('2026-10-21T08:14:00'))
+    })
+  })
+
+  // Orphan screen: the copy page with GOV.UK warning text.
+  router.get(`${base}/software-providers/example/created-warning`, (req, res) => {
+    const credential = {
+      id: '7b4ll1di9l73m4lpb9iu0b4k2i',
+      clientName: 'Kerbside_Collect_Test',
+      clientId: '7b4ll1di9l73m4lpb9iu0b4k2i',
+      pendingSecret: 'k3x9v0m2qz7c1ndw84pbh5ty6fa0ge2ujr9l7s4o1i3x8wc5bn6d'
+    }
+    res.render(view('client-credentials/created-warning'), {
+      credential,
+      generatedOn: formatDateTimeObj(new Date('2026-10-21T08:14:00'))
+    })
+  })
+
+  // Closing goes to the software provider page, which confirms what was created.
+  router.post(`${base}/software-providers/:id/created`, (req, res) => {
+    const credential = ccV9.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    delete credential.pendingSecret
+    delete credential.pendingAction
+    // Tells the detail page to tag the new secret, once.
+    credential.showNewTag = true
+    res.redirect(`${base}/software-providers/${credential.id}`)
+  })
+
+  // Rotating asks the user to confirm first. Only the POST gives a new secret.
+  // A refresh of the reveal page keeps the same new secret, because it is only
+  // replaced once the user has closed the page.
+  router.get(`${base}/software-providers/:id`, (req, res) => {
+    const credential = ccV9.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    const showNew = Boolean(credential.showNewTag)
+    delete credential.showNewTag
+    renderDetail(res, credential, { showNew })
+  })
+
+  // Names that start with "Error_" always fail, so the service error alert can
+  // be shown in research. The example provider Error_Demo_Test is one of them.
+  function isDemoError (clientName) {
+    return /^error_/i.test(clientName || '')
+  }
+
+  function renderDetail (res, credential, extras) {
+    res.render(view('client-credentials/software-provider-detail'), Object.assign({
+      credential,
+      showNew: false,
+      secretLabels: secretLabels(credential),
+      canAddSecret: ccV9.secretDates(credential).length < ccV9.MAX_SECRETS,
+      caption: `${credential.environment} credentials`
+    }, extras))
+  }
+
+  router.post(`${base}/software-providers/:id/rotate`, (req, res) => {
+    if (!ccV9.getCredential(credentialList(req), req.params.id)) {
+      return res.redirect(`${base}/software-providers`)
+    }
+    // Demo failure: the secret is not replaced for a provider whose name starts
+    // with "Error_". The user goes back to the software provider page, which
+    // shows the alert.
+    const target = ccV9.getCredential(credentialList(req), req.params.id)
+    if (isDemoError(target.clientName)) {
+      return renderDetail(res, target, { serviceError: 'Try again. We have not replaced the secret.' })
+    }
+    const credential = ccV9.credentialToChange(credentialList(req), req.params.id)
+    if (credential.pendingAction !== 'rotated') {
+      ccV9.rotateSecret(credential)
+      // Replacing leaves one secret, generated now.
+      delete credential.secrets
+    }
+    res.redirect(`${base}/software-providers/${credential.id}/created`)
+  })
+
+  // Adding a secret changes data, so it is a POST. Two secrets at most. Goes
+  // straight to the page where the new secret is shown once.
+  router.post(`${base}/software-providers/:id/add-secret`, (req, res) => {
+    if (!ccV9.getCredential(credentialList(req), req.params.id)) {
+      return res.redirect(`${base}/software-providers`)
+    }
+    // Demo failure: no secret is added for a provider whose name starts with
+    // "Error_". The page is shown again with the alert.
+    const target = ccV9.getCredential(credentialList(req), req.params.id)
+    if (isDemoError(target.clientName)) {
+      return renderDetail(res, target, { serviceError: 'Try again. We have not added a secret.' })
+    }
+    const credential = ccV9.credentialToChange(credentialList(req), req.params.id)
+    if (ccV9.secretDates(credential).length < ccV9.MAX_SECRETS && credential.pendingAction !== 'added') {
+      ccV9.addSecret(credential)
+    }
+    res.redirect(`${base}/software-providers/${credential.id}/created`)
+  })
+
+  // Removing the older of two secrets asks the user to confirm first. The most
+  // recent secret stays. Only the POST removes it, then the user goes back to
+  // the manage page, which now shows one secret.
+  router.get(`${base}/software-providers/:id/remove`, (req, res) => {
+    const credential = ccV9.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    const labels = secretLabels(credential)
+    if (labels.length < 2) return res.redirect(`${base}/software-providers/${credential.id}`)
+    res.render(view('client-credentials/remove'), { credential, olderSecretDate: labels[1] })
+  })
+
+  router.post(`${base}/software-providers/:id/remove`, (req, res) => {
+    if (!ccV9.getCredential(credentialList(req), req.params.id)) {
+      return res.redirect(`${base}/software-providers`)
+    }
+    // Demo failure: the secret is not removed, for names starting "Error_".
+    const target = ccV9.getCredential(credentialList(req), req.params.id)
+    if (isDemoError(target.clientName)) {
+      return renderDetail(res, target, { serviceError: 'Try again. We have not removed the secret.' })
+    }
+    const credential = ccV9.credentialToChange(credentialList(req), req.params.id)
+    const dates = ccV9.secretDates(credential)
+    if (dates.length > 1) credential.secrets = dates.slice(-1)
+    res.redirect(`${base}/software-providers/${credential.id}`)
+  })
+
+  // Replacing the secret asks the user to confirm first. The form on this page
+  // posts to the rotate route above, which is what replaces the secret.
+  router.get(`${base}/software-providers/:id/replace`, (req, res) => {
+    const credential = ccV9.getCredential(credentialList(req), req.params.id)
+    if (!credential) return res.redirect(`${base}/software-providers`)
+    res.render(view('client-credentials/replace'), { credential })
+  })
+}
+
+registerV9Routes()
 
 // --- Design page ------------------------------------------------------------
 //

@@ -1,0 +1,30 @@
+{#
+  "Are you sure?" step before the client secret is replaced, using the MoJ
+  interruption card. The card is the only body content on the page, as MoJ
+  guidance asks. The macro's primary action is a link, so the card is written
+  out here to let "Yes, replace secret" post a form. Only the POST replaces the
+  secret (see routes.js). Buttons and links use the inverse style.
+#}
+{% extends "layouts/v9.html" %}
+
+{% set version = "v9" %}
+{% set pageName = "Replace the client secret" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="moj-interruption-card">
+  <div class="moj-interruption-card__content">
+    <h1 class="moj-interruption-card__heading">Are you sure you want to replace the current secret?</h1>
+    <div class="moj-interruption-card__body">
+      <p>The current secret for {{ credential.clientName }} will stop working immediately. Make sure the software provider knows before you continue.</p>
+      <p>If credentials have been exposed, email <a class="govuk-link govuk-link--inverse" href="mailto:security.team@defra.gov.uk?cc=chris.knight@defra.gov.uk,steve.wilson@defra.gov.uk&amp;subject=API%20credentials%20exposed&amp;body=Replace%20this%20text%20with%20your%20message%20to%20the%20Security%20Team.%20You%20can%20request%20they%20contact%20you%20on%20Microsoft%20Teams%20if%20you%20do%20not%20want%20to%20give%20full%20details%20by%20email.">security.team@defra.gov.uk</a>.</p>
+    </div>
+    <form method="post" action="/{{ version }}/software-providers/{{ credential.id }}/rotate" novalidate>
+      <div class="govuk-button-group moj-interruption-card__actions">
+        {{ govukButton({ text: "Yes, replace secret", classes: "govuk-button--inverse", preventDoubleClick: true }) }}
+        <a class="govuk-link govuk-link--inverse" href="/{{ version }}/software-providers/{{ credential.id }}">Go back to software provider</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

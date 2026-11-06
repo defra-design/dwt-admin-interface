@@ -1,0 +1,65 @@
+{#
+  Used to create credentials and to edit a client name (see routes.js), so the
+  two journeys look and behave the same. Only one question is asked, so the
+  label is the page heading. The caption names the task
+  and the environment, which the user already chose on the Test or Production
+  page.
+  There is no software provider field: the client name holds the software
+  provider and software name.
+#}
+{% extends "layouts/v9.html" %}
+
+{% set version = "v9" %}
+{% set editing = (mode === "edit") %}
+{% set pageName = (("Error: " if errorList.length else "") + "Edit client name") if editing else (("Error: " if errorList.length else "") + "What is the name of the software provider and package?") %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if serviceError %}
+      {{ mojAlert({
+        variant: "error",
+        role: "alert",
+        title: "Sorry, there is a problem with the service",
+        showTitleAsHeading: true,
+        text: serviceError,
+        classes: "govuk-!-margin-bottom-7"
+      }) }}
+    {% endif %}
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+
+    {% if not editing %}
+      <span class="govuk-caption-l">Create external test environment credentials</span>
+    {% endif %}
+    <h1 class="govuk-heading-l">{{ "Edit client name" if editing else "What is the name of the software provider and package?" }}</h1>
+
+    <form method="post" action="/{{ version }}/software-providers/{{ credential.id + '/edit' if editing else 'create' }}" novalidate>
+
+      {{ govukInput({
+        id: "clientName",
+        name: "clientName",
+        label: { text: "Client name", classes: "govuk-label--s" },
+        hint: { text: "Enter the name of the software provider and software package, using letters and underscores only. For example, Waste_Technologies_Software" + ("" if editing else ".") },
+        classes: "govuk-!-width-two-thirds",
+        value: values.clientName,
+        errorMessage: { text: errors.clientName } if errors.clientName else undefined,
+        autocomplete: "off",
+        spellcheck: false
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Save" if editing else "Generate credentials" }) }}
+        <a class="govuk-link" href="/{{ version }}/{{ 'software-providers/' + credential.id if editing else 'software-providers' }}">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

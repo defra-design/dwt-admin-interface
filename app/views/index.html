@@ -41,8 +41,36 @@
     <div class="govuk-summary-card">
       <div class="govuk-summary-card__title-wrapper">
         <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 8
+          Version 9
           {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+        </h3>
+      </div>
+      <div class="govuk-summary-card__content">
+        <div>
+          {{ govukButton({
+            html: 'View prototype<span class="govuk-visually-hidden"> for version 9</span>',
+            href: "/v9/start",
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+
+        <p class="govuk-body-s">A copy of version 7, with the developers’ URL pattern for software providers. For the next batch of tickets.</p>
+
+        <p class="govuk-body-s">
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 6 November 2026<br>
+          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-body-s">
+          <li><a class="govuk-link" href="/versions/v9">Changes and design rationale for version 9</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
+          Version 8
         </h3>
       </div>
       <div class="govuk-summary-card__content">

@@ -18,6 +18,14 @@
 
 module.exports = [
   {
+    label: 'Version 9',
+    source: 'Prototype',
+    href: '/v9/software-providers',
+    linkNote: 'Select a client name.',
+    difference: 'A copy of version 7 with the developers’ URL pattern: /software-providers/{clientId}, with actions as subpaths such as /delete. No change to the screens.',
+    rationaleHref: '/versions/v9'
+  },
+  {
     id: 'home',
     name: 'Home',
     summary: 'The landing page after the start of the service.',

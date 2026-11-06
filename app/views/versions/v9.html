@@ -1,0 +1,80 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 9" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 9
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 6 November 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 9</span>',
+        href: "/v9/start",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A copy of version 7, not version 8. Changes are recorded here as they are made." },
+          { text: "Version 8 was a concept for a technical discussion. Version 9 starts from the version 7 journeys for the next batch of tickets." },
+          { html: '<a class="govuk-link" href="/v9/software-providers">/v9/software-providers</a>' }
+        ],
+        [
+          { text: "URLs" },
+          { text: "Pages for a software provider now follow the pattern from the developers: /software-providers/{clientId}, with any action as a subpath, for example /software-providers/{clientId}/delete. The software provider page is at /software-providers/{clientId}. The other actions are /edit, /replace, /remove, /add-secret, /rotate and /created. “Create new credentials” is at /software-providers/create. The old /client-credentials/ and /software-provider-detail URLs are not used. The client ID is the identifier in the URL (in version 7 it was a separate id such as client-1), so the example clients’ URLs now use their client ID. The demo error pages are at /software-providers/example/created-panel and /software-providers/example/created-warning." },
+          { text: "To match the URL pattern the developers will build, so the prototype and the service use the same addresses." },
+          { html: '<a class="govuk-link" href="/v9/software-providers">/v9/software-providers</a> (select a client name)' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">This version is not tested with users. Other design decisions are the same as in
+      <a class="govuk-link" href="/versions/v7#design-rationale">version 7</a>, except for the changes recorded in the table above.</p>
+
+    <p class="govuk-body">This version has its own session data. Credentials created in this version are not
+      shown in version 7, and the other way round.</p>
+
+  </div>
+</div>
+{% endblock %}
