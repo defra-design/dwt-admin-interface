@@ -65,6 +65,13 @@ module.exports = [
     summary: 'The page you reach from “Software providers” in the navigation.',
     variants: [
       {
+        label: 'DWTSPI-512 design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-512/design',
+        difference: 'The version 8 table with a 67-character client name in Production. The Client name column is half the table width on tablet and wider screens, and the client name and client ID wrap instead of making the page scroll sideways.',
+        rationaleHref: '/jira-tickets/dwtspi-512'
+      },
+      {
         label: 'DWTSPI-469 deleted design',
         source: 'Jira design',
         href: '/jira-tickets/dwtspi-469/design-deleted',

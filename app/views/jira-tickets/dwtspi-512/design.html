@@ -1,0 +1,56 @@
+{#
+  Design reference for DWTSPI-512: the Software providers page with a long client name.
+  A copy of v8/software-providers/index.html with fixed, synthetic rows. The Production row
+  has a client name of 67 characters, the longest in use. The Client name column is half the
+  table width, and the client name and client ID can wrap (app-break-word, as for the
+  email addresses on the software provider page). No wbr elements after the underscores:
+  in Chrome they add a space to the link's accessible name. Links go to #.
+#}
+{% extends "layouts/jira-dwtspi-512.html" %}
+
+{% set pageName = "Software providers" %}
+{% set activeSection = "providers" %}
+
+{% set credentials = [
+  { clientName: "Greenlane_Waste_Management_Digital_Records_Platform_Connection_Live", clientId: "2jcg4fq0misvqui9mo6eh18bsb", environment: "Production" },
+  { clientName: "Kerbside_Collect_Live", clientId: "7pt052mlt5arkvbq09c8dgpds5", environment: "Production" },
+  { clientName: "Kerbside_Collect_Test", clientId: "7b4ll1di9l73m4lpb9iu0b4k2i", environment: "Test" },
+  { clientName: "Skipflow_Test", clientId: "6qgjqg6661oeqq5cbatniq37c8", environment: "Test" },
+  { clientName: "Wastebase_Manager_Test", clientId: "5i4gmksh5eds98bpcs7467vv4l", environment: "Test" }
+] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    <p class="govuk-body govuk-!-margin-bottom-7">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+  </div>
+</div>
+
+{{ govukButton({
+  text: "Create new credentials",
+  href: "#",
+  classes: "govuk-button--secondary govuk-!-margin-bottom-7"
+}) }}
+
+{# MoJ sortable table, as in version 8. Rows are sorted by Client name, A to Z. #}
+<table class="govuk-table" data-module="moj-sortable-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">Client credentials</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header govuk-!-width-one-half" aria-sort="ascending">Client name</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Client ID</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Environment</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for credential in credentials %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell app-break-word"><a class="govuk-link" href="#">{{ credential.clientName }}</a></td>
+        <td class="govuk-table__cell app-break-word">{{ credential.clientId }}</td>
+        <td class="govuk-table__cell">{{ credential.environment }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
