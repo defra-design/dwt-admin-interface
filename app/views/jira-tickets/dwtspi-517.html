@@ -1,0 +1,193 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTSPI-517: Show which environment users are in, and link to the other one" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">DWTSPI-517</span>
+    <h1 class="govuk-heading-l">Show which environment users are in, and link to the other one</h1>
+
+    <p class="govuk-body"><strong>Clickable prototype:</strong> <a class="govuk-link" href="/v9/environment-header-heading/on">Version 9</a>. This link turns on the “Tag in the header, link under a ‘Current environment’ heading” idea and opens the Software provider list page. Select “Go to Production” to see the Production page.</p>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design reference page",
+        href: "/jira-tickets/dwtspi-517/design",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the Software provider detail design reference",
+        href: "/jira-tickets/dwtspi-517/design-detail",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to see which environment I am in, and to move to the other environment from the Software provider list page,<br><strong>so that</strong> I do not change or copy credentials in the wrong environment.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">The portal shows credentials for 2 environments: External test and Production. The pages look the same in both. Only the credentials differ, so nothing else on the page tells users which environment they are in.</p>
+    <p class="govuk-body">This story shows the environment in the header of the Software provider list page and the Software provider detail page, and in their page titles. It adds a way to move between the 2 environments on the Software provider list page. It includes a Production version of the Software provider list page.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "Tag" },
+          { text: "GOV.UK Design System" },
+          { html: 'In the header, with the modifier classes <code>govuk-tag--teal</code> (External test) and <code>govuk-tag--purple</code> (Production). Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/tag/">Tag</a>. No JavaScript.' }
+        ],
+        [
+          { text: "<code>app-defra-header__environment</code>" | safe },
+          { text: "Bespoke" },
+          { text: "Holds the tag in the header, next to the service name. The header has no GOV.UK component or slot for this. It also sets the tag text to 16px, because GOV.UK has no smaller tag, and removes the vertical margin on small screens (see the design criteria). GOV.UK Whitehall Publishing uses this pattern, with a tag in the header to show which environment the user is in." }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Colours</h2>
+    {{ govukTable({
+      caption: "Colours used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Name" },
+        { text: "Value" },
+        { text: "Source" },
+        { text: "Used for" }
+      ],
+      rows: [
+        [
+          { html: "<code>tag-teal-text</code>" },
+          { text: "#0b4144" },
+          { text: "GOV.UK (govuk-tag--teal)" },
+          { text: "Text of the External test tag" }
+        ],
+        [
+          { html: "<code>tag-teal-background</code>" },
+          { text: "#d0e6e7" },
+          { text: "GOV.UK (govuk-tag--teal)" },
+          { text: "Background of the External test tag" }
+        ],
+        [
+          { html: "<code>tag-purple-text</code>" },
+          { text: "#2a1950" },
+          { text: "GOV.UK (govuk-tag--purple)" },
+          { text: "Text of the Production tag" }
+        ],
+        [
+          { html: "<code>tag-purple-background</code>" },
+          { text: "#ddd6ec" },
+          { text: "GOV.UK (govuk-tag--purple)" },
+          { text: "Background of the Production tag" }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Design acceptance criteria</h2>
+
+    <h3 class="govuk-heading-s">Header, on the Software provider list page and the Software provider detail page</h3>
+    <ol class="govuk-list govuk-list--number">
+      <li>On tablet and wider screens (641px and wider), a tag shows in the header to the right of “DWT admin portal”, on the same line.</li>
+      <li>The tag is not a link and does not look like one.</li>
+      <li>The tag is vertically centred with “DWT admin portal”.</li>
+      <li>There is 24px between “DWT admin portal” and the tag. This is the header’s existing gap, not a spacing unit.</li>
+      <li>The tag text is 16px, with 2px of padding above and below and 6px to the left and right.</li>
+      <li>In the External test environment, the tag says “External test”. It has the modifier class <code>govuktag--teal</code>.</li>
+      <li>In the Production environment, the tag says “Production”. It has the the modifier class <code>govuktag--purple</code>..</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Header, below the tablet breakpoint (640px and narrower)</h3>
+    <ol class="govuk-list govuk-list--number" start="8">
+      <li>The logo, “DWT admin portal” and the tag are stacked, in that order, aligned to the left.</li>
+      <li>There is spacing unit 2 (10px) between “DWT admin portal” and the tag. This is the same on all screen sizes.</li>
+      <li>There is 12px between the tag and the navigation. This is the header’s own padding, the same space as below “DWT admin portal” when there is no tag. It is not a spacing unit.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Software provider list page</h3>
+    <ol class="govuk-list govuk-list--number" start="11">
+      <li>An H2 heading, “Current environment”, shows below the “Create new credentials” button and above the table.</li>
+      <li>Below the heading is one paragraph. In External test it says “You are in the External test environment.” followed by a link, “Go to Production”. In Production it says “You are in the Production environment.” followed by a link, “Go to External test”.</li>
+      <li>The link follows the sentence on the same line when there is room. The link text has no full stop.</li>
+      <li>There is spacing unit 8 (50px) between the “Create new credentials” button and the heading.</li>
+      <li>There is spacing unit 3 (15px) between the heading and the paragraph.</li>
+      <li>There is spacing unit 8 (50px) between the paragraph and the table.</li>
+      <li>On small screens, the same spacing units are used. Spacing unit 8 is 30px and spacing unit 3 is 15px.</li>
+      <li>There is no tag or link between the page heading and the introduction.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Software provider list page, Production</h3>
+    <ol class="govuk-list govuk-list--number" start="19">
+      <li>The page has the same layout as the External test page. The table shows only Production credentials, sorted by client name from A to Z. The Environment column says “Production” in every row.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Software provider detail page</h3>
+    <ol class="govuk-list govuk-list--number" start="20">
+      <li>The “External test” tag that sat under the H1 is removed.</li>
+      <li>There is spacing unit 8 (50px) between the H1 and the Client ID. On small screens this is 30px.</li>
+    </ol>
+
+    <ol class="govuk-list govuk-list--number" start="22">
+      <li>The pages match the design reference.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+    <ol class="govuk-list govuk-list--number">
+      <li>Given a user is on the Software provider list page or the Software provider detail page, then the header shows the environment they are in.</li>
+      <li>Given a user opens the Software provider list page in External test, then the table shows only External test credentials.</li>
+      <li>Given a user opens the Software provider list page in Production, then the table shows only Production credentials.</li>
+      <li>Given a user is on the External test Software provider list page, when they select “Go to Production”, then they go to the Production Software provider list page and the header tag says “Production”.</li>
+      <li>Given a user is on the Production Software provider list page, when they select “Go to External test”, then they go to the External test Software provider list page and the header tag says “External test”.</li>
+      <li>Given a user opens a software provider from the External test list, then the header tag says “External test” and the page has no environment tag in its content.</li>
+      <li>Given a user is on any page other than the Software provider list page, then the page has no link to the other environment.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">Meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The environment is shown in the tag text, “External test” or “Production”, not by colour alone (1.4.1).</li>
+      <li>The tag is inside the header landmark, after “DWT admin portal” in the reading order. It is plain text, not focusable and has no role or <code>aria-label</code> (1.3.1, 1.3.2, 2.4.3).</li>
+      <li>The page title is the page name, then the environment, then the service name. For example, “Software providers - External test - DWT admin portal”, or “Software providers - Production - DWT admin portal”. On the Software provider detail page, the page name is the client name. On an error page the title starts with “Error: ” (2.4.2).</li>
+      <li>“Current environment” is an H2. It comes after the H1 and before the table caption, which is also an H2. No heading level is skipped (1.3.1, 2.4.6).</li>
+      <li>The sentence and the link are in one paragraph. The link text, “Go to Production” or “Go to External test”, names where the link goes (2.4.4).</li>
+      <li>The link works with a keyboard. It has the GOV.UK focus style, with a <code>yellow</code> background and <code>black</code> text (2.1.1, 2.4.7).</li>
+      <li>At 320px wide and at 200% zoom, the page does not scroll sideways. The logo, service name and tag do not overlap or get cut off (1.4.4, 1.4.10).</li>
+      <li>The cells and the tag have no fixed height or width in pixels, so no text is clipped when the user increases text spacing (1.4.12).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE.</li>
+      <li>With only a keyboard, go through the page. The tag is skipped and the link shows the focus style.</li>
+      <li>Check the page with a screen reader, such as NVDA or VoiceOver. The page title includes the environment, the environment is read in the header, and the heading and sentence are read in order.</li>
+      <li>Check the page at 320px wide and at 200% zoom.</li>
+      <li>Check both environments.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Questions for refinement</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>What should the header tag and page title show on pages that may not belong to one environment, such as the start page and Waste organisations? Do these pages exist in both environments?</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>A link to the other environment on pages other than the Software provider list page. Currently, the user will only be able to change environment from the Software provider list page. That is because we have no concept of a software provider, and no way to link a set of test credentials to a set of production credentials even if they are for the same provider.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

@@ -13,7 +13,7 @@
 {# Page name, then the service name, with no "GOV.UK" because the service is not
    on GOV.UK. The home page title is just the service name. #}
 {% block pageTitle %}
-  {% if pageName and pageName != "DWT admin portal" %}{{ pageName }} - {% endif %}DWT admin portal
+  {% if pageName and pageName != "DWT admin portal" %}{{ pageName }} - {% endif %}{% if environmentHeader and activeSection === "providers" %}{{ "Production" if currentEnvironment === "production" else "External test" }} - {% endif %}DWT admin portal
 {% endblock %}
 
 {# Wider page container (1100px) for this version only. See .app-width-wide in application.scss. #}
@@ -50,9 +50,13 @@
         {% endif %}
       </div>
     </div>
-    <nav class="app-defra-service-nav app-defra-service-nav--v5" aria-label="Menu">
+    {# Mobile menu: the GOV.UK service navigation pattern. The button is hidden until
+       GOV.UK Frontend's script (data-module) shows it on small screens, so without
+       JavaScript the links are always shown. The styles are our own (app-defra-service-nav). #}
+    <nav class="app-defra-service-nav app-defra-service-nav--v5 app-defra-service-nav--menu" aria-label="Menu" data-module="govuk-service-navigation">
       <div class="govuk-width-container">
-        <ul class="app-defra-service-nav__list">
+        <button type="button" class="app-defra-service-nav__toggle govuk-js-service-navigation-toggle" aria-controls="v9-navigation" hidden aria-hidden="true">Menu</button>
+        <ul class="app-defra-service-nav__list" id="v9-navigation">
           <li class="app-defra-service-nav__item">
             <a class="app-defra-service-nav__link{% if activeSection === 'home' %} app-defra-service-nav__link--active{% endif %}" href="/{{ version }}/start"{% if activeSection === "home" %} aria-current="page"{% endif %}>DWT admin portal</a>
           </li>

@@ -249,6 +249,14 @@
   }
 }
 
+// On small screens the tag sits closer to the service name than the logo does,
+// and has the same space below it as the service name has above the navigation.
+@media (max-width: 40.0625em) {
+  .app-defra-header--v5 .app-defra-header__environment {
+    margin-top: -14px; // 24px gap less 14px = 10px
+  }
+}
+
 .app-defra-service-nav--v5 {
   background-color: #008531;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
@@ -291,6 +299,108 @@
     &:focus {
       background-color: #ffdd00;
       box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    }
+  }
+}
+
+// --- Mobile menu (v9) ---------------------------------------------------------
+// Follows the GOV.UK service navigation pattern, as adapted on the Defra digital
+// service manual: a "Menu" button that opens a stacked list with chevrons. The
+// open and close behaviour comes from GOV.UK Frontend's script. Only the small
+// screen layout is set here, so the desktop bar is unchanged.
+.app-defra-service-nav__toggle[hidden],
+.app-defra-service-nav__list[hidden] {
+  display: none;
+}
+
+.app-defra-service-nav__toggle {
+  display: block;
+  width: calc(100% + 30px); // full width of the bar, past the page container's 15px sides
+  margin: 0 -15px;
+  padding: 12px 15px;
+  border: 0;
+  border-radius: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 1.1875rem;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: left;
+  cursor: pointer;
+
+  // Small triangle: points up when the menu is open, down when it is closed.
+  &::after {
+    content: "";
+    display: inline-block;
+    margin-left: 10px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 6px solid currentColor;
+    vertical-align: middle;
+  }
+
+  &[aria-expanded="false"]::after {
+    border-bottom: 0;
+    border-top: 6px solid currentColor;
+  }
+
+  &:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    color: #0b0c0c;
+    background-color: #ffdd00;
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+  }
+}
+
+@media (max-width: 40.0625em) {
+  // Scoped to --menu so earlier versions that share --v5 keep their layout.
+  .app-defra-service-nav--v5.app-defra-service-nav--menu {
+    .app-defra-service-nav__list {
+      display: block;
+    }
+
+    .app-defra-service-nav__list[hidden] {
+      display: none;
+    }
+
+    .app-defra-service-nav__item {
+      display: block;
+    }
+
+    // Each link is a full-width row with a divider and a chevron.
+    .app-defra-service-nav__link {
+      position: relative;
+      display: block;
+      margin: 0 -15px;
+      padding: 12px 45px 12px 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      border-bottom: 0;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        width: 8px;
+        height: 8px;
+        border-top: 2px solid currentColor;
+        border-right: 2px solid currentColor;
+        transform: translateY(-50%) rotate(45deg);
+      }
+
+      &:hover {
+        box-shadow: none;
+      }
+    }
+
+    .app-defra-service-nav__item:first-child .app-defra-service-nav__link {
+      margin-left: -15px;
+    }
+
+    .app-defra-service-nav__link--active {
+      box-shadow: inset 4px 0 0 0 #ffffff;
     }
   }
 }

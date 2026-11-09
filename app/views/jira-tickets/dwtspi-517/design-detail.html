@@ -1,0 +1,61 @@
+{#
+  Design reference for DWTSPI-517: the Software provider detail page in External test,
+  with the environment tag in the header and no tag under the H1. A copy of
+  v9/client-credentials/software-provider-detail.html with a fixed, synthetic client.
+  Links go to #, except the back link.
+#}
+{% extends "layouts/jira-dwtspi-517.html" %}
+
+{% set pageName = "Kerbside_Collect_Test" %}
+{% set environment = "External test" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/jira-tickets/dwtspi-517/design" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Software provider</span>
+    <div class="app-heading-with-link govuk-!-margin-bottom-8">
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-0">Kerbside_Collect_Test</h1>
+      <a class="govuk-link govuk-body" href="#">Edit<span class="govuk-visually-hidden"> client name</span></a>
+    </div>
+
+    {{ govukSummaryList({
+      classes: "govuk-summary-list--no-border govuk-!-margin-bottom-8",
+      rows: [
+        { key: { text: "Client ID" }, value: { text: "7b4ll1di9l73m4lpb9iu0b4k2i" } }
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-4">Client secrets for external test environment</h2>
+
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-visually-hidden">Client secrets for external test environment</caption>
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Generated on</th>
+          <th scope="col" class="govuk-table__header">Client secret</th>
+          <th scope="col" class="govuk-table__header">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">14 September 2026</td>
+          <td class="govuk-table__cell">[Hidden]</td>
+          <td class="govuk-table__cell"><a class="govuk-link" href="#">Replace secret<span class="govuk-visually-hidden"> generated on 14 September 2026</span></a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    {{ govukButton({ text: "Add another secret", href: "#", classes: "govuk-button--secondary" }) }}
+
+    <p class="govuk-body govuk-!-margin-top-9">
+      <a class="govuk-link" href="#">Delete software provider</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

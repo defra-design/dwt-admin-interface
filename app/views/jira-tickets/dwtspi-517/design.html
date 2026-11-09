@@ -1,0 +1,55 @@
+{#
+  Design reference for DWTSPI-517: the Software providers page in the External test
+  environment, with the environment tag in the header and the link under a "Current
+  environment" heading. A copy of v9/software-providers/index.html with fixed,
+  synthetic rows. The Production version is design-production.html. Links go to #,
+  except "Go to Production".
+#}
+{% extends "layouts/jira-dwtspi-517.html" %}
+
+{% set pageName = "Software providers" %}
+{% set environment = "External test" %}
+
+{% set credentials = [
+  { clientName: "Kerbside_Collect_Test", clientId: "7b4ll1di9l73m4lpb9iu0b4k2i" },
+  { clientName: "Skipflow_Test", clientId: "6qgjqg6661oeqq5cbatniq37c8" },
+  { clientName: "Wastebase_Manager_Test", clientId: "5i4gmksh5eds98bpcs7467vv4l" }
+] %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    <p class="govuk-body govuk-!-margin-bottom-7">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+  </div>
+</div>
+
+{{ govukButton({
+  text: "Create new credentials",
+  href: "#",
+  classes: "govuk-button--secondary govuk-!-margin-bottom-8"
+}) }}
+
+<h2 class="govuk-heading-m govuk-!-margin-bottom-3">Current environment</h2>
+<p class="govuk-body govuk-!-margin-bottom-8">You are in the {{ environment }} environment. <a class="govuk-link" href="/jira-tickets/dwtspi-517/design-production">Go to Production</a></p>
+
+<table class="govuk-table" data-module="moj-sortable-table">
+  <caption class="govuk-table__caption govuk-table__caption--m">Client credentials</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header" aria-sort="ascending">Client name</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Client ID</th>
+      <th scope="col" class="govuk-table__header" aria-sort="none">Environment</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for credential in credentials %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell"><a class="govuk-link" href="#">{{ credential.clientName }}</a></td>
+        <td class="govuk-table__cell">{{ credential.clientId }}</td>
+        <td class="govuk-table__cell">{{ environment }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
