@@ -17,7 +17,7 @@
     </h1>
 
     <p class="govuk-body">
-      <span class="govuk-!-font-weight-bold">Date of last change:</span> 6 November 2026<br>
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 9 November 2026<br>
       <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
     </p>
 
@@ -57,6 +57,12 @@
           { text: "Pages for a software provider now follow the pattern from the developers: /software-providers/{clientId}, with any action as a subpath, for example /software-providers/{clientId}/delete. The software provider page is at /software-providers/{clientId}. The other actions are /edit, /replace, /remove, /add-secret, /rotate and /created. “Create new credentials” is at /software-providers/create. The old /client-credentials/ and /software-provider-detail URLs are not used. The client ID is the identifier in the URL (in version 7 it was a separate id such as client-1), so the example clients’ URLs now use their client ID. The demo error pages are at /software-providers/example/created-panel and /software-providers/example/created-warning." },
           { text: "To match the URL pattern the developers will build, so the prototype and the service use the same addresses." },
           { html: '<a class="govuk-link" href="/v9/software-providers">/v9/software-providers</a> (select a client name)' }
+        ],
+        [
+          { text: "Environment" },
+          { text: "A mock of the Production list, and three ideas for showing which environment you are in and linking to the other one. 1: a tag and link under the heading on the list (the default). 2: a banner on every page. 3: a tag and link in the header. 4: a tag in the header, with the link as a sentence above the Create button on the list. 5: a tag in the header, with a “Current environment” heading and the link sentence below the Create button. In ideas 1 and 3, blue is External test and purple is Production. In the banner, External test is orange and purple is Production, and the link says only “Go to Production” or “Go to External test”. The colours are not red, green, grey or yellow, because the other tag colours mean urgent, new, inactive or delayed. Switch ideas with the links below. Production detail and create pages are not built (placeholder)." },
+          { text: "External test and Production credentials look the same, so users need to see which environment they are in, and a way to move between them." },
+          { html: '<a class="govuk-link" href="/v9/environment-banner/off">Tag and link under the heading</a><br><a class="govuk-link" href="/v9/environment-banner/on">Banner on every page</a><br><a class="govuk-link" href="/v9/environment-header/on">Tag and link in the header</a><br><a class="govuk-link" href="/v9/environment-header-page-link/on">Tag in the header, link above the Create button</a><br><a class="govuk-link" href="/v9/environment-header-heading/on">Tag in the header, link under a “Current environment” heading</a><br><a class="govuk-link" href="/v9/software-providers/production">/v9/software-providers/production</a>' }
         ]
       ]
     }) }}

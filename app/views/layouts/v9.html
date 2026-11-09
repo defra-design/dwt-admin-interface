@@ -20,11 +20,16 @@
 {% set bodyClasses = "app-width-wide" %}
 
 {% block govukHeader %}
+  {# Used by both environment concepts below (banner and header). #}
+  {% set onProduction = currentEnvironment === "production" %}
+  {% set environmentName = "Production" if onProduction else "External test" %}
+  {% set otherEnvironmentName = "External test" if onProduction else "Production" %}
+  {% set otherEnvironmentHref = "/" + version + "/software-providers" + ("" if onProduction else "/production") %}
   {# A div, not a header: the kit already wraps this block in a header, and a
      second one would give the page two banner landmarks. #}
   <div class="app-defra-header app-defra-header--service app-defra-header--v5">
     <div class="govuk-width-container">
-      <div class="app-defra-header__inner">
+      <div class="app-defra-header__inner{% if environmentHeader %} app-defra-header__inner--environment{% endif %}">
         <a href="/" class="app-defra-header__link">
           {# Crest is decorative; the visible name is in the SVG. Hidden text
              is the accessible name of the link (Defra branding: ignore the
@@ -33,6 +38,16 @@
           <span class="govuk-visually-hidden">Department for Environment, Food and Rural Affairs</span>
         </a>
         <a href="/{{ version }}/start" class="app-defra-header__service-name">DWT admin portal</a>
+        {# Third concept: the environment sits in the header, next to the service name. #}
+        {% if environmentHeader %}
+          <div class="app-defra-header__environment">
+            {{ govukTag({ text: environmentName, classes: "govuk-tag--purple" if onProduction else "govuk-tag--teal" }) }}
+            {# The link only shows on the Software providers list, as in the banner. #}
+            {% if environmentHeaderLink and showEnvironmentLink %}
+              <a class="govuk-link" href="{{ otherEnvironmentHref }}">Go to {{ otherEnvironmentName }}</a>
+            {% endif %}
+          </div>
+        {% endif %}
       </div>
     </div>
     <nav class="app-defra-service-nav app-defra-service-nav--v5" aria-label="Menu">
@@ -51,6 +66,21 @@
       </div>
     </nav>
   </div>
+  {# Alternative to the tag on the list page: the environment banner shows on every
+     page. Turned on at /v9/environment-banner/on (off again at .../off). #}
+  {# The link in the banner only shows on the Software providers list (the list routes set showEnvironmentLink). #}
+  {% if environmentBanner %}
+    <div class="govuk-width-container">
+      {{ govukPhaseBanner({
+        tag: {
+          text: environmentName,
+          classes: "govuk-tag--purple" if onProduction else "govuk-tag--orange"
+        },
+        html: "You are viewing " + environmentName + " credentials."
+          + (' <a class="govuk-link" href="' + otherEnvironmentHref + '">Go to ' + otherEnvironmentName + "</a>" if showEnvironmentLink else "")
+      }) }}
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block govukFooter %}

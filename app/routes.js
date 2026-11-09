@@ -3377,12 +3377,46 @@ function registerV9Routes () {
 
   router.use(base, (req, res, next) => {
     res.locals.version = 'v9'
+    // Environment banner concept: off unless switched on. The list pages set the
+    // environment; every other page keeps showing the last one chosen.
+    // A second concept puts the environment in the header. Only one is on at a time.
+    res.locals.environmentBanner = req.session.data.environmentConceptV9 === 'banner'
+    // 'header-page-link' is the header idea with no link in the header: the link is a
+    // paragraph above the Create button on the list instead.
+    const concept = req.session.data.environmentConceptV9
+    // 'header-heading' is the same, with a "Current environment" heading below the Create button.
+    res.locals.environmentHeader = ['header', 'header-page-link', 'header-heading'].includes(concept)
+    res.locals.environmentHeaderLink = concept === 'header'
+    res.locals.environmentPageLink = concept === 'header-page-link'
+    res.locals.environmentHeadingLink = concept === 'header-heading'
+    // Software provider pages show the environment they belong to. Only the
+    // Production list is built for Production, so every other software provider
+    // page (detail, create, replace and so on) is External test.
+    if (req.path === '/software-providers/production' || req.path.startsWith('/software-providers/production/')) {
+      req.session.data.environmentV9 = 'production'
+    } else if (req.path.startsWith('/software-providers')) {
+      req.session.data.environmentV9 = 'test'
+    }
+    res.locals.currentEnvironment = req.session.data.environmentV9 || 'test'
     next()
+  })
+
+  function setEnvironment (req, res, key) {
+    req.session.data.environmentV9 = key
+    res.locals.currentEnvironment = key
+  }
+
+  // Demo switch for the banner concept. Goes back to the list to show the result.
+  router.get(`${base}/environment-:concept/:state`, (req, res) => {
+    const concept = req.params.concept
+    if (!['banner', 'header', 'header-page-link', 'header-heading'].includes(concept)) return res.redirect(`${base}/software-providers`)
+    req.session.data.environmentConceptV9 = req.params.state === 'on' ? concept : null
+    res.redirect(`${base}/software-providers`)
   })
 
   // Credentials created or changed in this session. See data/client-credentials.js.
   function credentialList (req) {
-    if (!Array.isArray(req.session.data.clientCredentialsV9)) {
+    if (!Array.isArray(req.session.data.clientCredentialsV9) ) {
       req.session.data.clientCredentialsV9 = []
     }
     return req.session.data.clientCredentialsV9
@@ -3537,7 +3571,45 @@ function registerV9Routes () {
     // The "deleted" message shows once, then is cleared.
     const deletedName = req.session.data.deletedClientNameV9
     delete req.session.data.deletedClientNameV9
-    res.render(view('software-providers/index'), { credentials, deletedName })
+    setEnvironment(req, res, 'test')
+    res.render(view('software-providers/index'), {
+      credentials,
+      deletedName,
+      environmentLabel: 'External test',
+      environmentTagClass: 'govuk-tag--blue',
+      showEnvironmentLink: true,
+      otherEnvironmentLabel: 'Production',
+      otherEnvironmentHref: `${base}/software-providers/production`
+    })
+  })
+
+  // Mock of the same page for the Production environment. Production detail and
+  // create pages are not designed, so those links go to the placeholder page.
+  // Must stay above the `:id` routes, or "production" would be read as an id.
+  router.get(`${base}/software-providers/production`, (req, res) => {
+    const credentials = ccV9.listCredentials(credentialList(req))
+      .filter((c) => c.environment === 'Production')
+      .sort((a, b) => a.clientName.localeCompare(b.clientName))
+    const notBuilt = `${base}/software-providers/production/not-built`
+    setEnvironment(req, res, 'production')
+    res.render(view('software-providers/index'), {
+      credentials,
+      environmentLabel: 'Production',
+      environmentTagClass: 'govuk-tag--purple',
+      showEnvironmentLink: true,
+      otherEnvironmentLabel: 'External test',
+      otherEnvironmentHref: `${base}/software-providers`,
+      createHref: notBuilt,
+      detailHref: notBuilt
+    })
+  })
+
+  router.get(`${base}/software-providers/production/not-built`, (req, res) => {
+    res.render(view('placeholder'), {
+      heading: 'Production credentials',
+      activeSection: 'providers',
+      backHref: `${base}/software-providers/production`
+    })
   })
 
   // Deleted software providers. The fixed example rows cannot be removed from

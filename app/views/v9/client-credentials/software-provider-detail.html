@@ -35,16 +35,19 @@
     {% endif %}
 
     <span class="govuk-caption-l">Software provider</span>
-    <div class="app-heading-with-link govuk-!-margin-bottom-4">
+    {# With the environment banner or header on, they already name the environment, so the tag is left out. #}
+    <div class="app-heading-with-link {{ 'govuk-!-margin-bottom-8' if (environmentBanner or environmentHeader) else 'govuk-!-margin-bottom-4' }}">
       <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ credential.clientName }}</h1>
       <a class="govuk-link govuk-body" href="/{{ version }}/software-providers/{{ credential.id }}/edit">Edit<span class="govuk-visually-hidden"> client name</span></a>
     </div>
 
     {# The tag is a status label, so it sits under the heading. Inside the H1 it
        sat low against the larger text. Default (blue) tag colour: the grey tag means "Inactive". #}
+    {% if not (environmentBanner or environmentHeader) %}
     <p class="govuk-body govuk-!-margin-bottom-8">
       {{ govukTag({ text: "External test" }) }}
     </p>
+    {% endif %}
 
     {{ govukSummaryList({
       classes: "govuk-summary-list--no-border govuk-!-margin-bottom-8",

@@ -220,6 +220,35 @@
   }
 }
 
+// Environment in the header (v9 concept): a tag and a link after the service name.
+// No GOV.UK class puts content in the header grid, so this adds a third column.
+.app-defra-header--v5 .app-defra-header__inner--environment {
+  grid-template-columns: auto auto 1fr;
+}
+
+.app-defra-header__environment {
+  grid-column: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 10px; // smaller than the 24px between the service name and the tag
+
+  // GOV.UK has no small tag, and the header tag should be quieter than the service name.
+  .govuk-tag {
+    font-size: 1rem; // 16px
+    line-height: 1.2;
+    padding: 2px 6px;
+  }
+
+  // Link is the same size as the tag text, with no margin, so it lines up with
+  // the tag and service name.
+  .govuk-link {
+    font-size: 1rem; // 16px
+    line-height: 1.2;
+    margin: 0;
+  }
+}
+
 .app-defra-service-nav--v5 {
   background-color: #008531;
   border-top: 1px solid rgba(255, 255, 255, 0.3);

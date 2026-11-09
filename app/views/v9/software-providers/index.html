@@ -27,16 +27,39 @@
 {% endif %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
+    {# Same page in both environments: only the credentials differ. The tag says
+       which environment this is, and the link goes to the other one. With the
+       environment banner on (see layouts/v9.html), the banner does this instead. #}
+    {% if environmentBanner or environmentHeader %}
     <h1 class="govuk-heading-l">Software providers</h1>
-    <p class="govuk-body govuk-!-margin-bottom-7">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
+    {% else %}
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-3">Software providers</h1>
+    <p class="govuk-body govuk-!-margin-bottom-6">
+      {{ govukTag({ text: environmentLabel, classes: environmentTagClass }) }}
+      <a class="govuk-link govuk-!-margin-left-2" href="{{ otherEnvironmentHref }}">Go to {{ otherEnvironmentLabel }} credentials</a>
+    </p>
+    {% endif %}
+    {# With the link paragraph below (fourth idea), the gap is the standard paragraph gap. #}
+    <p class="govuk-body {{ 'govuk-!-margin-bottom-4' if environmentPageLink else 'govuk-!-margin-bottom-7' }}">Manage the client credentials that software providers use to connect to the Digital Waste Tracking service.</p>
   </div>
 </div>
 
+{# Fourth idea: header with no link. The link to the other environment sits here instead. #}
+{% if environmentPageLink %}
+<p class="govuk-body govuk-!-margin-bottom-6">You are in the {{ environmentLabel }} environment. <a class="govuk-link" href="{{ otherEnvironmentHref }}">Go to {{ otherEnvironmentLabel }}</a></p>
+{% endif %}
+
 {{ govukButton({
   text: "Create new credentials",
-  href: "/" + version + "/software-providers/create",
-  classes: "govuk-button--secondary govuk-!-margin-bottom-7"
+  href: createHref | default("/" + version + "/software-providers/create"),
+  classes: "govuk-button--secondary govuk-!-margin-bottom-8"
 }) }}
+
+{# Fifth idea: header with no link, and a "Current environment" heading below the button. #}
+{% if environmentHeadingLink %}
+<h2 class="govuk-heading-m govuk-!-margin-bottom-3">Current environment</h2>
+<p class="govuk-body govuk-!-margin-bottom-8">You are in the {{ environmentLabel }} environment. <a class="govuk-link" href="{{ otherEnvironmentHref }}">Go to {{ otherEnvironmentLabel }}</a></p>
+{% endif %}
 
 {# MoJ sortable table: the MoJ script turns each header with aria-sort into a sort button.
    The rows arrive sorted by Client name, A to Z, so that header starts as ascending. #}
@@ -52,7 +75,7 @@
   <tbody class="govuk-table__body">
     {% for credential in credentials %}
       <tr class="govuk-table__row">
-        <td class="govuk-table__cell"><a class="govuk-link" href="/{{ version }}/software-providers/{{ credential.id }}">{{ credential.clientName }}</a></td>
+        <td class="govuk-table__cell"><a class="govuk-link" href="{{ detailHref | default('/' + version + '/software-providers/' + credential.id) }}">{{ credential.clientName }}</a></td>
         <td class="govuk-table__cell">{{ credential.clientId }}</td>
         <td class="govuk-table__cell">{{ credential.environment }}</td>
       </tr>
