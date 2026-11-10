@@ -13,7 +13,7 @@
     <span class="govuk-caption-l">DWTSPI-517</span>
     <h1 class="govuk-heading-l">Show which environment users are in, and link to the other one</h1>
 
-    <p class="govuk-body"><strong>Clickable prototype:</strong> <a class="govuk-link" href="/v9/environment-header-heading/on">Version 9</a>. This link turns on the “Tag in the header, link under a ‘Current environment’ heading” idea and opens the Software provider list page. Select “Go to Production” to see the Production page.</p>
+    <p class="govuk-body"><strong>Clickable prototype:</strong> <a class="govuk-link" href="/v9/environment-header-heading/on">Version 9</a>. This link turns on the “Tag in the header, link under a ‘Change environment’ heading” idea and opens the Software provider list page. Select “Go to Production” to see the Production page.</p>
 
     <div class="govuk-button-group">
       {{ govukButton({
@@ -120,7 +120,7 @@
 
     <h3 class="govuk-heading-s">Software provider list page</h3>
     <ol class="govuk-list govuk-list--number" start="11">
-      <li>An H2 heading, “Current environment”, shows below the “Create new credentials” button and above the table.</li>
+      <li>An H2 heading, “Change environment”, shows below the “Create new credentials” button and above the table.</li>
       <li>Below the heading is one paragraph. In External test it says “You are in the External test environment.” followed by a link, “Go to Production”. In Production it says “You are in the Production environment.” followed by a link, “Go to External test”.</li>
       <li>The link follows the sentence on the same line when there is room. The link text has no full stop.</li>
       <li>There is spacing unit 8 (50px) between the “Create new credentials” button and the heading.</li>
@@ -162,7 +162,7 @@
       <li>The environment is shown in the tag text, “External test” or “Production”, not by colour alone (1.4.1).</li>
       <li>The tag is inside the header landmark, after “DWT admin portal” in the reading order. It is plain text, not focusable and has no role or <code>aria-label</code> (1.3.1, 1.3.2, 2.4.3).</li>
       <li>The page title is the page name, then the environment, then the service name. For example, “Software providers - External test - DWT admin portal”, or “Software providers - Production - DWT admin portal”. On the Software provider detail page, the page name is the client name. On an error page the title starts with “Error: ” (2.4.2).</li>
-      <li>“Current environment” is an H2. It comes after the H1 and before the table caption, which is also an H2. No heading level is skipped (1.3.1, 2.4.6).</li>
+      <li>“Change environment” is an H2. It comes after the H1 and before the table caption, which is also an H2. No heading level is skipped (1.3.1, 2.4.6).</li>
       <li>The sentence and the link are in one paragraph. The link text, “Go to Production” or “Go to External test”, names where the link goes (2.4.4).</li>
       <li>The link works with a keyboard. It has the GOV.UK focus style, with a <code>yellow</code> background and <code>black</code> text (2.1.1, 2.4.7).</li>
       <li>At 320px wide and at 200% zoom, the page does not scroll sideways. The logo, service name and tag do not overlap or get cut off (1.4.4, 1.4.10).</li>

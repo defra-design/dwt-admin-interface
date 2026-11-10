@@ -3384,7 +3384,7 @@ function registerV9Routes () {
     // 'header-page-link' is the header idea with no link in the header: the link is a
     // paragraph above the Create button on the list instead.
     const concept = req.session.data.environmentConceptV9
-    // 'header-heading' is the same, with a "Current environment" heading below the Create button.
+    // 'header-heading' is the same, with a "Change environment" heading below the Create button.
     res.locals.environmentHeader = ['header', 'header-page-link', 'header-heading'].includes(concept)
     res.locals.environmentHeaderLink = concept === 'header'
     res.locals.environmentPageLink = concept === 'header-page-link'
