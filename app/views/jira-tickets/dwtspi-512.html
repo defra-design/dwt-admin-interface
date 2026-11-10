@@ -27,8 +27,8 @@
     <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to read a whole client name and client ID in the Software providers table without scrolling sideways,<br><strong>so that</strong> I can tell clients apart and open the right one.</p>
 
     <h2 class="govuk-heading-m">Context</h2>
-    <p class="govuk-body">A client name can be up to 2,048 characters, and it has no spaces, so it cannot wrap. The longest client name in Production is 67 characters. It makes the table wider than the page, and the whole page scrolls sideways. The scrollbar is at the bottom of the very long table and can easily be missed altogether.</p>
-    <p class="govuk-body">The limit of 2,048 characters is not changing. The table needs to wrap the client name and the client ID instead.</p>
+    <p class="govuk-body">A client name can be up to 128 characters, and it has no spaces, so it cannot wrap. The longest client name in Production is 67 characters. It makes the table wider than the page, and the whole page scrolls sideways. The scrollbar is at the bottom of the very long table and can easily be missed altogether.</p>
+    <p class="govuk-body">The limit of 128 characters is not changing. The table needs to wrap the client name and the client ID instead.</p>
     <p class="govuk-body">This improves the existing solution but is not ideal. To improve usability and accessibility, we would need to introduce fields that follow standard conventions for text input, e.g. for Software provider name. That is out of scope for this ticket.</p>
 
     <h2 class="govuk-heading-m">Components and patterns</h2>
@@ -74,7 +74,7 @@
 
     <h2 class="govuk-heading-m">Acceptance criteria</h2>
     <ol class="govuk-list govuk-list--number">
-      <li>Given a client name of any length up to 2,048 characters, when the table is shown, then the whole name is shown.</li>
+      <li>Given a client name of any length up to 128 characters, when the table is shown, then the whole name is shown.</li>
       <li>Given the table has a long client name, when the user views the page at any width from 320px, then the page does not scroll sideways.</li>
       <li>Given a client name has wrapped onto more than one line, when the user selects it, then they go to that client’s software provider page.</li>
       <li>Given the table has a long client name, when the user sorts by a column, then the rows sort as before.</li>
@@ -98,12 +98,12 @@
       <li>With only a keyboard, tab to the long client name and check that the focus style shows on every line.</li>
       <li>Check the long client name with a screen reader, such as NVDA or VoiceOver. It is read as one link with the whole name.</li>
       <li>Check the page at 320px wide and at 200% zoom. The page does not scroll sideways.</li>
-      <li>Check a 67-character name and a 2,048-character name.</li>
+      <li>Check a 67-character name and a 128-character name.</li>
     </ul>
 
     <h2 class="govuk-heading-m">Out of scope</h2>
     <ul class="govuk-list govuk-list--bullet">
-      <li>Changing the limit of 2,048 characters, or the characters allowed in a client name.</li>
+      <li>Changing the limit of 128 characters, or the characters allowed in a client name.</li>
       <li>Cutting a long client name short, with a “Show more” control or a tooltip.</li>
       <li>Wrapping the client name on other pages, such as the software provider page.</li>
       <li>Showing the table in another way on small screens, such as stacked rows.</li>
