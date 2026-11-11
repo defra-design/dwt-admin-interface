@@ -1,0 +1,14 @@
+{# A message shown once after an action, for example "Case file created". Set by flash() in routes.js. #}
+{% if flash %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ mojAlert({
+      variant: "success",
+      title: flash.title,
+      showTitleAsHeading: true,
+      text: flash.text,
+      classes: "govuk-!-margin-bottom-7"
+    }) }}
+  </div>
+</div>
+{% endif %}

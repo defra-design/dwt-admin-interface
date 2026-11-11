@@ -257,6 +257,34 @@
   }
 }
 
+// Signed-in user in the header (v10): the name, role and a "Sign out" link, at the
+// right of the header on large screens and under the service name on small ones.
+// It uses the third column added for the v9 environment tag. No GOV.UK or Defra
+// class puts account links in this header.
+.app-defra-header__account {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 15px;
+  font-size: 1rem; // 16px, quieter than the service name
+  line-height: 1.25;
+
+  .govuk-link {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+}
+
+// Case file identity bar (v10): the MoJ identity bar adds its own page gutters,
+// because MoJ services put it outside the page container. Here it sits inside
+// the container, so the gutters are removed to line it up with the page.
+.app-identity-bar .moj-identity-bar__container {
+  max-width: none;
+  margin: 0;
+}
+
 .app-defra-service-nav--v5 {
   background-color: #008531;
   border-top: 1px solid rgba(255, 255, 255, 0.3);

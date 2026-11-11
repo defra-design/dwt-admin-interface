@@ -1,0 +1,75 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 10" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 10
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 11 November 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <p class="govuk-body">A future-state concept, not a design for the next tickets. Ticket work continues in <a class="govuk-link" href="/versions/v9">version 9</a>.</p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 10</span>',
+        href: "/v10/sign-in",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A copy of version 9, rebuilt around a case file for each software provider: organisation details, contacts, software packages, credentials and history. The version 9 client credentials pages and environment ideas are not copied." },
+          { text: "To show a future state that supports the tasks in the October 2026 task flows (allocation is out of scope). Today the information is held in a spreadsheet, emails and Jira tickets." },
+          { html: '<a class="govuk-link" href="/v10/software-providers">/v10/software-providers</a>' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">This version is not tested with users.</p>
+
+    <p class="govuk-body">This version has its own session data. Changes made in this version are not
+      shown in any other version, and the other way round.</p>
+
+  </div>
+</div>
+{% endblock %}

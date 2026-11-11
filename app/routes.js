@@ -14,6 +14,7 @@ const ccV6 = require('./data/client-credentials-v6')
 const ccV7 = require('./data/client-credentials-v7')
 const ccV8 = require('./data/client-credentials-v8')
 const ccV9 = require('./data/client-credentials-v9')
+const cf = require('./data/case-files-v10')
 const { paginate } = require('./data/pagination')
 const {
   formatDateObj,
@@ -3914,6 +3915,322 @@ function registerV9Routes () {
 }
 
 registerV9Routes()
+
+// --- Version 10 ----------------------------------------------------------
+// A future-state concept, built around the October 2026 task flows: one case
+// file for each software provider. It has its own function, its own data file
+// (data/case-files-v10.js) and its own session data keys, so version 9 stays
+// frozen. Allocation is out of scope.
+function registerV10Routes () {
+  const base = '/v10'
+  const view = (page) => `v10/${page}`
+
+  // Data in session, with its own keys for this version — no backend. Each
+  // session starts with a copy of the example case files.
+  function caseFiles (req) {
+    if (!Array.isArray(req.session.data.caseFilesV10)) {
+      req.session.data.caseFilesV10 = cf.exampleCaseFiles()
+    }
+    return req.session.data.caseFilesV10
+  }
+
+  // Mock sign-in with two roles (see USERS in the data file). Anyone who opens
+  // a page without signing in is the case worker, so links from the prototype
+  // index still work.
+  function currentUser (req) {
+    return cf.USERS[req.session.data.userV10] || cf.USERS.caseworker
+  }
+
+  // Who did an action, for the history.
+  const by = (req) => ({ by: currentUser(req).name })
+
+  // A message shown once, on the next page the user sees. For example "Case file created".
+  function flash (req, title, text) {
+    req.session.data.flashV10 = { title, text }
+  }
+
+  // The pages an auditor can open under Software providers: the list, and a
+  // case file's Overview, Contacts, History and software package pages. Every
+  // other page there changes something, so only a case worker can use it.
+  const VIEW_ONLY = /^\/software-providers(\/(?!create$)[^/]+(\/(contacts|history|packages\/[^/]+))?)?$/
+
+  router.use(base, (req, res, next) => {
+    const user = currentUser(req)
+    const path = req.path.replace(/\/$/, '')
+    res.locals.version = 'v10'
+    res.locals.user = user
+    res.locals.signedIn = path !== '/sign-in'
+    // Pages hide their action links and buttons when this is false.
+    res.locals.canEdit = user.key === 'caseworker'
+    if (req.method === 'GET') {
+      res.locals.flash = req.session.data.flashV10
+      delete req.session.data.flashV10
+    }
+    const blocked = user.key === 'auditor'
+      ? (path.startsWith('/software-providers') && !VIEW_ONLY.test(path)) || path.startsWith('/contact-providers')
+      : path.startsWith('/audit')
+    if (blocked) {
+      return res.status(403).render(view('no-permission'), {
+        activeSection: path.startsWith('/audit') ? 'audit' : (path.startsWith('/contact-providers') ? 'contact' : 'providers')
+      })
+    }
+    next()
+  })
+
+  // --- Sign in and home ------------------------------------------------------
+
+  router.get(`${base}/sign-in`, (req, res) => {
+    res.render(view('sign-in'), { errors: {}, errorList: [] })
+  })
+
+  router.post(`${base}/sign-in`, (req, res) => {
+    if (!cf.USERS[req.body.signInAs]) {
+      const text = 'Select who you want to sign in as'
+      return res.render(view('sign-in'), {
+        errors: { signInAs: text },
+        errorList: [{ text, href: '#signInAs' }]
+      })
+    }
+    req.session.data.userV10 = req.body.signInAs
+    res.redirect(`${base}/start`)
+  })
+
+  router.get(`${base}/sign-out`, (req, res) => {
+    delete req.session.data.userV10
+    res.redirect(`${base}/sign-in`)
+  })
+
+  // The home page has a search and a link to each status, so common lists are
+  // one click away and do not need the filter.
+  router.get(`${base}/start`, (req, res) => {
+    res.render(view('start'), { statusCounts: cf.statusCounts(caseFiles(req)) })
+  })
+
+  // --- Reporting (copied from version 9, unchanged) -------------------------
+
+  // Waste organisations report. Rows carry the values the MoJ sortable table
+  // needs: dates and periods sort on a number, not on the text shown.
+  // The payment year ending is shown as "Sep 2025" (the cycle always ends in September).
+  function orgRows (orgs) {
+    const byId = new Map(orgs.map((o) => [o.id, o]))
+    return mapOrgRows(orgs).map((row) => {
+      const match = /(\d{2})$/.exec(row.paymentPeriod)
+      return Object.assign({}, row, {
+        registeredSort: byId.get(row.id).registeredDate.getTime(),
+        paymentPeriod: match ? `Sep 20${match[1]}` : '',
+        paymentPeriodSort: match ? Number(match[1]) : 0
+      })
+    })
+  }
+
+  // Checks one date (day, month, year) from the filter. Messages are the ones
+  // agreed in the Jira ticket. `parts` lists the inputs to highlight: only the
+  // missing or wrong ones, as the GOV.UK dates pattern asks.
+  // Returns { error, href, parts, date }.
+  function checkReportDate (query, key, label, today) {
+    const prefix = `period-${key}`
+    const part = (name) => (query[`${prefix}-${name}`] || '').trim()
+    const values = { day: part('day'), month: part('month'), year: part('year') }
+    const all = ['day', 'month', 'year']
+    const missing = all.filter((name) => !values[name])
+    const fail = (error, parts) => ({ error, parts, href: `#${prefix}-${parts[0]}` })
+    const name = `‘${label}’ date`
+
+    if (missing.length === 3) {
+      return fail(`Enter or select a ${name}`, all)
+    }
+    if (missing.length === 2) {
+      return fail(`${name} must include a day, month and year`, all)
+    }
+    if (missing.length === 1) {
+      return fail(`${name} must include a ${missing[0]}`, missing)
+    }
+    // Letters or other characters, or a year that is not 4 numbers (for example 26).
+    const wrong = all.filter((n) => !/^\d+$/.test(values[n]) || (n === 'year' && values[n].length !== 4))
+    if (wrong.length) {
+      return fail(`Enter the ${name} in the correct format`, wrong)
+    }
+    const checked = validateDateParts(values.day, values.month, values.year)
+    if (checked.error) {
+      return fail(`${name} must be a real date`, all)
+    }
+    if (checked.date > today) {
+      return fail(`${name} must be today or in the past`, all)
+    }
+    return { date: checked.date }
+  }
+
+  // The filter is shown first. Results only appear once both dates are valid.
+  // Nothing is filled in or swapped for the user.
+  function checkReportPeriod (query) {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const raw = (key) => ({
+      day: (query[`period-${key}-day`] || '').trim(),
+      month: (query[`period-${key}-month`] || '').trim(),
+      year: (query[`period-${key}-year`] || '').trim()
+    })
+    const period = {
+      values: { from: raw('from'), to: raw('to') },
+      errors: {},
+      errorParts: { from: [], to: [] },
+      errorList: []
+    }
+    const from = checkReportDate(query, 'from', 'From', today)
+    const to = checkReportDate(query, 'to', 'To', today)
+    // The 'To' date error names the 'From' date the user entered.
+    if (!to.error && from.date && from.date > to.date) {
+      Object.assign(to, {
+        error: `‘To’ date must be the same as or after ${formatDateObj(from.date)}`,
+        parts: ['day', 'month', 'year'],
+        href: '#period-to-day'
+      })
+    }
+    for (const [key, result] of [['from', from], ['to', to]]) {
+      if (result.error) {
+        period.errors[key] = result.error
+        period.errorParts[key] = result.parts
+        period.errorList.push({ text: result.error, href: result.href })
+      }
+    }
+    if (!period.errorList.length) {
+      period.from = from.date
+      period.to = to.date
+    }
+    return period
+  }
+
+  router.get(`${base}/regulators`, (req, res) => {
+    const submitted = [
+      'period-from-day', 'period-from-month', 'period-from-year',
+      'period-to-day', 'period-to-month', 'period-to-year'
+    ].some((key) => key in req.query)
+    const period = submitted ? checkReportPeriod(req.query) : emptyPeriod
+    // Every row is shown on one page, so sorting reorders all of them.
+    const searched = submitted && !period.errorList.length
+    const rows = searched ? orgRows(reg.listRegisteredInPeriod(period.from, period.to)) : []
+    res.render(view('regulators/index'), {
+      period,
+      rows,
+      count: rows.length,
+      // All registered organisations, shown beside the count for the period.
+      totalCount: reg.listAllOrganisations().length,
+      filtered: submitted,
+      searched,
+      periodLabel: searched ? periodLabel(period) : null
+    })
+  })
+
+  // Download CSV is not built yet — goes to the placeholder page.
+  router.get(`${base}/regulators/download`, (req, res) => {
+    res.render(view('placeholder'), {
+      heading: 'Download CSV',
+      activeSection: 'regulators',
+      backHref: `${base}/regulators`
+    })
+  })
+
+  // --- Software providers: find a case file -----------------------------------
+
+  // "Closed" is not a status of a software package, but it can be filtered on.
+  const FILTER_STATUSES = cf.STATUSES.concat({ key: 'closed', text: 'Closed' })
+
+  router.get(`${base}/software-providers`, (req, res) => {
+    const search = (req.query.search || '').trim()
+    const statuses = [].concat(req.query.status || [])
+      .filter((key) => FILTER_STATUSES.some((s) => s.key === key))
+    // The address of the list with these filters, for the links that remove one filter.
+    const listHref = (searchText, statusKeys) => {
+      const params = new URLSearchParams()
+      if (searchText) params.set('search', searchText)
+      statusKeys.forEach((key) => params.append('status', key))
+      const query = params.toString()
+      return `${base}/software-providers${query ? `?${query}` : ''}`
+    }
+    res.render(view('software-providers/index'), {
+      rows: cf.listRows(caseFiles(req), { search, statuses }),
+      search,
+      filtered: Boolean(search || statuses.length),
+      statusItems: FILTER_STATUSES.map((s) => ({ value: s.key, text: s.text, checked: statuses.includes(s.key) })),
+      selectedSearch: search ? [{ text: search, href: listHref('', statuses) }] : [],
+      selectedStatuses: statuses.map((key) => ({
+        text: FILTER_STATUSES.find((s) => s.key === key).text,
+        href: listHref(search, statuses.filter((other) => other !== key))
+      }))
+    })
+  })
+
+  // --- Software providers: view a case file -----------------------------------
+
+  // Finds the case file named in the URL and hands it to the page's route. If
+  // there is no such case file, the user goes back to the list.
+  const withProvider = (handler) => (req, res) => {
+    const provider = cf.findProvider(caseFiles(req), req.params.id)
+    if (!provider) return res.redirect(`${base}/software-providers`)
+    res.locals.provider = cf.toProviderView(provider)
+    // A closed case file cannot be changed.
+    res.locals.canEdit = res.locals.canEdit && !provider.closed
+    handler(req, res, provider)
+  }
+
+  // The same, for a page about one software package.
+  const withPackage = (handler) => withProvider((req, res, provider) => {
+    const pkg = cf.findPackage(provider, req.params.packageId)
+    if (!pkg) return res.redirect(`${base}/software-providers/${provider.id}`)
+    res.locals.pkg = cf.toPackageView(provider, pkg)
+    handler(req, res, provider, pkg)
+  })
+
+  // Must stay below any `/software-providers/create` routes, or "create" would be read as an id.
+  router.get(`${base}/software-providers/:id`, withProvider((req, res, provider) => {
+    res.render(view('software-providers/overview'), {
+      recentHistory: cf.toHistoryView(provider.history).slice(0, 3)
+    })
+  }))
+
+  router.get(`${base}/software-providers/:id/contacts`, withProvider((req, res) => {
+    res.render(view('software-providers/contacts'))
+  }))
+
+  // History can be narrowed to one type of action, one software package, or both.
+  router.get(`${base}/software-providers/:id/history`, withProvider((req, res, provider) => {
+    const all = cf.toHistoryView(provider.history)
+    const categories = [...new Set(all.map((entry) => entry.category))].sort()
+    const category = categories.includes(req.query.category) ? req.query.category : ''
+    const pkg = cf.findPackage(provider, req.query.package)
+    res.render(view('software-providers/history'), {
+      entries: all.filter((entry) =>
+        (!category || entry.category === category) && (!pkg || entry.packageId === pkg.id)),
+      total: all.length,
+      categoryItems: [{ value: '', text: 'All types of action' }]
+        .concat(categories.map((c) => ({ value: c, text: c })))
+        .map((item) => Object.assign(item, { selected: item.value === category })),
+      packageItems: [{ value: '', text: 'All software packages' }]
+        .concat(provider.packages.map((p) => ({ value: p.id, text: p.name })))
+        .map((item) => Object.assign(item, { selected: item.value === (pkg ? pkg.id : '') })),
+      filtered: Boolean(category || pkg)
+    })
+  }))
+
+  router.get(`${base}/software-providers/:id/packages/:packageId`, withPackage((req, res) => {
+    res.render(view('software-providers/package'))
+  }))
+
+  // @@V10-NEXT@@ (later stages are added above this line)
+
+  // --- Not built yet -----------------------------------------------------------
+
+  // Any other page in these sections shows the placeholder page, not a dead link.
+  router.get([`${base}/software-providers/*`, `${base}/contact-providers*`, `${base}/audit*`], (req, res) => {
+    const section = req.path.split('/')[1]
+    res.render(view('placeholder'), {
+      activeSection: section === 'audit' ? 'audit' : (section === 'contact-providers' ? 'contact' : 'providers'),
+      backHref: `${base}/software-providers`
+    })
+  })
+}
+
+registerV10Routes()
 
 // --- Design page ------------------------------------------------------------
 //

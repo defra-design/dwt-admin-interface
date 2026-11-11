@@ -1,0 +1,13 @@
+{#
+  The parts of a case file. MoJ sub navigation: each part is its own page, so
+  it works without JavaScript and each has its own address. The page sets
+  `caseFileSection` to "overview", "contacts" or "history".
+#}
+{{ mojSubNavigation({
+  label: "Case file",
+  items: [
+    { text: "Overview", href: "/" + version + "/software-providers/" + provider.id, active: caseFileSection === "overview" },
+    { text: "Contacts", href: "/" + version + "/software-providers/" + provider.id + "/contacts", active: caseFileSection === "contacts" },
+    { text: "History", href: "/" + version + "/software-providers/" + provider.id + "/history", active: caseFileSection === "history" }
+  ]
+}) }}

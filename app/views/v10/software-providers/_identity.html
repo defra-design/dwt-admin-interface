@@ -1,0 +1,13 @@
+{#
+  Names the case file on every page about it, so staff can see they are
+  working on the right record (some organisations have similar names).
+  MoJ identity bar. Included in beforeContent, below the back link. The
+  app-identity-bar class lines it up with the page (see application.scss).
+#}
+{% set identityTitle %}
+  <span class="govuk-visually-hidden">Case file for </span>
+  <span class="govuk-!-font-weight-bold">{{ provider.name }}</span>
+  <span class="govuk-!-margin-left-2">Reference: {{ provider.reference }}</span>
+  {% if provider.closed %}{{ govukTag({ text: "Closed", classes: "govuk-tag--grey govuk-!-margin-left-2" }) }}{% endif %}
+{% endset %}
+{{ mojIdentityBar({ classes: "app-identity-bar", title: { html: identityTitle } }) }}

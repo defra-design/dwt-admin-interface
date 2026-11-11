@@ -1,0 +1,57 @@
+{#
+  Mock sign-in. In the real service, staff would sign in with their Defra
+  account, so there is no password here. The question only exists in the
+  prototype, to switch between the two roles (see USERS in
+  data/case-files-v10.js). Opening any page without signing in uses the case
+  worker, so links from the prototype index still work.
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set pageName = ("Error: " if errorList.length else "") + "Sign in" %}
+{% set activeSection = "" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l">Sign in</h1>
+
+    <p class="govuk-body">You sign in to the DWT admin portal with your Defra account.</p>
+
+    {{ govukInsetText({
+      text: "This is a prototype, so there is no password. Choose a user to see what each role can do."
+    }) }}
+
+    <form method="post" action="/{{ version }}/sign-in" novalidate>
+
+      {{ govukRadios({
+        name: "signInAs",
+        idPrefix: "signInAs",
+        fieldset: { legend: { text: "Who do you want to sign in as?", classes: "govuk-fieldset__legend--m" } },
+        errorMessage: { text: errors.signInAs } if errors.signInAs else undefined,
+        items: [
+          {
+            value: "caseworker",
+            text: "Priya Shah, case worker",
+            hint: { text: "Finds, creates and changes case files. Cannot audit." }
+          },
+          {
+            value: "auditor",
+            text: "Tom Fielding, auditor",
+            hint: { text: "Views case files and audits the actions staff have taken. Cannot change a case file." }
+          }
+        ]
+      }) }}
+
+      {{ govukButton({ text: "Sign in" }) }}
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

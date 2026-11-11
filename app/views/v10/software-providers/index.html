@@ -1,0 +1,126 @@
+{#
+  Find a case file. One row for each software package, because the status
+  belongs to the package. A search and a status filter sit beside the table
+  (MoJ filter component, and the Home Office "Filter a data table" pattern:
+  search, filter and table work as one). The filter is a GET form, so it works
+  without JavaScript and a filtered list can be bookmarked or shared.
+  The reference, package and key contact are shown because some organisations
+  have similar names.
+  The MoJ filter layout (which hides the filter behind a button on small
+  screens) is not used, because it needs its own script. On small screens the
+  filter sits above the table.
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set pageName = "Software providers" %}
+{% set activeSection = "providers" %}
+
+{% block content %}
+{% include version + "/software-providers/_flash.html" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Software providers</h1>
+    <p class="govuk-body">Find the case file for a software provider that connects to the Digital Waste Tracking service.</p>
+    {% if canEdit %}
+      {{ govukButton({
+        text: "Create a case file",
+        href: "/" + version + "/software-providers/create",
+        classes: "govuk-button--secondary govuk-!-margin-bottom-8"
+      }) }}
+    {% endif %}
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-third">
+    <form method="get" action="/{{ version }}/software-providers" novalidate>
+      {% set filterOptions %}
+        {{ govukInput({
+          id: "search",
+          name: "search",
+          type: "search",
+          label: { text: "Search", classes: "govuk-label--m" },
+          hint: { text: "Organisation, reference, software package, client name, client ID or contact" },
+          value: search,
+          autocomplete: "off",
+          spellcheck: false
+        }) }}
+        {{ govukCheckboxes({
+          name: "status",
+          idPrefix: "status",
+          classes: "govuk-checkboxes--small",
+          fieldset: { legend: { text: "Status", classes: "govuk-fieldset__legend--m" } },
+          items: statusItems
+        }) }}
+      {% endset %}
+
+      {% set selectedCategories = [] %}
+      {% if selectedSearch.length %}
+        {% set selectedCategories = (selectedCategories.push({ heading: { text: "Search" }, items: selectedSearch }), selectedCategories) %}
+      {% endif %}
+      {% if selectedStatuses.length %}
+        {% set selectedCategories = (selectedCategories.push({ heading: { text: "Status" }, items: selectedStatuses }), selectedCategories) %}
+      {% endif %}
+
+      {{ mojFilter({
+        heading: { text: "Filter" },
+        selectedFilters: {
+          heading: { text: "Selected filters" },
+          clearLink: { text: "Clear filters", href: "/" + version + "/software-providers" },
+          categories: selectedCategories
+        } if filtered else undefined,
+        optionsHtml: filterOptions
+      }) }}
+    </form>
+  </div>
+
+  <div class="govuk-grid-column-two-thirds">
+    {% if rows.length %}
+      {# MoJ sortable table: the MoJ script turns each header with aria-sort into a sort
+         button. The rows arrive sorted by software provider, A to Z. data-sort-value gives
+         the script a value that sorts correctly where the text shown would not. #}
+      <table class="govuk-table" data-module="moj-sortable-table">
+        <caption class="govuk-table__caption govuk-table__caption--m">{{ rows.length }} software package{{ "s" if rows.length != 1 }}{{ " found" if filtered }}</caption>
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header" aria-sort="ascending">Software provider</th>
+            <th scope="col" class="govuk-table__header" aria-sort="none">Software package</th>
+            <th scope="col" class="govuk-table__header" aria-sort="none">Status</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric" aria-sort="none">Days in status</th>
+            <th scope="col" class="govuk-table__header" aria-sort="none">Key contact</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for row in rows %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell" data-sort-value="{{ row.providerName | lower }}">
+                <a class="govuk-link" href="/{{ version }}/software-providers/{{ row.providerId }}">{{ row.providerName }}</a>
+                {# The reference sits on a second line in smaller, secondary text. #}
+                <div class="govuk-hint govuk-!-font-size-16 govuk-!-margin-top-1 govuk-!-margin-bottom-0">{{ row.reference }}</div>
+              </td>
+              <td class="govuk-table__cell" data-sort-value="{{ row.packageName | default('', true) | lower }}">
+                {% if row.packageId %}
+                  <a class="govuk-link" href="/{{ version }}/software-providers/{{ row.providerId }}/packages/{{ row.packageId }}">{{ row.packageName }}</a>
+                {% else %}
+                  None yet
+                {% endif %}
+              </td>
+              <td class="govuk-table__cell" data-sort-value="{{ row.statusOrder }}">
+                {% if row.status %}{{ govukTag({ text: row.status.text, classes: row.status.tag }) }}{% endif %}
+              </td>
+              <td class="govuk-table__cell govuk-table__cell--numeric" data-sort-value="{{ row.days if row.days !== null else -1 }}">{{ row.days if row.days !== null }}</td>
+              <td class="govuk-table__cell">{{ row.keyContact }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <h2 class="govuk-heading-m">No software providers found</h2>
+      <p class="govuk-body">Check the spelling, or try a different search. You can search by organisation, reference, software package, client name, client ID or contact.</p>
+      <p class="govuk-body"><a class="govuk-link" href="/{{ version }}/software-providers">Clear filters</a></p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

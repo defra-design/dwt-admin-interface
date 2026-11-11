@@ -1,0 +1,20 @@
+{#
+  History entries as an MoJ timeline, newest first. Each entry says what was
+  done, who did it, when, what it was about and why.
+  The page sets `timelineEntries` and `timelineHeadingLevel`.
+#}
+{% set timelineItems = [] %}
+{% for entry in timelineEntries %}
+  {% set description %}
+    <p class="govuk-hint govuk-!-margin-bottom-2">{{ entry.context }}</p>
+    {% if entry.detail %}<p class="govuk-body govuk-!-margin-bottom-2">{{ entry.detail }}</p>{% endif %}
+    {% if entry.reason %}<p class="govuk-body govuk-!-margin-bottom-0"><span class="govuk-!-font-weight-bold">Reason:</span> {{ entry.reason }}</p>{% endif %}
+  {% endset %}
+  {% set timelineItems = (timelineItems.push({
+    label: { text: entry.title },
+    byline: { text: entry.by },
+    datetime: { timestamp: entry.at, type: "datetime" },
+    html: description
+  }), timelineItems) %}
+{% endfor %}
+{{ mojTimeline({ headingLevel: timelineHeadingLevel, items: timelineItems }) }}
