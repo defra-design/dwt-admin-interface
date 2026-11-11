@@ -1,0 +1,63 @@
+{#
+  Complete an audit (the task flow step "Record that the audit was done").
+  Only reached when every action has been reviewed. Notes are needed when an
+  action needed follow-up, to say what was done about it. A completed audit
+  cannot be changed.
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set pageName = ("Error: " if errorList.length else "") + "Complete the audit" %}
+{% set activeSection = "audit" %}
+{% set sampleHref = "/" + version + "/audit/" + audit.id %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: sampleHref }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l">Complete the audit</h1>
+
+    {{ govukSummaryList({
+      rows: [
+        { key: { text: "Audit started on" }, value: { text: audit.startedOn } },
+        { key: { text: "Actions reviewed" }, value: { text: audit.total | string } },
+        {
+          key: { text: "Need follow-up" },
+          value: { text: audit.followUps | string },
+          actions: { items: [{ href: sampleHref, text: "Change", visuallyHiddenText: "your review of the actions" }] }
+        }
+      ]
+    }) }}
+
+    <form method="post" action="{{ sampleHref }}/complete" novalidate>
+
+      {{ govukTextarea({
+        id: "notes",
+        name: "notes",
+        rows: 5,
+        label: { text: "Audit notes" if audit.followUps else "Audit notes (optional)", classes: "govuk-label--m" },
+        hint: { text: "Say what you did about the actions that need following up, for example who you contacted and what they said." if audit.followUps else "Anything you want to record about this audit." },
+        value: values.notes,
+        errorMessage: { text: errors.notes } if errors.notes else undefined
+      }) }}
+
+      {{ govukWarningText({ text: "You cannot change an audit after you complete it.", iconFallbackText: "Warning" }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Complete audit", preventDoubleClick: true }) }}
+        <a class="govuk-link" href="{{ sampleHref }}">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

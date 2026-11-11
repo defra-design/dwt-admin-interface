@@ -695,6 +695,27 @@ function findAudit (audits, id) {
   return audits.completed.find((audit) => audit.id === id) || null
 }
 
+// An audit as the pages show it. Each item carries the action it is about.
+function toAuditView (audit, actions) {
+  const byId = new Map(toHistoryView(actions).map((action) => [action.id, action]))
+  const items = audit.items
+    .filter((item) => byId.has(item.actionId))
+    .map((item) => Object.assign({}, item, { action: byId.get(item.actionId) }))
+  const reviewed = items.filter((item) => item.outcome).length
+  return {
+    id: audit.id,
+    by: audit.by,
+    startedOn: formatDateObj(new Date(audit.startedAt)),
+    completedOn: audit.completedAt ? formatDateObj(new Date(audit.completedAt)) : null,
+    notes: audit.notes || '',
+    items,
+    total: items.length,
+    reviewed,
+    allReviewed: reviewed === items.length,
+    followUps: items.filter((item) => item.outcome === 'follow-up').length
+  }
+}
+
 // When each action was audited, by action id.
 function auditedDates (audits) {
   const dates = {}
@@ -1215,6 +1236,8 @@ module.exports = {
   completeAudit,
   findAudit,
   auditedDates,
+  toAuditView,
+  formatDate: (iso) => formatDateObj(new Date(iso)),
   toContactView,
   toPackageView,
   toHistoryView,

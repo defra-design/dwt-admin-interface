@@ -1,0 +1,109 @@
+{#
+  Review one action in an audit: what was done, who did it, when and why,
+  with a link to the case file for the context. The auditor marks it "No
+  concerns" or "Needs follow-up" (the task flow step "Contact staff if
+  necessary"). Following up is done outside this service and recorded here:
+  nothing is sent. The follow-up box is always shown without JavaScript.
+  In a completed audit the page shows the decision and cannot be changed.
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set action = item.action %}
+{% set complete = (audit.completedOn !== null) %}
+{% set pageName = ("Error: " if errorList.length else "") + "Review action: " + action.title %}
+{% set activeSection = "audit" %}
+{% set sampleHref = "/" + version + "/audit/" + audit.id %}
+{% set caseFileHref = "/" + version + "/software-providers/" + action.providerId %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: sampleHref }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <span class="govuk-caption-l">Review action</span>
+    <h1 class="govuk-heading-l">{{ action.title }}</h1>
+
+    {% set providerHtml %}
+      <a class="govuk-link" href="{{ caseFileHref }}/history">{{ action.providerName }}<span class="govuk-visually-hidden"> case file history</span></a><br>{{ action.reference }}
+    {% endset %}
+    {% set rows = [
+      { key: { text: "Software provider" }, value: { html: providerHtml } }
+    ] %}
+    {% if action.packageName %}
+      {% set rows = (rows.push({ key: { text: "Software package" }, value: { text: action.packageName } }), rows) %}
+    {% endif %}
+    {% set rows = (rows.push(
+      { key: { text: "Type of action" }, value: { text: action.category } },
+      { key: { text: "Done by" }, value: { text: action.by } },
+      { key: { text: "Date" }, value: { text: action.dateTime } }
+    ), rows) %}
+    {% if action.detail %}
+      {% set rows = (rows.push({ key: { text: "Details" }, value: { text: action.detail } }), rows) %}
+    {% endif %}
+    {% set rows = (rows.push({ key: { text: "Reason given" }, value: { text: action.reason or "No reason recorded" } }), rows) %}
+    {{ govukSummaryList({ classes: "govuk-!-margin-bottom-8", rows: rows }) }}
+
+    {% if complete %}
+
+      <h2 class="govuk-heading-m">Audit decision</h2>
+      {% set decisionRows = [
+        { key: { text: "Decision" }, value: { text: "Needs follow-up" if item.outcome === "follow-up" else "No concerns" } }
+      ] %}
+      {% if item.note %}
+        {% set decisionRows = (decisionRows.push({ key: { text: "What needed following up" }, value: { text: item.note } }), decisionRows) %}
+      {% endif %}
+      {{ govukSummaryList({ rows: decisionRows }) }}
+
+    {% else %}
+
+      <form method="post" action="{{ sampleHref }}/actions/{{ item.actionId }}" novalidate>
+
+        {% set noteHtml %}
+          {{ govukTextarea({
+            id: "note",
+            name: "note",
+            rows: 4,
+            label: { text: "What needs following up?" },
+            hint: { text: "Contact " + action.by + " outside this service. Record what you need to ask them." },
+            value: values.note,
+            errorMessage: { text: errors.note } if errors.note else undefined
+          }) }}
+        {% endset %}
+
+        {{ govukRadios({
+          name: "outcome",
+          idPrefix: "outcome",
+          fieldset: { legend: { text: "Do you have any concerns about this action?", classes: "govuk-fieldset__legend--m" } },
+          hint: { text: "Check that the reason given is a business reason for the action." },
+          errorMessage: { text: errors.outcome } if errors.outcome else undefined,
+          items: [
+            { value: "ok", text: "No concerns", checked: values.outcome === "ok" },
+            {
+              value: "follow-up",
+              text: "Needs follow-up",
+              checked: values.outcome === "follow-up",
+              conditional: { html: noteHtml }
+            }
+          ]
+        }) }}
+
+        <div class="govuk-button-group">
+          {{ govukButton({ text: "Save and continue", preventDoubleClick: true }) }}
+          <a class="govuk-link" href="{{ sampleHref }}">Cancel</a>
+        </div>
+
+      </form>
+
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

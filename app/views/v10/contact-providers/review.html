@@ -1,0 +1,97 @@
+{#
+  Contact providers, step 2: check the contact list, download it, send the
+  message from the team mailbox, then record the contact (the task flow steps
+  "Download list of contact details", "Contact all providers with [status]"
+  and "Record reason for contact"). Recording it adds the message to the
+  history of every case file in the list.
+  TO CONFIRM: this assumes the message is sent from a team mailbox, not by
+  this service.
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set pageName = ("Error: " if errorList.length else "") + "Check the contact list" %}
+{% set activeSection = "contact" %}
+{% set contactHref = "/" + version + "/contact-providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: contactHref }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <span class="govuk-caption-l">Contact providers</span>
+    <h1 class="govuk-heading-l">Check the contact list</h1>
+
+    <p class="govuk-body">
+      {{ rows.length }} contact{{ "s" if rows.length != 1 }} at {{ providerCount }} software provider{{ "s" if providerCount != 1 }} with a software package that is {{ group }}{{ " (key contacts only)" if keyOnly }}.
+      <a class="govuk-link" href="{{ contactHref }}">Change<span class="govuk-visually-hidden"> who you want to contact</span></a>
+    </p>
+
+  </div>
+</div>
+
+<table class="govuk-table">
+  <caption class="govuk-table__caption govuk-visually-hidden">Contacts to send the message to</caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Software provider</th>
+      <th scope="col" class="govuk-table__header">Software package</th>
+      <th scope="col" class="govuk-table__header">Contact</th>
+      <th scope="col" class="govuk-table__header">Email address</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for row in rows %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">{{ row.providerName }}<div class="govuk-hint govuk-!-margin-bottom-0">{{ row.reference }}</div></td>
+        <td class="govuk-table__cell">{{ row.packages }}</td>
+        <td class="govuk-table__cell">{{ row.name }}{% if row.keyContact and not keyOnly %}<div class="govuk-hint govuk-!-margin-bottom-0">Key contact</div>{% endif %}</td>
+        <td class="govuk-table__cell app-break-word">{{ row.email }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <p class="govuk-body"><a class="govuk-link" href="{{ contactHref }}/contacts.csv" download>Download the contact list (CSV)</a></p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-8">Send your message</h2>
+    <p class="govuk-body">Send your message from the team mailbox. Put the email addresses in the ‘Bcc’ field, so that software providers cannot see each other’s addresses.</p>
+
+    {# Spacing unit 8 (50px) separates sending the message from recording it. #}
+    <h2 class="govuk-heading-m govuk-!-margin-top-8">Record the contact</h2>
+    <p class="govuk-body">When you have sent your message, record it. We will add it to the history of {{ "each of these case files" if providerCount != 1 else "this case file" }}.</p>
+
+    <form method="post" action="{{ contactHref }}/review" novalidate>
+
+      {% include version + "/software-providers/_reason.html" %}
+
+      {{ govukTextarea({
+        id: "summary",
+        name: "summary",
+        rows: 5,
+        label: { text: "Summary of the message", classes: "govuk-label--m" },
+        hint: { text: "Say what you told the software providers, and anything they need to do." },
+        value: values.summary,
+        errorMessage: { text: errors.summary } if errors.summary else undefined
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Record contact", preventDoubleClick: true }) }}
+        <a class="govuk-link" href="{{ contactHref }}">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

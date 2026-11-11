@@ -1,0 +1,72 @@
+{#
+  One audit: its sample of actions and what the auditor decided about each
+  (the task flow steps "Find random actions" and "Review reasons for action").
+  The GOV.UK task list shows what is left to review. Status wording follows
+  the task list guidance: a blue tag for not started, plain text when done.
+  "Needs follow-up" has a tag so it stands out. The hint is on two short
+  lines, so the status has room and its tag does not wrap.
+  A completed audit shows the same list, with its notes, and cannot be changed.
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set complete = (audit.completedOn !== null) %}
+{% set heading = ("Audit completed on " + audit.completedOn) if complete else ("Audit started on " + audit.startedOn) %}
+{% set pageName = heading %}
+{% set activeSection = "audit" %}
+{% set auditHref = "/" + version + "/audit" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to audit", href: auditHref }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+    {% if complete %}
+      {{ govukSummaryList({
+        rows: [
+          { key: { text: "Auditor" }, value: { text: audit.by } },
+          { key: { text: "Actions reviewed" }, value: { text: audit.total | string } },
+          { key: { text: "Needed follow-up" }, value: { text: audit.followUps | string } },
+          { key: { text: "Audit notes" }, value: { text: audit.notes or "None" } }
+        ]
+      }) }}
+    {% else %}
+      <p class="govuk-body">Review each action and the reason given for it. You have reviewed {{ audit.reviewed }} of {{ audit.total }} actions.</p>
+    {% endif %}
+
+    <h2 class="govuk-heading-m">Actions in this audit</h2>
+
+    {% set taskItems = [] %}
+    {% for item in audit.items %}
+      {% if item.outcome === "ok" %}
+        {% set status = { text: "No concerns" } %}
+      {% elif item.outcome === "follow-up" %}
+        {% set status = { tag: { text: "Needs follow-up", classes: "govuk-tag--orange" } } %}
+      {% else %}
+        {% set status = { tag: { text: "Not reviewed", classes: "govuk-tag--blue" } } %}
+      {% endif %}
+      {% set taskItems = (taskItems.push({
+        title: { text: item.action.title },
+        hint: { html: (item.action.providerName | escape) + "<br>By " + (item.action.by | escape) + " on " + item.action.dateTime },
+        href: auditHref + "/" + audit.id + "/actions/" + item.actionId,
+        status: status
+      }), taskItems) %}
+    {% endfor %}
+    {{ govukTaskList({ idPrefix: "action", items: taskItems }) }}
+
+    {% if not complete %}
+      {% if audit.allReviewed %}
+        {{ govukButton({ text: "Continue to complete the audit", href: auditHref + "/" + audit.id + "/complete" }) }}
+      {% else %}
+        <p class="govuk-body">You can complete the audit when you have reviewed every action.</p>
+      {% endif %}
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

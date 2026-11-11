@@ -3927,12 +3927,21 @@ function registerV10Routes () {
 
   // Data in session, with its own keys for this version — no backend. Each
   // session starts with a copy of the example case files.
+  // The audits refer to actions on the case files, so the three lists are
+  // always set up together.
   function caseFiles (req) {
-    if (!Array.isArray(req.session.data.caseFilesV10)) {
-      req.session.data.caseFilesV10 = cf.exampleCaseFiles()
+    const data = req.session.data
+    if (!Array.isArray(data.caseFilesV10) || !Array.isArray(data.systemActionsV10) || !data.auditsV10) {
+      data.caseFilesV10 = cf.exampleCaseFiles()
+      data.systemActionsV10 = cf.exampleSystemActions()
+      data.auditsV10 = cf.exampleAudits()
     }
-    return req.session.data.caseFilesV10
+    return data.caseFilesV10
   }
+  // Messages sent to a group of software providers (Contact providers).
+  const systemActions = (req) => caseFiles(req) && req.session.data.systemActionsV10
+  // The audit under way, if there is one, and the completed audits.
+  const audits = (req) => caseFiles(req) && req.session.data.auditsV10
 
   // Mock sign-in with two roles (see USERS in the data file). Anyone who opens
   // a page without signing in is the case worker, so links from the prototype
@@ -5115,7 +5124,244 @@ function registerV10Routes () {
     res.redirect(packageHref(to, pkg))
   }))
 
-  // @@V10-NEXT@@ (later stages are added above this line)
+  // --- Contact providers (case worker only) ---------------------------------------
+
+  // For an incident or a mailshot. Choose who to contact by the status of their
+  // software packages, check and download the list, send the message from the
+  // team mailbox, then record it. The message is recorded on every case file.
+  // This service does not send the message.
+  const CONTACT_STATUSES = cf.STATUSES.filter((status) => status.key !== 'revoked')
+  const CONTACT_WHO = ['key', 'all']
+
+  const bulkChoice = (req) => req.session.data.bulkContactV10 || null
+  const bulkRows = (req, choice) => cf.contactsForStatuses(caseFiles(req), choice.statuses, choice.who)
+
+  // "in test or in production", for the history.
+  function groupText (statuses) {
+    const names = CONTACT_STATUSES
+      .filter((status) => statuses.includes(status.key))
+      .map((status) => status.text.toLowerCase())
+    return names.length > 1 ? `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}` : names[0]
+  }
+
+  function renderContactProviders (req, res, options) {
+    const values = (options && options.values) || bulkChoice(req) || { statuses: [], who: '' }
+    form(res, 'contact-providers/index', Object.assign({
+      activeSection: 'contact',
+      statusItems: CONTACT_STATUSES.map((status) => ({
+        value: status.key,
+        text: status.text,
+        checked: values.statuses.includes(status.key)
+      })),
+      sent: cf.toHistoryView(systemActions(req))
+    }, options, { values }))
+  }
+
+  router.get(`${base}/contact-providers`, (req, res) => {
+    renderContactProviders(req, res)
+  })
+
+  router.post(`${base}/contact-providers`, (req, res) => {
+    const errors = {}
+    const values = {
+      statuses: [].concat(req.body.statuses || []).filter((key) => CONTACT_STATUSES.some((status) => status.key === key)),
+      who: answer(req, 'who')
+    }
+    if (!values.statuses.length) errors.statuses = 'Select at least one status'
+    if (!CONTACT_WHO.includes(values.who)) errors.who = 'Select who you want to contact'
+    if (!failed(errors) && !bulkRows(req, values).length) {
+      errors.statuses = 'No software provider has a software package with that status. Select another status'
+    }
+    if (failed(errors)) {
+      return renderContactProviders(req, res, {
+        values,
+        errors,
+        errorList: cf.errorList(errors, [['statuses', '#statuses'], ['who', '#who']])
+      })
+    }
+    req.session.data.bulkContactV10 = values
+    res.redirect(`${base}/contact-providers/review`)
+  })
+
+  function renderBulkReview (req, res, options) {
+    const choice = bulkChoice(req)
+    const rows = bulkRows(req, choice)
+    form(res, 'contact-providers/review', Object.assign({
+      activeSection: 'contact',
+      rows,
+      providerCount: new Set(rows.map((row) => row.providerId)).size,
+      group: groupText(choice.statuses),
+      keyOnly: choice.who === 'key',
+      reasons: cf.REASONS.bulkContact
+    }, options))
+  }
+
+  router.get(`${base}/contact-providers/review`, (req, res) => {
+    if (!bulkChoice(req)) return res.redirect(`${base}/contact-providers`)
+    renderBulkReview(req, res)
+  })
+
+  // The contact list as a CSV file, to use in the team mailbox.
+  router.get(`${base}/contact-providers/contacts.csv`, (req, res) => {
+    const choice = bulkChoice(req)
+    if (!choice) return res.redirect(`${base}/contact-providers`)
+    const cell = (value) => `"${String(value).replace(/"/g, '""')}"`
+    const lines = [['Software provider', 'Reference', 'Software packages', 'Contact name', 'Email address', 'Key contact']]
+      .concat(bulkRows(req, choice).map((row) =>
+        [row.providerName, row.reference, row.packages, row.name, row.email, row.keyContact ? 'Yes' : 'No']))
+      .map((line) => line.map(cell).join(','))
+    res.set('Content-Type', 'text/csv; charset=utf-8')
+    res.set('Content-Disposition', 'attachment; filename="software-provider-contacts.csv"')
+    res.send(lines.join('\r\n') + '\r\n')
+  })
+
+  router.post(`${base}/contact-providers/review`, (req, res) => {
+    const choice = bulkChoice(req)
+    if (!choice) return res.redirect(`${base}/contact-providers`)
+    const errors = {}
+    const reason = readReason(req, cf.REASONS.bulkContact, errors)
+    const summary = answer(req, 'summary')
+    if (!summary) errors.summary = 'Enter a summary of the message you sent'
+    if (failed(errors)) {
+      return renderBulkReview(req, res, {
+        values: Object.assign({ summary }, reason.values),
+        errors,
+        errorList: cf.errorList(errors, REASON_FIELDS.concat([['summary', '#summary']]))
+      })
+    }
+    const providerIds = [...new Set(bulkRows(req, choice).map((row) => row.providerId))]
+    cf.recordBulkContact(caseFiles(req), systemActions(req), providerIds, {
+      group: groupText(choice.statuses),
+      summary,
+      reason: reason.text
+    }, by(req))
+    delete req.session.data.bulkContactV10
+    flash(req, 'Contact recorded', `We have recorded the message on ${providerIds.length} case file${providerIds.length === 1 ? '' : 's'}.`)
+    res.redirect(`${base}/contact-providers`)
+  })
+
+  // --- Audit (auditor only) ------------------------------------------------------------
+
+  // An audit is a random sample of actions that no earlier audit has looked
+  // at. The auditor reviews each action and its reason, marks it "no concerns"
+  // or "needs follow-up", then completes the audit, which records that it was
+  // done. Following up with a member of staff is recorded, not sent.
+  const AUDIT_OUTCOMES = ['ok', 'follow-up']
+  const allActions = (req) => cf.allActions(caseFiles(req))
+
+  router.get(`${base}/audit`, (req, res) => {
+    const state = audits(req)
+    const actions = allActions(req)
+    const audited = cf.auditedDates(state)
+    res.render(view('audit/index'), {
+      activeSection: 'audit',
+      current: state.current ? cf.toAuditView(state.current, actions) : null,
+      completed: state.completed.map((audit) => cf.toAuditView(audit, actions)).reverse(),
+      actionCount: actions.length,
+      notAudited: actions.filter((action) => !audited[action.id]).length,
+      sampleSize: cf.AUDIT_SAMPLE_SIZE
+    })
+  })
+
+  router.post(`${base}/audit/start`, (req, res) => {
+    const state = audits(req)
+    if (!state.current) cf.startAudit(state, allActions(req), by(req))
+    res.redirect(`${base}/audit/${state.current.id}`)
+  })
+
+  // Every action in the system. Must stay above the `/audit/:auditId` routes.
+  router.get(`${base}/audit/actions`, (req, res) => {
+    const audited = cf.auditedDates(audits(req))
+    const all = cf.toHistoryView(allActions(req))
+    const people = [...new Set(all.map((action) => action.by))].sort()
+    const categories = [...new Set(all.map((action) => action.category))].sort()
+    const person = people.includes(req.query.by) ? req.query.by : ''
+    const category = categories.includes(req.query.category) ? req.query.category : ''
+    const select = (first, options, chosen) => [{ value: '', text: first }]
+      .concat(options.map((option) => ({ value: option, text: option })))
+      .map((item) => Object.assign(item, { selected: item.value === chosen }))
+    res.render(view('audit/actions'), {
+      activeSection: 'audit',
+      actions: all
+        .filter((action) => (!person || action.by === person) && (!category || action.category === category))
+        .map((action) => Object.assign(action, { auditedOn: audited[action.id] ? cf.formatDate(audited[action.id]) : null })),
+      total: all.length,
+      personItems: select('All staff', people, person),
+      categoryItems: select('All types of action', categories, category),
+      filtered: Boolean(person || category)
+    })
+  })
+
+  // Finds the audit named in the URL. If there is none, back to the Audit page.
+  const withAudit = (handler) => (req, res) => {
+    const state = audits(req)
+    const audit = cf.findAudit(state, req.params.auditId)
+    if (!audit) return res.redirect(`${base}/audit`)
+    res.locals.activeSection = 'audit'
+    res.locals.audit = cf.toAuditView(audit, allActions(req))
+    handler(req, res, audit, state)
+  }
+
+  // The same, for one action in the audit.
+  const withAuditItem = (handler) => withAudit((req, res, audit) => {
+    const item = res.locals.audit.items.find((i) => i.actionId === req.params.actionId)
+    if (!item) return res.redirect(`${base}/audit/${audit.id}`)
+    res.locals.item = item
+    handler(req, res, audit, audit.items.find((i) => i.actionId === item.actionId))
+  })
+
+  router.get(`${base}/audit/:auditId`, withAudit((req, res) => {
+    res.render(view('audit/sample'))
+  }))
+
+  router.get(`${base}/audit/:auditId/actions/:actionId`, withAuditItem((req, res, audit, item) => {
+    form(res, 'audit/review', { values: { outcome: item.outcome || '', note: item.note } })
+  }))
+
+  router.post(`${base}/audit/:auditId/actions/:actionId`, withAuditItem((req, res, audit, item) => {
+    // A completed audit cannot be changed.
+    if (audit.completedAt) return res.redirect(`${base}/audit/${audit.id}`)
+    const errors = {}
+    const values = { outcome: answer(req, 'outcome'), note: answer(req, 'note') }
+    if (!AUDIT_OUTCOMES.includes(values.outcome)) {
+      errors.outcome = 'Select if you have any concerns about this action'
+    } else if (values.outcome === 'follow-up' && !values.note) {
+      errors.note = 'Enter what needs following up'
+    }
+    if (failed(errors)) {
+      return form(res, 'audit/review', {
+        values,
+        errors,
+        errorList: cf.errorList(errors, [['outcome', '#outcome'], ['note', '#note']])
+      })
+    }
+    item.outcome = values.outcome
+    item.note = values.outcome === 'follow-up' ? values.note : ''
+    res.redirect(`${base}/audit/${audit.id}`)
+  }))
+
+  router.get(`${base}/audit/:auditId/complete`, withAudit((req, res, audit) => {
+    if (audit.completedAt || !res.locals.audit.allReviewed) return res.redirect(`${base}/audit/${audit.id}`)
+    form(res, 'audit/complete')
+  }))
+
+  router.post(`${base}/audit/:auditId/complete`, withAudit((req, res, audit, state) => {
+    if (audit.completedAt || !res.locals.audit.allReviewed) return res.redirect(`${base}/audit/${audit.id}`)
+    const errors = {}
+    const notes = answer(req, 'notes')
+    // With a follow-up, the audit has to say what was done about it.
+    if (res.locals.audit.followUps && !notes) errors.notes = 'Enter what you did about the actions that need following up'
+    if (failed(errors)) {
+      return form(res, 'audit/complete', {
+        values: { notes },
+        errors,
+        errorList: cf.errorList(errors, [['notes', '#notes']])
+      })
+    }
+    cf.completeAudit(state, notes, by(req))
+    flash(req, 'Audit completed', `We have recorded that you audited ${res.locals.audit.total} actions.`)
+    res.redirect(`${base}/audit`)
+  }))
 
   // --- Not built yet -----------------------------------------------------------
 
