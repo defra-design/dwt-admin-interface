@@ -1,0 +1,124 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTSPI-490: Tell users when we could not show a new secret" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">DWTSPI-490</span>
+    <h1 class="govuk-heading-l">Tell users when we could not show a new secret</h1>
+
+    <p class="govuk-body"><strong>Clickable prototype:</strong> No prototype version shows this yet.</p>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to be told when a new secret was created but we could not show it to me,<br><strong>so that</strong> I know what to do next and do not give the software provider a secret that does not exist or is not known.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">When a user creates credentials, replaces a secret or adds another secret, the secret is created first and then shown once. If the request times out, the secret can exist without us receiving it. The user cannot see it and cannot get it again.</p>
+    <p class="govuk-body">The standard error page says “Your information has not been saved”. That is not true here, so these cases need their own message. The message tells the user what to do next.</p>
+    <p class="govuk-body">Deleting a software provider needs no new message. If the request times out but the provider is deleted, the user can search the list of software providers to check.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "There is a problem with the service" },
+          { text: "GOV.UK Design System" },
+          { html: 'Page pattern, already built as <code>v9/error.html</code>. This ticket adds a message for each of the three cases. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/patterns/problem-with-the-service-pages/">Problem with the service pages</a>. No JavaScript.' }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Design acceptance criteria</h2>
+    <p class="govuk-body">New page content, based on the existing “Sorry, there is a problem with the service” page in version 9. The “Try again later” and “Your information has not been saved” text is not used.</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The page has the same layout as the existing problem with the service page.</li>
+      <li>The H1 is “Sorry, there is a problem with the service”.</li>
+      <li>Under the H1 is one paragraph with the message for the case, from the table below.</li>
+      <li>The paragraph is body text, with the GOV.UK default spacing below the H1.</li>
+      <li>The page matches the content in the table.</li>
+    </ol>
+
+    {{ govukTable({
+      caption: "Messages",
+      captionClasses: "govuk-table__caption--s",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Case" },
+        { text: "Message" }
+      ],
+      rows: [
+        [
+          { text: "Replace a secret" },
+          { text: "You need to replace the secret again. We could not show it to you." }
+        ],
+        [
+          { text: "Create new credentials" },
+          { text: "You need to replace the secret for [client name]. We could not show it to you." }
+        ],
+        [
+          { text: "Add another secret" },
+          { text: "To be agreed. See “Open question”." }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Open question</h2>
+    <p class="govuk-body">After a timed-out “Add another secret”, the software provider has two secrets and the user can only remove one. The message depends on which secret they can remove.</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>If they can remove either secret, we could say: “You need to remove the newest secret and add another secret. We could not show it to you.” The newest secret is the one with the latest generated date.</li>
+      <li>If they can only remove the oldest secret, that secret is probably the one the software provider is using. Removing it would stop their software working. Confirm with the team what the user should do before writing the message.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+    <ol class="govuk-list govuk-list--number">
+      <li>Given a user selects “Yes, replace secret”, when the request times out and the new secret was created but not received, then the user sees the Replace a secret message.</li>
+      <li>Given a user creates new credentials, when the request times out and the credentials were created but the secret was not received, then the user sees the Create new credentials message, with the client name of the new credentials in place of [client name].</li>
+      <li>Given a user adds another secret, when the request times out and the secret was created but not received, then the user sees the Add another secret message.</li>
+      <li>Given a user sees one of these messages, when they want to carry on, then there is a link back to the software provider.</li>
+      <li>Given a request times out and no secret was created, then the user sees the existing problem with the service page.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">Meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>The page has one H1, “Sorry, there is a problem with the service” (1.3.1, 2.4.6).</li>
+      <li>The page title is “Sorry, there is a problem with the service”, followed by the service name (2.4.2).</li>
+      <li>The page has one banner, one labelled navigation, one main and one contentinfo landmark (1.3.1).</li>
+      <li>The message is in the page text, so a screen reader reads it as soon as the page loads. The client name is in the text, not only in an image or a tooltip (1.3.1, 4.1.3).</li>
+      <li>The link back to the software provider has text that makes sense out of context, and shows the GOV.UK focus style, with <code>focus</code> as the background and <code>focus-text</code> as the text (2.4.4, 2.4.7).</li>
+      <li>A long client name wraps and does not make the page scroll sideways at 320px wide or at 200% zoom (1.4.4, 1.4.10).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE.</li>
+      <li>With only a keyboard, tab to the link back to the software provider.</li>
+      <li>Check the page with a screen reader, such as NVDA or VoiceOver. The H1 and message are read.</li>
+      <li>Check the page at 320px wide and at 200% zoom, with a long client name.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Showing the lost secret to the user, or recovering it.</li>
+      <li>A new message for deleting a software provider.</li>
+      <li>Changing what happens when a request fails before anything is created.</li>
+      <li>Telling the software provider that their secret has changed.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}
