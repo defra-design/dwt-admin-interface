@@ -4923,6 +4923,198 @@ function registerV10Routes () {
     res.redirect(packageHref(provider, pkg))
   }))
 
+  // --- Software packages: approval for production -----------------------------
+
+  // Record the production approval test (PAT) result, or an exception that was
+  // agreed. A package can only be approved once one of these is recorded.
+  const PAT_KEYS = cf.PAT_OUTCOMES.map((outcome) => outcome.key)
+
+  router.get(`${base}/software-providers/:id/packages/:packageId/pat-result`, changePackage((req, res, provider, pkg) => {
+    if (!res.locals.pkg.canRecordPat) return res.redirect(packageHref(provider, pkg))
+    form(res, 'software-providers/pat-result', {
+      values: pkg.pat ? { outcome: pkg.pat.outcome, details: pkg.pat.details } : {}
+    })
+  }))
+
+  router.post(`${base}/software-providers/:id/packages/:packageId/pat-result`, changePackage((req, res, provider, pkg) => {
+    if (!res.locals.pkg.canRecordPat) return res.redirect(packageHref(provider, pkg))
+    const errors = {}
+    const values = { outcome: answer(req, 'outcome'), details: answer(req, 'details') }
+    if (!PAT_KEYS.includes(values.outcome)) {
+      errors.outcome = 'Select the result of the production approval test'
+    } else if (values.outcome === 'exception' && !values.details) {
+      errors.details = 'Enter what exception was agreed, and who agreed it'
+    }
+    if (failed(errors)) {
+      return form(res, 'software-providers/pat-result', {
+        values,
+        errors,
+        errorList: cf.errorList(errors, [['outcome', '#outcome'], ['details', '#details']])
+      })
+    }
+    cf.recordPat(provider, pkg, values, by(req))
+    flash(req, 'Production approval test result recorded', values.outcome === 'failed'
+      ? `${pkg.name} cannot be approved for production until it passes, or an exception is agreed.`
+      : `You can now approve ${pkg.name} for production.`)
+    res.redirect(packageHref(provider, pkg))
+  }))
+
+  router.get(`${base}/software-providers/:id/packages/:packageId/approve`, changePackage((req, res, provider, pkg) => {
+    if (!res.locals.pkg.canApprove) return res.redirect(packageHref(provider, pkg))
+    res.render(view('software-providers/approve'))
+  }))
+
+  router.post(`${base}/software-providers/:id/packages/:packageId/approve`, changePackage((req, res, provider, pkg) => {
+    if (!res.locals.pkg.canApprove) return res.redirect(packageHref(provider, pkg))
+    cf.approve(provider, pkg, by(req))
+    flash(req, `${pkg.name} approved for production`, 'You can now create production credentials.')
+    res.redirect(packageHref(provider, pkg))
+  }))
+
+  // --- Software packages: suspend, reactivate and revoke access -----------------
+
+  // One page each (access.html): the reason and a message for the software
+  // provider, which goes to the key contact. Revoking cannot be undone, so it
+  // has an "Are you sure?" step as well.
+  const ACCESS_ACTIONS = {
+    suspend: {
+      can: 'canSuspend',
+      reasons: cf.REASONS.suspend,
+      run: cf.suspend,
+      done: (pkg) => ['Access suspended', `${pkg.name} cannot connect to external test or production until you reactivate it.`]
+    },
+    reactivate: {
+      can: 'canReactivate',
+      reasons: cf.REASONS.reactivate,
+      run: cf.reactivate,
+      done: (pkg) => ['Access reactivated', `${pkg.name} can connect again with its existing credentials.`]
+    },
+    revoke: {
+      can: 'canRevoke',
+      reasons: cf.REASONS.revoke,
+      run: cf.revoke,
+      confirm: true,
+      done: (pkg) => ['Access revoked', `The credentials for ${pkg.name} have been deleted.`]
+    }
+  }
+
+  Object.keys(ACCESS_ACTIONS).forEach((key) => {
+    const action = ACCESS_ACTIONS[key]
+    const path = `${base}/software-providers/:id/packages/:packageId/${key}`
+    const page = (res, options) => form(res, 'software-providers/access', Object.assign({
+      action: key,
+      reasons: action.reasons
+    }, options))
+    const finish = (req, res, provider, pkg, reason, message) => {
+      action.run(provider, pkg, reason, message, by(req))
+      flash(req, ...action.done(pkg))
+      res.redirect(packageHref(provider, pkg))
+    }
+
+    router.get(path, changePackage((req, res, provider, pkg) => {
+      if (!res.locals.pkg[action.can]) return res.redirect(packageHref(provider, pkg))
+      page(res)
+    }))
+
+    router.post(path, changePackage((req, res, provider, pkg) => {
+      if (!res.locals.pkg[action.can]) return res.redirect(packageHref(provider, pkg))
+      const errors = {}
+      const reason = readReason(req, action.reasons, errors)
+      const message = answer(req, 'message')
+      if (!message) errors.message = 'Enter a message to the software provider'
+      if (failed(errors)) {
+        return page(res, {
+          values: Object.assign({ message }, reason.values),
+          errors,
+          errorList: cf.errorList(errors, REASON_FIELDS.concat([['message', '#message']]))
+        })
+      }
+      if (!action.confirm) return finish(req, res, provider, pkg, reason.text, message)
+      setPending(req, key, provider, { packageId: pkg.id, reason: reason.text, message })
+      res.redirect(`${packageHref(provider, pkg)}/${key}/confirm`)
+    }))
+
+    if (!action.confirm) return
+
+    const pendingFor = (req, provider, pkg) => {
+      const pending = getPending(req, key, provider)
+      return pending && pending.packageId === pkg.id ? pending : null
+    }
+
+    router.get(`${path}/confirm`, changePackage((req, res, provider, pkg) => {
+      const pending = pendingFor(req, provider, pkg)
+      if (!res.locals.pkg[action.can] || !pending) return res.redirect(`${packageHref(provider, pkg)}/${key}`)
+      res.render(view(`software-providers/${key}-confirm`), { pending })
+    }))
+
+    router.post(`${path}/confirm`, changePackage((req, res, provider, pkg) => {
+      const pending = pendingFor(req, provider, pkg)
+      if (!res.locals.pkg[action.can] || !pending) return res.redirect(`${packageHref(provider, pkg)}/${key}`)
+      delete req.session.data.pendingV10
+      finish(req, res, provider, pkg, pending.reason, pending.message)
+    }))
+  })
+
+  // --- Software packages: move to another software provider ---------------------
+
+  // For when a software package changes hands. Choose the new software provider
+  // and the reason, then "Are you sure?". The package takes its credentials and
+  // its history with it. With many software providers this would be a search.
+  const moveTargets = (req, provider) => caseFiles(req)
+    .filter((other) => other.id !== provider.id && !other.closed)
+    .sort((a, b) => a.name.localeCompare(b.name))
+
+  const movePending = (req, provider, pkg) => {
+    const pending = getPending(req, 'move-package', provider)
+    return pending && pending.packageId === pkg.id ? pending : null
+  }
+
+  function renderMove (req, res, provider, options) {
+    form(res, 'software-providers/move', Object.assign({
+      targets: moveTargets(req, provider).map((other) => ({ id: other.id, name: other.name, reference: other.reference })),
+      reasons: cf.REASONS.movePackage
+    }, options))
+  }
+
+  router.get(`${base}/software-providers/:id/packages/:packageId/move`, changePackage((req, res, provider, pkg) => {
+    if (!res.locals.pkg.canMove) return res.redirect(packageHref(provider, pkg))
+    renderMove(req, res, provider)
+  }))
+
+  router.post(`${base}/software-providers/:id/packages/:packageId/move`, changePackage((req, res, provider, pkg) => {
+    if (!res.locals.pkg.canMove) return res.redirect(packageHref(provider, pkg))
+    const errors = {}
+    const to = moveTargets(req, provider).find((other) => other.id === answer(req, 'to'))
+    if (!to) errors.to = `Select the software provider that ${pkg.name} is moving to`
+    const reason = readReason(req, cf.REASONS.movePackage, errors)
+    if (failed(errors)) {
+      return renderMove(req, res, provider, {
+        values: Object.assign({ to: to ? to.id : '' }, reason.values),
+        errors,
+        errorList: cf.errorList(errors, [['to', '#to']].concat(REASON_FIELDS))
+      })
+    }
+    setPending(req, 'move-package', provider, { packageId: pkg.id, toId: to.id, reason: reason.text })
+    res.redirect(`${packageHref(provider, pkg)}/move/confirm`)
+  }))
+
+  router.get(`${base}/software-providers/:id/packages/:packageId/move/confirm`, changePackage((req, res, provider, pkg) => {
+    const pending = movePending(req, provider, pkg)
+    const to = pending && moveTargets(req, provider).find((other) => other.id === pending.toId)
+    if (!res.locals.pkg.canMove || !to) return res.redirect(`${packageHref(provider, pkg)}/move`)
+    res.render(view('software-providers/move-confirm'), { pending, to: { name: to.name, reference: to.reference } })
+  }))
+
+  router.post(`${base}/software-providers/:id/packages/:packageId/move/confirm`, changePackage((req, res, provider, pkg) => {
+    const pending = movePending(req, provider, pkg)
+    const to = pending && moveTargets(req, provider).find((other) => other.id === pending.toId)
+    if (!res.locals.pkg.canMove || !to) return res.redirect(`${packageHref(provider, pkg)}/move`)
+    cf.movePackage(provider, pkg, to, pending.reason, by(req))
+    delete req.session.data.pendingV10
+    flash(req, 'Software package moved', `${pkg.name} is now on the case file for ${to.name}. Its client names have not changed. Replace its secrets if the new software provider should not use the old ones.`)
+    res.redirect(packageHref(to, pkg))
+  }))
+
   // @@V10-NEXT@@ (later stages are added above this line)
 
   // --- Not built yet -----------------------------------------------------------

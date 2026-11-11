@@ -1,0 +1,32 @@
+{#
+  "Are you sure?" step before a software package moves to another software
+  provider, using the MoJ interruption card as in version 9. Moving gives the
+  new provider's case file the package's working credentials, so it is
+  checked first. Only this POST moves it (see routes.js).
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set pageName = "Are you sure you want to move " + pkg.name + " to " + to.name + "?" %}
+{% set activeSection = "providers" %}
+{% set caseFileHref = "/" + version + "/software-providers/" + provider.id %}
+{% set packageHref = caseFileHref + "/packages/" + pkg.id %}
+
+{% block content %}
+<div class="moj-interruption-card">
+  <div class="moj-interruption-card__content">
+    <h1 class="moj-interruption-card__heading">Are you sure you want to move {{ pkg.name }} to {{ to.name }}?</h1>
+    <div class="moj-interruption-card__body">
+      <p>{{ pkg.name }} will move from {{ provider.name }} ({{ provider.reference }}) to {{ to.name }} ({{ to.reference }}), with its credentials and its history.</p>
+      <p>Its secrets will keep working. Replace them after the move if {{ provider.name }} should no longer have access.</p>
+      <p>Reason: {{ pending.reason }}</p>
+    </div>
+    <form method="post" action="{{ packageHref }}/move/confirm" novalidate>
+      <div class="govuk-button-group moj-interruption-card__actions">
+        {{ govukButton({ text: "Yes, move software package", classes: "govuk-button--inverse", preventDoubleClick: true }) }}
+        <a class="govuk-link govuk-link--inverse" href="{{ packageHref }}">Go back to software package</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
