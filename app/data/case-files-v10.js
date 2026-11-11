@@ -711,6 +711,7 @@ function daysSince (iso) {
 }
 
 function daysText (days) {
+  if (days === 0) return 'today'
   return days === 1 ? '1 day' : `${days} days`
 }
 
@@ -740,6 +741,8 @@ function toPackageView (provider, pkg) {
   const open = !provider.closed
   const status = open ? findStatus(pkg.status) : CLOSED_STATUS
   const active = open && ACTIVE_STATUSES.includes(pkg.status)
+  // A new package has no credentials yet, so it is not active, but it can be given them.
+  const canHaveCredentials = active || (open && pkg.status === 'created')
   const days = daysSince(open ? pkg.statusSince : provider.closed.at)
   const patOutcome = pkg.pat ? PAT_OUTCOMES.find((o) => o.key === pkg.pat.outcome) : null
   return {
@@ -768,8 +771,8 @@ function toPackageView (provider, pkg) {
           secrets: toSecretViews(credential),
           oldSecretWaiting: credential.secrets.length > 1
         } : null,
-        canCreate: active && !credential && allowed,
-        needsApproval: active && !credential && !allowed
+        canCreate: canHaveCredentials && !credential && allowed,
+        needsApproval: canHaveCredentials && !credential && !allowed
       })
     }),
     active,
@@ -806,7 +809,8 @@ function reminders (provider) {
           packageName: pkg.name,
           environment: environment.lower,
           sentOn: formatDateObj(new Date(newest.generatedAt)),
-          days: daysText(daysSince(newest.generatedAt))
+          // "today", or "3 days ago"
+          days: daysText(daysSince(newest.generatedAt)).replace(/(days?)$/, '$1 ago')
         })
       }
     })
@@ -1195,6 +1199,7 @@ module.exports = {
   closeProvider,
   addPackage,
   movePackage,
+  clientNameFor,
   createCredentials,
   replaceSecret,
   removeOldSecret,

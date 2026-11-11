@@ -37,7 +37,7 @@
     {# A routine replacement leaves the old secret working until it is removed. #}
     {% for reminder in provider.reminders %}
       {% set reminderHtml %}
-        The old {{ reminder.environment }} secret for {{ reminder.packageName }} still works. The new secret was sent on {{ reminder.sentOn }} ({{ reminder.days }} ago).
+        The old {{ reminder.environment }} secret for {{ reminder.packageName }} still works. The new secret was sent on {{ reminder.sentOn }} ({{ reminder.days }}).
         <a class="govuk-link" href="{{ caseFileHref }}/packages/{{ reminder.packageId }}">View {{ reminder.packageName }} credentials</a>
       {% endset %}
       {{ mojAlert({

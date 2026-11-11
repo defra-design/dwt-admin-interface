@@ -4752,6 +4752,177 @@ function registerV10Routes () {
     res.redirect(`${base}/software-providers`)
   }))
 
+  // --- Software packages: credentials ------------------------------------------
+
+  // The user never sees a client secret. They choose a contact who has been
+  // checked as able to act for the organisation, and the system sends the
+  // secret to them. Each journey is a question page, then a check page, and
+  // only the POST from the check page does anything.
+
+  const packageHref = (provider, pkg) => `${overviewHref(provider)}/packages/${pkg.id}`
+
+  // A page that changes one software package.
+  const changePackage = (handler) => withPackage((req, res, provider, pkg) => {
+    if (provider.closed) return res.redirect(overviewHref(provider))
+    handler(req, res, provider, pkg)
+  })
+
+  // The same, for one environment of the package (`test` or `production` in the URL).
+  const changeCredential = (handler) => changePackage((req, res, provider, pkg) => {
+    const environment = res.locals.pkg.environments.find((e) => e.key === req.params.env)
+    if (!environment) return res.redirect(packageHref(provider, pkg))
+    res.locals.environment = environment
+    handler(req, res, provider, pkg, environment)
+  })
+
+  // An answer waiting to be confirmed, for this package and environment only.
+  function getPendingCredential (req, action, provider, pkg, environment) {
+    const pending = getPending(req, action, provider)
+    return pending && pending.packageId === pkg.id && pending.env === environment.key ? pending : null
+  }
+
+  // Reads "Who should we send it to?" (_send-to.html). Only a checked contact can be chosen.
+  function readSendTo (req, provider, errors, what) {
+    const contact = cf.findContact(provider, answer(req, 'contact'))
+    if (!contact || !contact.verified) {
+      errors.contact = `Select who we should send the ${what} to`
+      return null
+    }
+    return contact
+  }
+
+  const credentialHref = (provider, pkg, environment, page) =>
+    `${packageHref(provider, pkg)}/credentials/${environment.key}/${page}`
+
+  // Create credentials
+  router.get(`${base}/software-providers/:id/packages/:packageId/credentials/:env/create`, changeCredential((req, res, provider, pkg, environment) => {
+    if (!environment.canCreate) return res.redirect(packageHref(provider, pkg))
+    const pending = getPendingCredential(req, 'create-credentials', provider, pkg, environment)
+    form(res, 'software-providers/credentials/create', { values: { contact: pending ? pending.contactId : '' } })
+  }))
+
+  router.post(`${base}/software-providers/:id/packages/:packageId/credentials/:env/create`, changeCredential((req, res, provider, pkg, environment) => {
+    if (!environment.canCreate) return res.redirect(packageHref(provider, pkg))
+    const errors = {}
+    const contact = readSendTo(req, provider, errors, 'client secret')
+    if (failed(errors)) {
+      return form(res, 'software-providers/credentials/create', {
+        errors,
+        errorList: cf.errorList(errors, [['contact', '#contact']])
+      })
+    }
+    setPending(req, 'create-credentials', provider, { packageId: pkg.id, env: environment.key, contactId: contact.id })
+    res.redirect(credentialHref(provider, pkg, environment, 'create/check'))
+  }))
+
+  router.get(`${base}/software-providers/:id/packages/:packageId/credentials/:env/create/check`, changeCredential((req, res, provider, pkg, environment) => {
+    const pending = getPendingCredential(req, 'create-credentials', provider, pkg, environment)
+    const contact = pending && cf.findContact(provider, pending.contactId)
+    if (!environment.canCreate || !contact) return res.redirect(credentialHref(provider, pkg, environment, 'create'))
+    res.render(view('software-providers/credentials/create-check'), {
+      sendTo: contact,
+      clientName: cf.clientNameFor(provider, pkg, environment)
+    })
+  }))
+
+  router.post(`${base}/software-providers/:id/packages/:packageId/credentials/:env/create/check`, changeCredential((req, res, provider, pkg, environment) => {
+    const pending = getPendingCredential(req, 'create-credentials', provider, pkg, environment)
+    const contact = pending && cf.findContact(provider, pending.contactId)
+    if (!environment.canCreate || !contact || !contact.verified) return res.redirect(credentialHref(provider, pkg, environment, 'create'))
+    cf.createCredentials(provider, pkg, environment.key, contact, by(req))
+    delete req.session.data.pendingV10
+    flash(req, `${environment.text} credentials created`, `We have sent the client ID and a one-time link to the client secret to ${contact.name} (${contact.email}).`)
+    res.redirect(packageHref(provider, pkg))
+  }))
+
+  // Replace a secret: routine, or after a security breach
+  const REPLACE_TYPES = ['routine', 'breach']
+  const canReplace = (pkgView, environment) => pkgView.active && Boolean(environment.credential)
+
+  router.get(`${base}/software-providers/:id/packages/:packageId/credentials/:env/replace`, changeCredential((req, res, provider, pkg, environment) => {
+    if (!canReplace(res.locals.pkg, environment)) return res.redirect(packageHref(provider, pkg))
+    const pending = getPendingCredential(req, 'replace-secret', provider, pkg, environment)
+    form(res, 'software-providers/credentials/replace', {
+      values: pending ? { type: pending.type, details: pending.details, contact: pending.contactId } : {}
+    })
+  }))
+
+  router.post(`${base}/software-providers/:id/packages/:packageId/credentials/:env/replace`, changeCredential((req, res, provider, pkg, environment) => {
+    if (!canReplace(res.locals.pkg, environment)) return res.redirect(packageHref(provider, pkg))
+    const errors = {}
+    const values = { type: answer(req, 'type'), details: answer(req, 'details'), contact: answer(req, 'contact') }
+    if (!REPLACE_TYPES.includes(values.type)) {
+      errors.type = 'Select why you are replacing the secret'
+    } else if (values.type === 'routine' && environment.credential.oldSecretWaiting) {
+      // Only two secrets can work at once.
+      errors.type = 'Remove the old secret before you start another routine replacement'
+    } else if (values.type === 'breach' && !values.details) {
+      errors.details = 'Enter what happened'
+    }
+    const contact = readSendTo(req, provider, errors, 'new secret')
+    if (failed(errors)) {
+      return form(res, 'software-providers/credentials/replace', {
+        values,
+        errors,
+        errorList: cf.errorList(errors, [['type', '#type'], ['details', '#details'], ['contact', '#contact']])
+      })
+    }
+    setPending(req, 'replace-secret', provider, {
+      packageId: pkg.id,
+      env: environment.key,
+      type: values.type,
+      details: values.type === 'breach' ? values.details : '',
+      contactId: contact.id
+    })
+    res.redirect(credentialHref(provider, pkg, environment, 'replace/check'))
+  }))
+
+  router.get(`${base}/software-providers/:id/packages/:packageId/credentials/:env/replace/check`, changeCredential((req, res, provider, pkg, environment) => {
+    const pending = getPendingCredential(req, 'replace-secret', provider, pkg, environment)
+    const contact = pending && cf.findContact(provider, pending.contactId)
+    if (!canReplace(res.locals.pkg, environment) || !contact) return res.redirect(credentialHref(provider, pkg, environment, 'replace'))
+    res.render(view('software-providers/credentials/replace-check'), { pending, sendTo: contact, breach: pending.type === 'breach' })
+  }))
+
+  router.post(`${base}/software-providers/:id/packages/:packageId/credentials/:env/replace/check`, changeCredential((req, res, provider, pkg, environment) => {
+    const pending = getPendingCredential(req, 'replace-secret', provider, pkg, environment)
+    const contact = pending && cf.findContact(provider, pending.contactId)
+    if (!canReplace(res.locals.pkg, environment) || !contact || !contact.verified) return res.redirect(credentialHref(provider, pkg, environment, 'replace'))
+    const breach = pending.type === 'breach'
+    cf.replaceSecret(provider, pkg, environment.key, contact, { breach, details: pending.details }, by(req))
+    delete req.session.data.pendingV10
+    flash(req, `${environment.text} secret replaced`, breach
+      ? `The earlier secret has stopped working. We have sent a one-time link to the new secret to ${contact.name} (${contact.email}).`
+      : `We have sent a one-time link to the new secret to ${contact.name} (${contact.email}). Remove the old secret when they have changed over.`)
+    res.redirect(packageHref(provider, pkg))
+  }))
+
+  // Remove the old secret, to finish a routine replacement
+  const canRemoveSecret = (pkgView, environment) =>
+    pkgView.active && Boolean(environment.credential) && environment.credential.oldSecretWaiting
+
+  router.get(`${base}/software-providers/:id/packages/:packageId/credentials/:env/remove-secret`, changeCredential((req, res, provider, pkg, environment) => {
+    if (!canRemoveSecret(res.locals.pkg, environment)) return res.redirect(packageHref(provider, pkg))
+    form(res, 'software-providers/credentials/remove-secret', { reasons: cf.REASONS.removeSecret })
+  }))
+
+  router.post(`${base}/software-providers/:id/packages/:packageId/credentials/:env/remove-secret`, changeCredential((req, res, provider, pkg, environment) => {
+    if (!canRemoveSecret(res.locals.pkg, environment)) return res.redirect(packageHref(provider, pkg))
+    const errors = {}
+    const reason = readReason(req, cf.REASONS.removeSecret, errors)
+    if (failed(errors)) {
+      return form(res, 'software-providers/credentials/remove-secret', {
+        values: reason.values,
+        errors,
+        errorList: cf.errorList(errors, REASON_FIELDS),
+        reasons: cf.REASONS.removeSecret
+      })
+    }
+    cf.removeOldSecret(provider, pkg, environment.key, reason.text, by(req))
+    flash(req, `Old ${environment.lower} secret removed`, 'The old secret no longer works.')
+    res.redirect(packageHref(provider, pkg))
+  }))
+
   // @@V10-NEXT@@ (later stages are added above this line)
 
   // --- Not built yet -----------------------------------------------------------
