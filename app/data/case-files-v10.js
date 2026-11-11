@@ -124,8 +124,12 @@ const REASONS = {
     what: 'moving this software package',
     options: ['The software package was sold to another software provider', 'I am correcting a mistake']
   },
+  // Not a "why" question, so it has its own wording.
   recordContact: {
-    what: 'in contact with the software provider',
+    legend: 'What was the contact about?',
+    error: 'Select what the contact was about',
+    detailsLabel: 'What was it about?',
+    detailsError: 'Enter what the contact was about',
     options: [
       'Question about joining or testing',
       'Request for credentials',
@@ -904,9 +908,9 @@ function checkReason (body, reasons) {
   const details = (body.reasonDetails || '').trim()
   const errors = {}
   if (!reasons.options.concat('Other').includes(reason)) {
-    errors.reason = `Select why you are ${reasons.what}`
+    errors.reason = reasons.error || `Select why you are ${reasons.what}`
   } else if (reason === 'Other' && !details) {
-    errors.reasonDetails = `Enter why you are ${reasons.what}`
+    errors.reasonDetails = reasons.detailsError || `Enter why you are ${reasons.what}`
   }
   return {
     values: { reason, reasonDetails: details },

@@ -4160,6 +4160,255 @@ function registerV10Routes () {
     })
   })
 
+  // --- Shared form helpers -----------------------------------------------------
+
+  // Shows a form page. `values`, `errors` and `errorList` are always given, so
+  // the pages do not have to check that they exist.
+  function form (res, page, options) {
+    res.render(view(page), Object.assign({ values: {}, errors: {}, errorList: [] }, options))
+  }
+
+  // One answer from a form, with spaces at the start and end removed.
+  const answer = (req, name) => String(req.body[name] || '').trim()
+
+  const failed = (errors) => Object.keys(errors).length > 0
+
+  // Reads the shared reason question (_reason.html) and adds any problem to `errors`.
+  function readReason (req, reasons, errors) {
+    const result = cf.checkReason(req.body, reasons)
+    Object.assign(errors, result.errors)
+    return result
+  }
+  const REASON_FIELDS = [['reason', '#reason'], ['reasonDetails', '#reasonDetails']]
+
+  // Organisation details: three questions, asked when creating a case file and
+  // when changing it (_organisation-details.html).
+  const DETAIL_QUESTIONS = [
+    { name: 'providerType', options: cf.PROVIDER_TYPES, error: 'Select the provider type' },
+    { name: 'developerType', options: cf.DEVELOPER_TYPES, error: 'Select the developer type' },
+    { name: 'size', options: cf.SIZES, error: 'Select the size of the organisation' }
+  ]
+  const DETAIL_FIELDS = DETAIL_QUESTIONS.map((question) => [question.name, `#${question.name}`])
+  const detailOptions = { providerTypes: cf.PROVIDER_TYPES, developerTypes: cf.DEVELOPER_TYPES, sizes: cf.SIZES }
+
+  function readDetails (req, errors) {
+    const values = {}
+    DETAIL_QUESTIONS.forEach((question) => {
+      values[question.name] = answer(req, question.name)
+      if (!question.options.includes(values[question.name])) errors[question.name] = question.error
+    })
+    return values
+  }
+
+  // A contact's details (_contact-fields.html).
+  const CONTACT_FIELDS = [['name', '#name'], ['email', '#email']]
+
+  function readContact (req, errors) {
+    const values = {
+      name: answer(req, 'name'),
+      jobTitle: answer(req, 'jobTitle'),
+      email: answer(req, 'email'),
+      phone: answer(req, 'phone')
+    }
+    Object.assign(errors, cf.validateContact(values))
+    return values
+  }
+
+  // "I have not checked yet", on the page that asks if a contact can act for the organisation.
+  const NOT_CHECKED = 'not-checked'
+
+  // --- Software providers: create a case file ----------------------------------
+
+  // Organisation name, possible matches, organisation details, key contact,
+  // can they act for the organisation, then check answers. The answers are kept
+  // in the session until the case file is created. Once the user has seen
+  // "Check your answers", a changed step goes straight back there.
+  // These routes must stay above the `/software-providers/:id` routes.
+  function draft (req) {
+    if (!req.session.data.newCaseFileV10) req.session.data.newCaseFileV10 = {}
+    return req.session.data.newCaseFileV10
+  }
+  const createHref = (step) => `${base}/software-providers/create${step ? `/${step}` : ''}`
+  const afterStep = (req, step) => createHref(draft(req).checked ? 'check' : step)
+
+  // The first step that has no answer yet, or null if they all have one.
+  function missingStep (answers) {
+    if (!answers.name) return ''
+    if (!answers.details) return 'details'
+    if (!answers.contact) return 'contact'
+    if (answers.verifyMethod === undefined) return 'authority'
+    return null
+  }
+
+  router.get(createHref(), (req, res) => {
+    // "Create a case file" on the list adds ?new=yes, to start with empty answers.
+    if (req.query.new) {
+      delete req.session.data.newCaseFileV10
+      return res.redirect(createHref())
+    }
+    form(res, 'software-providers/create/name', { values: { name: draft(req).name || '' } })
+  })
+
+  router.post(createHref(), (req, res) => {
+    const name = answer(req, 'name')
+    if (!name) {
+      const errors = { name: 'Enter the name of the organisation' }
+      return form(res, 'software-providers/create/name', {
+        values: { name },
+        errors,
+        errorList: cf.errorList(errors, [['name', '#name']])
+      })
+    }
+    // A new or changed name is checked against the case files we already have.
+    const answers = draft(req)
+    if (answers.name !== name) delete answers.notDuplicate
+    answers.name = name
+    if (!answers.notDuplicate && cf.similarProviders(caseFiles(req), name).length) {
+      return res.redirect(createHref('matches'))
+    }
+    res.redirect(afterStep(req, 'details'))
+  })
+
+  function renderMatches (req, res, options) {
+    form(res, 'software-providers/create/matches', Object.assign({
+      name: draft(req).name,
+      matches: cf.similarProviders(caseFiles(req), draft(req).name).map((p) => cf.toProviderView(p))
+    }, options))
+  }
+
+  router.get(createHref('matches'), (req, res) => {
+    if (!draft(req).name) return res.redirect(createHref())
+    renderMatches(req, res)
+  })
+
+  router.post(createHref('matches'), (req, res) => {
+    const answers = draft(req)
+    if (!answers.name) return res.redirect(createHref())
+    const choice = answer(req, 'match')
+    if (choice === 'none') {
+      answers.notDuplicate = true
+      return res.redirect(afterStep(req, 'details'))
+    }
+    const match = cf.similarProviders(caseFiles(req), answers.name).find((p) => p.id === choice)
+    if (!match) {
+      const errors = { match: `Select if ${answers.name} is one of these organisations` }
+      return renderMatches(req, res, { errors, errorList: cf.errorList(errors, [['match', '#match']]) })
+    }
+    // The organisation already has a case file, so a new one is not needed.
+    delete req.session.data.newCaseFileV10
+    res.redirect(`${base}/software-providers/${match.id}`)
+  })
+
+  router.get(createHref('details'), (req, res) => {
+    const answers = draft(req)
+    if (!answers.name) return res.redirect(createHref())
+    form(res, 'software-providers/create/details', Object.assign({
+      name: answers.name,
+      values: Object.assign({}, answers.details, answers.reason && answers.reason.values),
+      reasons: cf.REASONS.createCaseFile
+    }, detailOptions))
+  })
+
+  router.post(createHref('details'), (req, res) => {
+    const answers = draft(req)
+    if (!answers.name) return res.redirect(createHref())
+    const errors = {}
+    const details = readDetails(req, errors)
+    const reason = readReason(req, cf.REASONS.createCaseFile, errors)
+    if (failed(errors)) {
+      return form(res, 'software-providers/create/details', Object.assign({
+        name: answers.name,
+        values: Object.assign({}, details, reason.values),
+        errors,
+        errorList: cf.errorList(errors, DETAIL_FIELDS.concat(REASON_FIELDS)),
+        reasons: cf.REASONS.createCaseFile
+      }, detailOptions))
+    }
+    answers.details = details
+    answers.reason = { values: reason.values, text: reason.text }
+    res.redirect(afterStep(req, 'contact'))
+  })
+
+  router.get(createHref('contact'), (req, res) => {
+    const answers = draft(req)
+    if (!answers.details) return res.redirect(createHref(missingStep(answers)))
+    form(res, 'software-providers/create/contact', { name: answers.name, values: answers.contact || {} })
+  })
+
+  router.post(createHref('contact'), (req, res) => {
+    const answers = draft(req)
+    if (!answers.details) return res.redirect(createHref(missingStep(answers)))
+    const errors = {}
+    const values = readContact(req, errors)
+    if (failed(errors)) {
+      return form(res, 'software-providers/create/contact', {
+        name: answers.name,
+        values,
+        errors,
+        errorList: cf.errorList(errors, CONTACT_FIELDS)
+      })
+    }
+    answers.contact = values
+    res.redirect(afterStep(req, 'authority'))
+  })
+
+  // The same page is used later to check a contact on a case file (see below).
+  function renderAuthority (req, res, options) {
+    const answers = draft(req)
+    form(res, 'software-providers/verify-contact', Object.assign({
+      contactName: answers.contact.name,
+      organisationName: answers.name,
+      methods: cf.VERIFY_METHODS,
+      allowNotChecked: true,
+      action: createHref('authority'),
+      backHref: createHref('contact'),
+      cancelHref: `${base}/software-providers`,
+      buttonText: 'Continue',
+      values: { method: answers.verifyMethod === null ? NOT_CHECKED : answers.verifyMethod }
+    }, options))
+  }
+
+  router.get(createHref('authority'), (req, res) => {
+    const answers = draft(req)
+    if (!answers.contact) return res.redirect(createHref(missingStep(answers)))
+    renderAuthority(req, res)
+  })
+
+  router.post(createHref('authority'), (req, res) => {
+    const answers = draft(req)
+    if (!answers.contact) return res.redirect(createHref(missingStep(answers)))
+    const method = answer(req, 'method')
+    if (method !== NOT_CHECKED && !cf.VERIFY_METHODS.includes(method)) {
+      const errors = { method: `Select how you checked that ${answers.contact.name} can act for ${answers.name}, or select ‘I have not checked yet’` }
+      return renderAuthority(req, res, { values: { method }, errors, errorList: cf.errorList(errors, [['method', '#method']]) })
+    }
+    answers.verifyMethod = method === NOT_CHECKED ? null : method
+    res.redirect(createHref('check'))
+  })
+
+  router.get(createHref('check'), (req, res) => {
+    const answers = draft(req)
+    const missing = missingStep(answers)
+    if (missing !== null) return res.redirect(createHref(missing))
+    answers.checked = true
+    res.render(view('software-providers/create/check'), { answers })
+  })
+
+  router.post(createHref('check'), (req, res) => {
+    const answers = draft(req)
+    const missing = missingStep(answers)
+    if (missing !== null) return res.redirect(createHref(missing))
+    const provider = cf.createProvider(caseFiles(req), Object.assign({
+      name: answers.name,
+      contact: answers.contact,
+      verifyMethod: answers.verifyMethod,
+      reason: answers.reason.text
+    }, answers.details), by(req))
+    delete req.session.data.newCaseFileV10
+    flash(req, 'Case file created', `The reference for ${provider.name} is ${provider.reference}. Add a software package so you can create credentials.`)
+    res.redirect(`${base}/software-providers/${provider.id}`)
+  })
+
   // --- Software providers: view a case file -----------------------------------
 
   // Finds the case file named in the URL and hands it to the page's route. If
@@ -4214,6 +4463,293 @@ function registerV10Routes () {
 
   router.get(`${base}/software-providers/:id/packages/:packageId`, withPackage((req, res) => {
     res.render(view('software-providers/package'))
+  }))
+
+  // --- Software providers: change a case file ---------------------------------
+
+  const overviewHref = (provider) => `${base}/software-providers/${provider.id}`
+
+  // A page that changes a case file. A closed case file cannot be changed, so
+  // the user goes back to its overview.
+  const changeProvider = (handler) => withProvider((req, res, provider) => {
+    if (provider.closed) return res.redirect(overviewHref(provider))
+    handler(req, res, provider)
+  })
+
+  // The same, for a page about one contact.
+  const changeContact = (handler) => changeProvider((req, res, provider) => {
+    const contact = cf.findContact(provider, req.params.contactId)
+    if (!contact) return res.redirect(`${overviewHref(provider)}/contacts`)
+    res.locals.contact = cf.toContactView(contact)
+    handler(req, res, provider, contact)
+  })
+
+  // An answer that is waiting for the user to confirm it on the next page.
+  function setPending (req, action, provider, values) {
+    req.session.data.pendingV10 = Object.assign({ action, providerId: provider.id }, values)
+  }
+  function getPending (req, action, provider) {
+    const pending = req.session.data.pendingV10
+    return pending && pending.action === action && pending.providerId === provider.id ? pending : null
+  }
+
+  router.get(`${base}/software-providers/:id/add-package`, changeProvider((req, res) => {
+    form(res, 'software-providers/add-package', { reasons: cf.REASONS.addPackage })
+  }))
+
+  router.post(`${base}/software-providers/:id/add-package`, changeProvider((req, res, provider) => {
+    const errors = {}
+    const name = answer(req, 'name')
+    if (!name) {
+      errors.name = 'Enter the name of the software package'
+    } else if (provider.packages.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
+      errors.name = `${provider.name} already has a software package with this name. Enter a different name`
+    }
+    const reason = readReason(req, cf.REASONS.addPackage, errors)
+    if (failed(errors)) {
+      return form(res, 'software-providers/add-package', {
+        values: Object.assign({ name }, reason.values),
+        errors,
+        errorList: cf.errorList(errors, [['name', '#name']].concat(REASON_FIELDS)),
+        reasons: cf.REASONS.addPackage
+      })
+    }
+    const pkg = cf.addPackage(provider, name, reason.text, by(req))
+    flash(req, 'Software package added', `Create external test credentials when ${provider.name} is ready to test ${name}.`)
+    res.redirect(`${overviewHref(provider)}/packages/${pkg.id}`)
+  }))
+
+  router.get(`${base}/software-providers/:id/change-name`, changeProvider((req, res, provider) => {
+    form(res, 'software-providers/change-name', { values: { name: provider.name }, reasons: cf.REASONS.changeName })
+  }))
+
+  router.post(`${base}/software-providers/:id/change-name`, changeProvider((req, res, provider) => {
+    const errors = {}
+    const name = answer(req, 'name')
+    if (!name) errors.name = 'Enter the name of the organisation'
+    // Saving without a change goes back to the overview, and nothing is recorded.
+    if (name === provider.name) return res.redirect(overviewHref(provider))
+    const reason = readReason(req, cf.REASONS.changeName, errors)
+    if (failed(errors)) {
+      return form(res, 'software-providers/change-name', {
+        values: Object.assign({ name }, reason.values),
+        errors,
+        errorList: cf.errorList(errors, [['name', '#name']].concat(REASON_FIELDS)),
+        reasons: cf.REASONS.changeName
+      })
+    }
+    cf.updateName(provider, name, reason.text, by(req))
+    flash(req, 'Organisation name changed', `The organisation name is now ${name}.`)
+    res.redirect(overviewHref(provider))
+  }))
+
+  router.get(`${base}/software-providers/:id/change-details`, changeProvider((req, res, provider) => {
+    form(res, 'software-providers/change-details', Object.assign({
+      values: { providerType: provider.providerType, developerType: provider.developerType, size: provider.size },
+      reasons: cf.REASONS.changeDetails
+    }, detailOptions))
+  }))
+
+  router.post(`${base}/software-providers/:id/change-details`, changeProvider((req, res, provider) => {
+    const errors = {}
+    const details = readDetails(req, errors)
+    const reason = readReason(req, cf.REASONS.changeDetails, errors)
+    if (failed(errors)) {
+      return form(res, 'software-providers/change-details', Object.assign({
+        values: Object.assign({}, details, reason.values),
+        errors,
+        errorList: cf.errorList(errors, DETAIL_FIELDS.concat(REASON_FIELDS)),
+        reasons: cf.REASONS.changeDetails
+      }, detailOptions))
+    }
+    if (cf.updateDetails(provider, details, reason.text, by(req))) {
+      flash(req, 'Organisation details changed')
+    }
+    res.redirect(overviewHref(provider))
+  }))
+
+  // --- Software providers: contacts ---------------------------------------------
+
+  // Adding and changing a contact share one page (contact-form.html).
+  router.get(`${base}/software-providers/:id/contacts/add`, changeProvider((req, res) => {
+    form(res, 'software-providers/contact-form', { mode: 'add', reasons: cf.REASONS.addContact })
+  }))
+
+  router.post(`${base}/software-providers/:id/contacts/add`, changeProvider((req, res, provider) => {
+    const errors = {}
+    const values = readContact(req, errors)
+    values.keyContact = Boolean(req.body.keyContact)
+    const reason = readReason(req, cf.REASONS.addContact, errors)
+    if (failed(errors)) {
+      return form(res, 'software-providers/contact-form', {
+        mode: 'add',
+        values: Object.assign(values, reason.values),
+        errors,
+        errorList: cf.errorList(errors, CONTACT_FIELDS.concat(REASON_FIELDS)),
+        reasons: cf.REASONS.addContact
+      })
+    }
+    const contact = cf.addContact(provider, values, reason.text, by(req))
+    flash(req, 'Contact added', `Check that ${contact.name} can act for ${provider.name} before you send them credentials.`)
+    res.redirect(`${overviewHref(provider)}/contacts`)
+  }))
+
+  router.get(`${base}/software-providers/:id/contacts/:contactId/change`, changeContact((req, res, provider, contact) => {
+    form(res, 'software-providers/contact-form', { mode: 'change', values: contact, reasons: cf.REASONS.changeContact })
+  }))
+
+  router.post(`${base}/software-providers/:id/contacts/:contactId/change`, changeContact((req, res, provider, contact) => {
+    const errors = {}
+    const values = readContact(req, errors)
+    values.keyContact = contact.keyContact || Boolean(req.body.keyContact)
+    const reason = readReason(req, cf.REASONS.changeContact, errors)
+    if (failed(errors)) {
+      return form(res, 'software-providers/contact-form', {
+        mode: 'change',
+        values: Object.assign(values, reason.values),
+        errors,
+        errorList: cf.errorList(errors, CONTACT_FIELDS.concat(REASON_FIELDS)),
+        reasons: cf.REASONS.changeContact
+      })
+    }
+    const emailChanged = contact.email !== values.email
+    cf.updateContact(provider, contact, values, reason.text, by(req))
+    flash(req, 'Contact changed', emailChanged
+      ? `The email address changed, so check again that ${contact.name} can act for ${provider.name}.`
+      : undefined)
+    res.redirect(`${overviewHref(provider)}/contacts`)
+  }))
+
+  // Checking a contact: the method is the reason, so no other reason is asked for.
+  function renderVerify (res, provider, contact, options) {
+    form(res, 'software-providers/verify-contact', Object.assign({
+      contactName: contact.name,
+      organisationName: provider.name,
+      methods: cf.VERIFY_METHODS,
+      action: `${overviewHref(provider)}/contacts/${contact.id}/verify`,
+      backHref: `${overviewHref(provider)}/contacts`,
+      cancelHref: `${overviewHref(provider)}/contacts`,
+      buttonText: 'Save'
+    }, options))
+  }
+
+  router.get(`${base}/software-providers/:id/contacts/:contactId/verify`, changeContact((req, res, provider, contact) => {
+    renderVerify(res, provider, contact)
+  }))
+
+  router.post(`${base}/software-providers/:id/contacts/:contactId/verify`, changeContact((req, res, provider, contact) => {
+    const method = answer(req, 'method')
+    if (!cf.VERIFY_METHODS.includes(method)) {
+      const errors = { method: `Select how you checked that ${contact.name} can act for ${provider.name}` }
+      return renderVerify(res, provider, contact, { errors, errorList: cf.errorList(errors, [['method', '#method']]) })
+    }
+    cf.verifyContact(provider, contact, method, by(req))
+    flash(req, 'Contact checked', `${contact.name} can act for ${provider.name}. You can send them credentials.`)
+    res.redirect(`${overviewHref(provider)}/contacts`)
+  }))
+
+  // The key contact cannot be removed. Another contact has to be made the key contact first.
+  router.get(`${base}/software-providers/:id/contacts/:contactId/remove`, changeContact((req, res, provider, contact) => {
+    if (contact.keyContact) return res.redirect(`${overviewHref(provider)}/contacts`)
+    form(res, 'software-providers/contact-remove', { reasons: cf.REASONS.removeContact })
+  }))
+
+  router.post(`${base}/software-providers/:id/contacts/:contactId/remove`, changeContact((req, res, provider, contact) => {
+    if (contact.keyContact) return res.redirect(`${overviewHref(provider)}/contacts`)
+    const errors = {}
+    const reason = readReason(req, cf.REASONS.removeContact, errors)
+    if (failed(errors)) {
+      return form(res, 'software-providers/contact-remove', {
+        values: reason.values,
+        errors,
+        errorList: cf.errorList(errors, REASON_FIELDS),
+        reasons: cf.REASONS.removeContact
+      })
+    }
+    cf.removeContact(provider, contact, reason.text, by(req))
+    flash(req, 'Contact removed', `${contact.name} has been removed from the case file.`)
+    res.redirect(`${overviewHref(provider)}/contacts`)
+  }))
+
+  // --- Software providers: record a contact with the provider --------------------
+
+  router.get(`${base}/software-providers/:id/record-contact`, changeProvider((req, res) => {
+    form(res, 'software-providers/record-contact', { reasons: cf.REASONS.recordContact, channels: cf.CHANNELS })
+  }))
+
+  router.post(`${base}/software-providers/:id/record-contact`, changeProvider((req, res, provider) => {
+    const errors = {}
+    const values = {
+      who: answer(req, 'who'),
+      otherName: answer(req, 'otherName'),
+      channel: answer(req, 'channel'),
+      summary: answer(req, 'summary')
+    }
+    const contact = cf.findContact(provider, values.who)
+    if (!contact && values.who !== 'other') {
+      errors.who = 'Select who you were in contact with'
+    } else if (values.who === 'other' && !values.otherName) {
+      errors.otherName = 'Enter the name of the person you were in contact with'
+    }
+    if (!cf.CHANNELS.includes(values.channel)) errors.channel = 'Select how you were in contact'
+    const reason = readReason(req, cf.REASONS.recordContact, errors)
+    if (!values.summary) errors.summary = 'Enter a summary of the contact'
+    if (failed(errors)) {
+      return form(res, 'software-providers/record-contact', {
+        values: Object.assign(values, reason.values),
+        errors,
+        errorList: cf.errorList(errors, [['who', '#who'], ['otherName', '#otherName'], ['channel', '#channel']]
+          .concat(REASON_FIELDS, [['summary', '#summary']])),
+        reasons: cf.REASONS.recordContact,
+        channels: cf.CHANNELS
+      })
+    }
+    cf.recordContact(provider, {
+      who: contact ? contact.name : values.otherName,
+      verified: Boolean(contact && contact.verified),
+      channel: values.channel,
+      reason: reason.text,
+      summary: values.summary
+    }, by(req))
+    flash(req, 'Contact recorded', 'It has been added to the history of this case file.')
+    res.redirect(overviewHref(provider))
+  }))
+
+  // --- Software providers: remove a software provider ------------------------------
+
+  // Two steps: the reason, then "Are you sure?". Only the second POST removes it.
+  router.get(`${base}/software-providers/:id/remove`, changeProvider((req, res) => {
+    form(res, 'software-providers/remove', { reasons: cf.REASONS.removeProvider })
+  }))
+
+  router.post(`${base}/software-providers/:id/remove`, changeProvider((req, res, provider) => {
+    const errors = {}
+    const reason = readReason(req, cf.REASONS.removeProvider, errors)
+    if (failed(errors)) {
+      return form(res, 'software-providers/remove', {
+        values: reason.values,
+        errors,
+        errorList: cf.errorList(errors, REASON_FIELDS),
+        reasons: cf.REASONS.removeProvider
+      })
+    }
+    setPending(req, 'remove-provider', provider, { reason: reason.text })
+    res.redirect(`${overviewHref(provider)}/remove/confirm`)
+  }))
+
+  router.get(`${base}/software-providers/:id/remove/confirm`, changeProvider((req, res, provider) => {
+    const pending = getPending(req, 'remove-provider', provider)
+    if (!pending) return res.redirect(`${overviewHref(provider)}/remove`)
+    res.render(view('software-providers/remove-confirm'), { pending })
+  }))
+
+  router.post(`${base}/software-providers/:id/remove/confirm`, changeProvider((req, res, provider) => {
+    const pending = getPending(req, 'remove-provider', provider)
+    if (!pending) return res.redirect(`${overviewHref(provider)}/remove`)
+    cf.closeProvider(provider, pending.reason, by(req))
+    delete req.session.data.pendingV10
+    flash(req, 'Software provider removed', `The credentials for ${provider.name} have been deleted and its case file is closed.`)
+    res.redirect(`${base}/software-providers`)
   }))
 
   // @@V10-NEXT@@ (later stages are added above this line)

@@ -1,0 +1,47 @@
+{#
+  A contact's details. Used for the key contact when creating a case file, and
+  when adding or changing a contact. Autocomplete is off because these are
+  another person's details, not the user's own.
+#}
+{{ govukInput({
+  id: "name",
+  name: "name",
+  label: { text: "Full name", classes: "govuk-label--s" },
+  classes: "govuk-!-width-two-thirds",
+  value: values.name,
+  errorMessage: { text: errors.name } if errors.name else undefined,
+  autocomplete: "off",
+  spellcheck: false
+}) }}
+
+{{ govukInput({
+  id: "jobTitle",
+  name: "jobTitle",
+  label: { text: "Job title (optional)", classes: "govuk-label--s" },
+  classes: "govuk-!-width-two-thirds",
+  value: values.jobTitle,
+  autocomplete: "off"
+}) }}
+
+{{ govukInput({
+  id: "email",
+  name: "email",
+  type: "email",
+  label: { text: "Email address", classes: "govuk-label--s" },
+  hint: { text: "We send credentials to this address" },
+  classes: "govuk-!-width-two-thirds",
+  value: values.email,
+  errorMessage: { text: errors.email } if errors.email else undefined,
+  autocomplete: "off",
+  spellcheck: false
+}) }}
+
+{{ govukInput({
+  id: "phone",
+  name: "phone",
+  type: "tel",
+  label: { text: "Phone number (optional)", classes: "govuk-label--s" },
+  classes: "govuk-input--width-20",
+  value: values.phone,
+  autocomplete: "off"
+}) }}

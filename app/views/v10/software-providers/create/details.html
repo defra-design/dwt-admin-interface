@@ -1,0 +1,41 @@
+{#
+  Create a case file, step 3: the organisation details and why the case file is
+  being created. They are on one page because staff do this often and know the
+  answers (DWP finding: for colleagues, the "one thing" on a page can be larger).
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set pageName = ("Error: " if errorList.length else "") + "Organisation details" %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/" + version + "/software-providers/create" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <span class="govuk-caption-l">Create a case file for {{ name }}</span>
+    <h1 class="govuk-heading-l">Organisation details</h1>
+
+    <form method="post" action="/{{ version }}/software-providers/create/details" novalidate>
+
+      {% include version + "/software-providers/_organisation-details.html" %}
+      {% include version + "/software-providers/_reason.html" %}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Continue" }) }}
+        <a class="govuk-link" href="/{{ version }}/software-providers">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

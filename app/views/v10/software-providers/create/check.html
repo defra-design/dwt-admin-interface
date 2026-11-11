@@ -1,0 +1,58 @@
+{#
+  Create a case file, last step. GOV.UK "Check answers" pattern. Earlier
+  versions have no check pages. This one is here because the journey has
+  several steps and the case file should be recorded once, correctly.
+  A changed answer comes straight back to this page (see routes.js).
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set pageName = "Check your answers before you create the case file" %}
+{% set activeSection = "providers" %}
+{% set createHref = "/" + version + "/software-providers/create" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: createHref + "/authority" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Create a case file</span>
+    <h1 class="govuk-heading-l">Check your answers before you create the case file</h1>
+
+    <h2 class="govuk-heading-m">Organisation</h2>
+    {{ govukSummaryList({
+      classes: "govuk-!-margin-bottom-9",
+      rows: [
+        { key: { text: "Organisation name" }, value: { text: answers.name }, actions: { items: [{ href: createHref, text: "Change", visuallyHiddenText: "organisation name" }] } },
+        { key: { text: "Provider type" }, value: { text: answers.details.providerType }, actions: { items: [{ href: createHref + "/details", text: "Change", visuallyHiddenText: "provider type" }] } },
+        { key: { text: "Developer type" }, value: { text: answers.details.developerType }, actions: { items: [{ href: createHref + "/details", text: "Change", visuallyHiddenText: "developer type" }] } },
+        { key: { text: "Size" }, value: { text: answers.details.size }, actions: { items: [{ href: createHref + "/details", text: "Change", visuallyHiddenText: "size" }] } },
+        { key: { text: "Reason for creating the case file" }, value: { text: answers.reason.text }, actions: { items: [{ href: createHref + "/details", text: "Change", visuallyHiddenText: "reason for creating the case file" }] } }
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Key contact</h2>
+    {{ govukSummaryList({
+      classes: "govuk-!-margin-bottom-9",
+      rows: [
+        { key: { text: "Full name" }, value: { text: answers.contact.name }, actions: { items: [{ href: createHref + "/contact", text: "Change", visuallyHiddenText: "full name" }] } },
+        { key: { text: "Job title" }, value: { text: answers.contact.jobTitle or "Not given" }, actions: { items: [{ href: createHref + "/contact", text: "Change", visuallyHiddenText: "job title" }] } },
+        { key: { text: "Email address" }, value: { text: answers.contact.email, classes: "app-break-word" }, actions: { items: [{ href: createHref + "/contact", text: "Change", visuallyHiddenText: "email address" }] } },
+        { key: { text: "Phone number" }, value: { text: answers.contact.phone or "Not given" }, actions: { items: [{ href: createHref + "/contact", text: "Change", visuallyHiddenText: "phone number" }] } },
+        { key: { text: "Can act for the organisation" }, value: { text: answers.verifyMethod or "Not checked yet" }, actions: { items: [{ href: createHref + "/authority", text: "Change", visuallyHiddenText: "whether the contact can act for the organisation" }] } }
+      ]
+    }) }}
+
+    <form method="post" action="{{ createHref }}/check" novalidate>
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Create case file", preventDoubleClick: true }) }}
+        <a class="govuk-link" href="/{{ version }}/software-providers">Cancel</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

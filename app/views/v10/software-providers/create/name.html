@@ -1,0 +1,49 @@
+{#
+  Create a case file, step 1. Only the name is asked for first, so it can be
+  checked against the case files we already have before anything else is typed
+  (the task flow step "Check for existing"). One question, so the label is the
+  page heading.
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set pageName = ("Error: " if errorList.length else "") + "What is the name of the organisation?" %}
+{% set activeSection = "providers" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/" + version + "/software-providers" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <form method="post" action="/{{ version }}/software-providers/create" novalidate>
+
+      <span class="govuk-caption-l">Create a case file</span>
+      {{ govukInput({
+        id: "name",
+        name: "name",
+        label: { text: "What is the name of the organisation?", classes: "govuk-label--l", isPageHeading: true },
+        hint: { text: "Use the registered name, for example Waste Technologies Ltd" },
+        classes: "govuk-!-width-two-thirds",
+        value: values.name,
+        errorMessage: { text: errors.name } if errors.name else undefined,
+        autocomplete: "off",
+        spellcheck: false
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Continue" }) }}
+        <a class="govuk-link" href="/{{ version }}/software-providers">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

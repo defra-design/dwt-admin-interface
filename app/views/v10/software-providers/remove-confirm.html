@@ -1,0 +1,30 @@
+{#
+  "Are you sure?" step before a software provider is removed, using the MoJ
+  interruption card as in version 9 (written out so the button can post a
+  form). Only this POST removes it (see routes.js), then the user goes to the
+  Software providers page, which confirms it.
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set pageName = "Are you sure you want to remove " + provider.name + "?" %}
+{% set activeSection = "providers" %}
+{% set caseFileHref = "/" + version + "/software-providers/" + provider.id %}
+
+{% block content %}
+<div class="moj-interruption-card">
+  <div class="moj-interruption-card__content">
+    <h1 class="moj-interruption-card__heading">Are you sure you want to remove {{ provider.name }}?</h1>
+    <div class="moj-interruption-card__body">
+      <p>You will delete all the credentials for {{ provider.name }} ({{ provider.reference }}), in external test and production, and close its case file. You cannot undo this.</p>
+      <p>Reason: {{ pending.reason }}</p>
+    </div>
+    <form method="post" action="{{ caseFileHref }}/remove/confirm" novalidate>
+      <div class="govuk-button-group moj-interruption-card__actions">
+        {{ govukButton({ text: "Yes, remove software provider", classes: "govuk-button--inverse", preventDoubleClick: true }) }}
+        <a class="govuk-link govuk-link--inverse" href="{{ caseFileHref }}">Go back to case file</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

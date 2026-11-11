@@ -1,0 +1,43 @@
+{#
+  Remove a contact from a case file, with the reason. The history keeps their
+  name and email address. The key contact cannot be removed (see routes.js).
+#}
+{% extends "layouts/v10.html" %}
+
+{% set version = "v10" %}
+{% set heading = "Remove " + contact.name + " from the case file" %}
+{% set pageName = ("Error: " if errorList.length else "") + heading + " - " + provider.name %}
+{% set activeSection = "providers" %}
+{% set contactsHref = "/" + version + "/software-providers/" + provider.id + "/contacts" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: contactsHref }) }}
+  {% include version + "/software-providers/_identity.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+    <p class="govuk-body">We will not send credentials or messages to {{ contact.name }} ({{ contact.email }}) again. Secrets already sent to them will still work.</p>
+
+    <form method="post" action="{{ contactsHref }}/{{ contact.id }}/remove" novalidate>
+
+      {% include version + "/software-providers/_reason.html" %}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Remove contact", classes: "govuk-button--warning", preventDoubleClick: true }) }}
+        <a class="govuk-link" href="{{ contactsHref }}">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}
