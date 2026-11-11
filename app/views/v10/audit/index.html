@@ -40,6 +40,8 @@
 <h2 class="govuk-heading-m govuk-!-margin-top-7">Completed audits</h2>
 
 {% if completed.length %}
+  {# MoJ scrollable pane: on a small screen the table scrolls sideways, so the page does not. It can be focused, so it can be scrolled with the keyboard. app-scrollable-pane is explained in application.scss. #}
+  <div class="moj-scrollable-pane app-scrollable-pane" tabindex="0" role="region" aria-label="Completed audits">
   <table class="govuk-table">
     <caption class="govuk-table__caption govuk-visually-hidden">Completed audits, newest first</caption>
     <thead class="govuk-table__head">
@@ -61,6 +63,7 @@
       {% endfor %}
     </tbody>
   </table>
+  </div>
 {% else %}
   <p class="govuk-body">No audits have been completed.</p>
 {% endif %}

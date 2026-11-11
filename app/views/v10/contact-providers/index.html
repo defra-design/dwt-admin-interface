@@ -4,7 +4,7 @@
   or a mailshot). Today this means filtering the team spreadsheet.
   This service does not send the message: the user downloads the contact
   list, sends the message from the team mailbox, then records it.
-  The table shows the messages already recorded.
+  The timeline shows the messages already recorded.
   Case worker only (see the router.use block in routes.js).
 #}
 {% extends "layouts/v10.html" %}
@@ -57,32 +57,22 @@
   </div>
 </div>
 
-{# Spacing unit 9 (60px) separates the form from the record of what has been sent. #}
-<h2 class="govuk-heading-m govuk-!-margin-top-9">Messages recorded</h2>
+{# Spacing unit 9 (60px) separates the form from the record of what has been sent.
+   The record is the same timeline as a case file's History page, because each
+   entry is sentences, which do not fit a table on a small screen. #}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
 
-{% if sent.length %}
-  <table class="govuk-table">
-    <caption class="govuk-table__caption govuk-visually-hidden">Messages sent to groups of software providers, newest first</caption>
-    <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-        <th scope="col" class="govuk-table__header">Date</th>
-        <th scope="col" class="govuk-table__header">Sent by</th>
-        <th scope="col" class="govuk-table__header">Reason</th>
-        <th scope="col" class="govuk-table__header">Sent to and summary</th>
-      </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-      {% for message in sent %}
-        <tr class="govuk-table__row">
-          <td class="govuk-table__cell">{{ message.dateTime }}</td>
-          <td class="govuk-table__cell">{{ message.by }}</td>
-          <td class="govuk-table__cell">{{ message.reason }}</td>
-          <td class="govuk-table__cell">{{ message.detail }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-{% else %}
-  <p class="govuk-body">No messages to a group of software providers have been recorded.</p>
-{% endif %}
+    <h2 class="govuk-heading-m govuk-!-margin-top-9">Messages recorded</h2>
+
+    {% if sent.length %}
+      {% set timelineEntries = sent %}
+      {% set timelineHeadingLevel = 3 %}
+      {% include version + "/software-providers/_timeline.html" %}
+    {% else %}
+      <p class="govuk-body">No messages to a group of software providers have been recorded.</p>
+    {% endif %}
+
+  </div>
+</div>
 {% endblock %}

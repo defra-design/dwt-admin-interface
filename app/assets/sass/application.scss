@@ -285,6 +285,22 @@
   margin: 0;
 }
 
+// Tables in an MoJ scrollable pane (v10). Two fixes, because the MoJ styles do
+// not cover them:
+// 1. Visually hidden text in a cell (for example in a link) is positioned
+//    outside the pane, which makes the whole page scroll sideways on a small
+//    screen. Making the pane the positioning parent keeps it inside.
+// 2. The MoJ pane stops cells wrapping on screens under 1020px. That suits
+//    short values, but not a column of sentences, so --wrap turns it back on.
+.app-scrollable-pane {
+  position: relative;
+}
+
+.moj-scrollable-pane.app-scrollable-pane--wrap .govuk-table__header,
+.moj-scrollable-pane.app-scrollable-pane--wrap .govuk-table__cell {
+  white-space: normal;
+}
+
 .app-defra-service-nav--v5 {
   background-color: #008531;
   border-top: 1px solid rgba(255, 255, 255, 0.3);

@@ -31,6 +31,13 @@ module.exports = [
     summary: 'The landing page after the start of the service.',
     variants: [
       {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/start',
+        difference: 'Future-state concept. A search box for case files, and links to software packages by status with a count for each. The header shows who is signed in.',
+        rationaleHref: '/versions/v10'
+      },
+      {
         label: 'Version 5',
         source: 'Prototype',
         href: '/v5/start',
@@ -72,6 +79,13 @@ module.exports = [
     name: 'Software providers list',
     summary: 'The page you reach from “Software providers” in the navigation.',
     variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers',
+        difference: 'Future-state concept. One row for each software package, with the software provider, its reference, status, days in that status and key contact. A search box and a status filter (MoJ filter) beside the table. “Create a case file” replaces “Create new credentials”.',
+        rationaleHref: '/versions/v10'
+      },
       {
         label: 'DWTSPI-512 design',
         source: 'Jira design',
@@ -224,8 +238,15 @@ module.exports = [
   {
     id: 'software-provider-detail',
     name: 'Software provider detail',
-    summary: 'A single software provider company, with its email addresses and notes. Only built in version 3.',
+    summary: 'A single software provider company, with its email addresses and notes. Built in version 3, and as a case file in version 10.',
     variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers/sp-1001',
+        difference: 'Future-state concept. A case file with three pages: Overview, Contacts and History (MoJ sub navigation), with the name and reference at the top of each (MoJ identity bar). Software packages are summary cards with their status. History is a timeline of every action, with who did it and why.',
+        rationaleHref: '/versions/v10'
+      },
       {
         label: 'Version 3',
         source: 'Prototype',
@@ -246,8 +267,16 @@ module.exports = [
   {
     id: 'add-software-provider',
     name: 'Add a software provider',
-    summary: 'Adding a company to the list. Only built in version 3.',
+    summary: 'Adding a company to the list. Built in version 3, and as “Create a case file” in version 10.',
     variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers/create?new=yes',
+        linkNote: 'Enter “Greenlane Digital” to see the similar names page.',
+        difference: 'Future-state concept, called “Create a case file”. Organisation name, a check for case files with a similar name, organisation details, key contact, how the contact was checked, then check your answers.',
+        rationaleHref: '/versions/v10'
+      },
       {
         label: 'Version 3',
         source: 'Prototype',
@@ -262,6 +291,13 @@ module.exports = [
     name: 'Create and edit credentials',
     summary: 'The question page for the client name, reached from the Create credentials button.',
     variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers/sp-1003/packages/sp-1003-p1/credentials/production/create',
+        difference: 'Future-state concept. No client name question: the service makes the client name. The page asks which checked contact to send the client secret to, then has a check page. The environment comes from the button on the software package page.',
+        rationaleHref: '/versions/v10'
+      },
       {
         label: 'DWTSPI-493 edit client name error design',
         source: 'Jira design',
@@ -380,6 +416,13 @@ module.exports = [
     summary: 'Shown once, after credentials are created or a secret is rotated. Needs session data, so these links open the list.',
     variants: [
       {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers/sp-1001/packages/sp-1001-p1',
+        difference: 'Future-state concept. There is no page that shows the secret. The service sends it to a checked contact, and the software package page records when it was generated, who it was sent to and who sent it.',
+        rationaleHref: '/versions/v10'
+      },
+      {
         label: 'Copy credentials page ticket design',
         source: 'Jira design',
         href: '/jira-tickets/copy-credentials-page/design',
@@ -447,6 +490,13 @@ module.exports = [
     name: 'Rotate client secret',
     summary: 'Reached from the Rotate link in the table.',
     variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers/sp-1004/packages/sp-1004-p1/credentials/production/replace',
+        difference: 'Future-state concept. One page asks why the secret is being replaced. Routine keeps the current secret until it is removed. Security breach stops it immediately. Then who to send the new secret to, and a check page.',
+        rationaleHref: '/versions/v10'
+      },
       {
         label: 'DWTSPI-505 replace secret design',
         source: 'Jira design',
@@ -600,6 +650,91 @@ module.exports = [
         linkNote: 'Select Rotate in the table.',
         difference: 'Rotate goes to a “not built” page.',
         rationaleHref: '/versions/v4'
+      }
+    ]
+  },
+  {
+    id: 'software-package',
+    name: 'Software package',
+    summary: 'One software package on a case file, with its approval and credentials. Only built in version 10.',
+    variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers/sp-1002/packages/sp-1002-p1',
+        difference: 'Status tag with days in that status, approval for production, and the credentials for external test and production on one page. A table of secrets shows when each was generated and who it was sent to. Links to suspend, revoke or move the software package.',
+        rationaleHref: '/versions/v10'
+      }
+    ]
+  },
+  {
+    id: 'approve-for-production',
+    name: 'Approve for production',
+    summary: 'Recording the production approval test (PAT) result and approving a software package. Only built in version 10.',
+    variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers/sp-1008/packages/sp-1008-p1/pat-result',
+        difference: 'Passed, Failed or Exception agreed, with details that are needed for an exception. “Approve for production” is offered after a pass or an exception, and shows what the approval is based on.',
+        rationaleHref: '/versions/v10'
+      }
+    ]
+  },
+  {
+    id: 'access',
+    name: 'Suspend, reactivate or revoke access',
+    summary: 'Stopping or restoring a software package’s access. Only built in version 10.',
+    variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers/sp-1001/packages/sp-1001-p1/suspend',
+        difference: 'One page each, with what will happen, the reason and a message to the software provider. Revoke has an “Are you sure?” page (MoJ interruption card).',
+        rationaleHref: '/versions/v10'
+      }
+    ]
+  },
+  {
+    id: 'record-contact',
+    name: 'Record a contact',
+    summary: 'Recording a conversation with a software provider on its case file. Only built in version 10.',
+    variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers/sp-1001/record-contact',
+        difference: 'One page: who the contact was with and whether they have been checked, how, what it was about and a summary. It is added to the history.',
+        rationaleHref: '/versions/v10'
+      }
+    ]
+  },
+  {
+    id: 'contact-providers',
+    name: 'Contact providers',
+    summary: 'Contacting a group of software providers, for an incident or a mailshot. Only built in version 10.',
+    variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/contact-providers',
+        difference: 'Choose software providers by the status of their software packages, check the contact list, download it as a CSV file, then record the message on every case file. The service does not send the message.',
+        rationaleHref: '/versions/v10'
+      }
+    ]
+  },
+  {
+    id: 'audit',
+    name: 'Audit',
+    summary: 'Auditing a random sample of actions. Auditor only. Only built in version 10.',
+    variants: [
+      {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/sign-in',
+        linkNote: 'Sign in as the auditor, then select Audit.',
+        difference: 'A random sample of 10 actions as a GOV.UK task list. Each action shows who did it, when and why, and is marked “No concerns” or “Needs follow-up”. Completing the audit records that it was done. “All actions” lists every action with filters.',
+        rationaleHref: '/versions/v10'
       }
     ]
   },

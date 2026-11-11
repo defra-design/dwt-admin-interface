@@ -23,6 +23,8 @@
 
     <p class="govuk-body">A future-state concept, not a design for the next tickets. Ticket work continues in <a class="govuk-link" href="/versions/v9">version 9</a>.</p>
 
+    <p class="govuk-body">Sign in as the case worker to use every page except Audit. Sign in as the auditor to use the Audit pages. All the data is made up.</p>
+
     <div>
       {{ govukButton({
         html: 'View prototype<span class="govuk-visually-hidden"> for version 10</span>',
@@ -50,8 +52,110 @@
       rows: [
         [
           { text: "Scope" },
-          { text: "A copy of version 9, rebuilt around a case file for each software provider: organisation details, contacts, software packages, credentials and history. The version 9 client credentials pages and environment ideas are not copied." },
-          { text: "To show a future state that supports the tasks in the October 2026 task flows (allocation is out of scope). Today the information is held in a spreadsheet, emails and Jira tickets." },
+          { text: "A copy of version 9, rebuilt around a case file for each software provider: organisation details, contacts, software packages, credentials and history. The version 9 client credentials pages and environment ideas are not copied. Allocation is out of scope." },
+          { text: "To show a future state that supports the tasks in the October 2026 task flows. Today the information is held in a spreadsheet, emails and Jira tickets." },
+          { html: '<a class="govuk-link" href="/v10/software-providers">/v10/software-providers</a>' }
+        ],
+        [
+          { text: "Sign in and roles" },
+          { text: "A mock sign-in with two roles. A case worker can do everything except audit, and can see the history of a case file. An auditor can view case files and audit actions, but cannot change anything. The header shows who is signed in. A page a role cannot use shows “You do not have permission to use this page”. Opening a page without signing in uses the case worker." },
+          { text: "Design decision on 11 November 2026: two roles, so that the person who audits is not the person who made the changes." },
+          { html: '<a class="govuk-link" href="/v10/sign-in">/v10/sign-in</a>' }
+        ],
+        [
+          { text: "Home" },
+          { text: "A search box for case files, and links to software packages by status with a count for each." },
+          { text: "Task flow “Find a case file”. Staff should not have to set a filter for a view they use every day (Home Office “Filter a data table”, see design rationale)." },
+          { html: '<a class="govuk-link" href="/v10/start">/v10/start</a>' }
+        ],
+        [
+          { text: "Software providers list" },
+          { text: "One row for each software package, with the software provider and its reference, status, days in that status and key contact. Search by organisation, reference, software package, client name, client ID or contact. Filter by status. Columns can be sorted. A removed software provider stays in the list with the status “Closed”." },
+          { text: "Task flow “Find a case file”, and its risk that software providers have similar names: the reference and key contact tell them apart. “Days in status” supports finding a software provider who is stuck." },
+          { html: '<a class="govuk-link" href="/v10/software-providers">/v10/software-providers</a><br><a class="govuk-link" href="/v10/software-providers?search=green">Search for “green”</a>' }
+        ],
+        [
+          { text: "Case file" },
+          { text: "Three pages for each software provider: Overview (organisation details, key contact, software packages and the latest history), Contacts and History. The name and reference are at the top of every page of the case file. History shows every action, newest first, with who did it, when and why, and can be filtered by type of action or software package. The Overview shows a reminder when an old secret is waiting to be removed." },
+          { text: "Task flow “Communicate with a provider”: staff need to see what has happened before they reply. Risks on the task flows: information is spread across a spreadsheet, emails and Jira, and there is no audit trail." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/sp-1001">Overview</a><br><a class="govuk-link" href="/v10/software-providers/sp-1001/contacts">Contacts</a><br><a class="govuk-link" href="/v10/software-providers/sp-1001/history">History</a><br><a class="govuk-link" href="/v10/software-providers/sp-1002">Overview with a reminder</a>' }
+        ],
+        [
+          { text: "Reason for every change" },
+          { text: "Every page that changes a case file asks why, with the common reasons as radios and “Another reason” with a text box. The reason is shown in the history and in audits. Creating credentials and approving for production record their reason automatically." },
+          { text: "Task flow “Audit”: the auditor reviews the reason for each action. Reasons are not recorded today." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/sp-1001/change-name">Example: change organisation name</a>' }
+        ],
+        [
+          { text: "Create a case file" },
+          { text: "Organisation name, then a check for case files with a similar name, organisation details, key contact, how you checked the contact can act for the organisation, and check your answers. A changed answer goes back to “Check your answers”." },
+          { text: "Task flow “Create a case file”, with its step “Check for existing” and the risk of similar company names. Earlier versions have no check page: this journey has several steps and should be recorded once, correctly." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/create?new=yes">/v10/software-providers/create</a> (enter “Greenlane Digital” to see the similar names page)' }
+        ],
+        [
+          { text: "Change a case file" },
+          { text: "Add a software package. Change the organisation name or details. Add, change or remove a contact, and make a contact the key contact. Record how you checked that a contact can act for the organisation. If a contact’s email address changes, they have to be checked again. The key contact cannot be removed." },
+          { text: "Task flows “Add software package” and “Change organisation name or contact details”. Risk on the task flows: there is no way to know if a contact can act for the software provider." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/sp-1001/add-package">Add a software package</a><br><a class="govuk-link" href="/v10/software-providers/sp-1001/change-details">Change organisation details</a><br><a class="govuk-link" href="/v10/software-providers/sp-1001/contacts/add">Add a contact</a>' }
+        ],
+        [
+          { text: "Record a contact" },
+          { text: "One page to record a conversation with a software provider: who it was with, whether they have been checked, how, what it was about and a summary. It is added to the history." },
+          { text: "Task flow “Communicate with a provider”, with its step “Verify person can act for provider”. Conversations are in emails and Jira today." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/sp-1001/record-contact">Record a contact</a>' }
+        ],
+        [
+          { text: "Software package and credentials" },
+          { text: "One page for each software package, with its status, approval and the credentials for external test and production. The service makes the client name. Staff never see a client secret: they choose a checked contact, and the service sends the client ID and a one-time link to the secret. The page records when each secret was generated, who it was sent to and who sent it. Production credentials can only be created after approval." },
+          { text: "Design decision on 11 November 2026: secrets go straight to a checked contact. Risks on the task flows: secrets are visible to the team, the client name format is easy to get wrong, and the environments have separate addresses." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/sp-1001/packages/sp-1001-p1">Software package in production</a><br><a class="govuk-link" href="/v10/software-providers/sp-1003/packages/sp-1003-p1/credentials/production/create">Create production credentials</a><br><a class="govuk-link" href="/v10/software-providers/sp-1005/packages/sp-1005-p1/credentials/test/create">No checked contact yet</a>' }
+        ],
+        [
+          { text: "Replace a secret" },
+          { text: "One page for both kinds of replacement. Routine: the current secret keeps working until staff remove it, with a reminder on the case file. Security breach: the current secret stops working immediately and the security team is told. Both have a check page before anything is sent. “Remove old secret” finishes a routine replacement." },
+          { text: "Task flows “Rotate a secret (routine)” and “Rotate a secret (urgent, breach)”. One starting point, because the first thing to decide is which it is." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/sp-1004/packages/sp-1004-p1/credentials/production/replace">Replace a secret</a><br><a class="govuk-link" href="/v10/software-providers/sp-1002/packages/sp-1002-p1/credentials/test/remove-secret">Remove old secret</a>' }
+        ],
+        [
+          { text: "Approve for production" },
+          { text: "Record the production approval test (PAT) result: passed, failed, or an exception with what was agreed and who agreed it. “Approve for production” is only offered after a pass or an exception, and shows what the approval is based on. The PAT submissions are not in this version." },
+          { text: "Task flow “Approve for production”, which includes PAT results and exceptions. The decision is in emails and Jira today." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/sp-1008/packages/sp-1008-p1/pat-result">Record the PAT result</a>' }
+        ],
+        [
+          { text: "Suspend, reactivate or revoke" },
+          { text: "One page each, asking for the reason and a message to the software provider, which goes to the key contact. Suspend keeps the credentials. Revoke deletes them, cannot be undone and has an “Are you sure?” page." },
+          { text: "Task flow “Suspend, reactivate or revoke”, with its step to tell the software provider." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/sp-1001/packages/sp-1001-p1/suspend">Suspend</a><br><a class="govuk-link" href="/v10/software-providers/sp-1006/packages/sp-1006-p1/reactivate">Reactivate</a><br><a class="govuk-link" href="/v10/software-providers/sp-1001/packages/sp-1001-p1/revoke">Revoke</a>' }
+        ],
+        [
+          { text: "Move a software package" },
+          { text: "Move a software package to another software provider’s case file, with the reason and an “Are you sure?” page. It takes its credentials and history with it. Client names do not change." },
+          { text: "Task flow “Change provider of software package”." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/sp-1001/packages/sp-1001-p2/move">Move a software package</a>' }
+        ],
+        [
+          { text: "Remove a software provider" },
+          { text: "The reason, then an “Are you sure?” page. All credentials are deleted and the case file is closed. It is kept, with its history, so it can still be audited." },
+          { text: "Task flow “Remove software organisation”. Deleting the record would remove the audit trail." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/sp-1001/remove">Remove a software provider</a><br><a class="govuk-link" href="/v10/software-providers/sp-1009">A closed case file</a>' }
+        ],
+        [
+          { text: "Contact providers" },
+          { text: "For an incident or a mailshot. Choose software providers by the status of their software packages, and key contacts or all contacts. Check the list, download it as a CSV file, send the message from the team mailbox, then record it. The message is added to the history of each case file. The service does not send the message." },
+          { text: "Task flow “Contact all providers”, with its steps to download the contact details and record the reason. Today this means filtering the spreadsheet." },
+          { html: '<a class="govuk-link" href="/v10/contact-providers">/v10/contact-providers</a>' }
+        ],
+        [
+          { text: "Audit" },
+          { text: "Auditor only. An audit is a random sample of 10 actions that no earlier audit has looked at. The auditor reviews each action and its reason, marks it “No concerns” or “Needs follow-up”, then completes the audit, which records that it was done. Following up with staff is recorded, not sent. “All actions” lists every action, with filters, and shows which have been audited." },
+          { text: "Task flow “Audit”: find random actions, review the reasons, contact staff if necessary, record that the audit was done. Risk on the task flows: there is no audit trail." },
+          { html: '<a class="govuk-link" href="/v10/sign-in">Sign in</a> as the auditor, then select “Audit”' }
+        ],
+        [
+          { text: "Small screens and zoom" },
+          { text: "Tables are in an MoJ scrollable pane, so on a small screen or at high zoom the table scrolls sideways and the page does not. The pane can be reached and scrolled with the keyboard." },
+          { text: "WCAG 2.2 reflow (1.4.10). Checked at 320px wide, which is the same as 400% zoom on a 1280px screen." },
           { html: '<a class="govuk-link" href="/v10/software-providers">/v10/software-providers</a>' }
         ]
       ]
@@ -65,10 +169,59 @@
 
     <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
 
-    <p class="govuk-body">This version is not tested with users.</p>
+    <p class="govuk-body">This version is not tested with users. It is built from the October 2026 task flows, which are partly unverified. It is a concept to discuss with the service team and stakeholders, not a specification.</p>
 
     <p class="govuk-body">This version has its own session data. Changes made in this version are not
       shown in any other version, and the other way round.</p>
+
+    <h3 class="govuk-heading-s">Patterns from other departments</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li><a class="govuk-link" href="https://dwpdigital.blog.gov.uk/2018/03/13/eight-things-ive-learnt-from-designing-services-for-colleagues/">Eight things I’ve learnt from designing services for colleagues (DWP Digital)</a>: design for repetition, let the “one thing” on a page be larger for staff, and keep everything needed to answer an enquiry in one place. This is why a change and its reason are on one page, and why the case file Overview brings the details, contacts, software packages and latest history together.</li>
+      <li><a class="govuk-link" href="https://medium.com/@ctdesign/designing-caseworking-systems-2-4d3efd1fbf82">Designing caseworking systems meetup 2 (cross-government)</a>: persistent navigation, important information on the overview, and history entries that are labelled and can be filtered. This is why the case file has Overview, Contacts and History as pages with the same navigation, a reminder on the Overview, and a type on each history entry.</li>
+      <li><a class="govuk-link" href="https://github.com/UKHomeOffice/design-system/discussions/362">Filter a data table (a pattern proposed for the Home Office design system)</a>: search, filters and a data table work as one pattern, and staff should not need filters for tasks they repeat. This is why the home page links to each status with a count. It is a proposal, not a published pattern.</li>
+      <li><a class="govuk-link" href="https://design.homeoffice.gov.uk/design-system/patterns/help-users-to/search-for-something">Search for something (Home Office)</a>: a wide search when staff may only have part of the information, and a button to apply filters. This is why one search box covers the organisation, reference, software package, client name, client ID and contact.</li>
+      <li><a class="govuk-link" href="https://design-patterns.service.justice.gov.uk/patterns/filter-a-list/">Filter a list (MoJ)</a>, with the MoJ filter, sortable table, sub navigation, identity bar, timeline, alert, interruption card and scrollable pane, which are made for internal services. GOV.UK components are used for everything else, including the task list for an audit.</li>
+    </ul>
+
+    <h3 class="govuk-heading-s">Differences from earlier versions and from the MoJ patterns</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>After an action, the next page shows an MoJ success alert, as version 9 does on its list and software provider pages. There are no confirmation panel pages, because staff carry on working in the case file.</li>
+      <li>The MoJ filter component is used, but not the MoJ “filter layout”, which hides the filter behind a button with JavaScript. The filter is always shown, in a GOV.UK grid.</li>
+      <li>The MoJ identity bar is made for the full width of the screen. A small style lines it up with the page.</li>
+      <li>The environment for new credentials comes from the button on the software package page. There is no “which environment?” question to get wrong.</li>
+      <li>“Check your answers” pages are used where a journey has several steps or cannot be undone: creating a case file, creating credentials and replacing a secret.</li>
+      <li>“Are you sure?” pages (MoJ interruption card, as in version 9) are used for removing a software provider, revoking access and moving a software package.</li>
+      <li>Statuses are tags with words, never colour alone: Created (grey), In test (blue), Approved for production (teal), In production (purple), Suspended (orange), Revoked (red) and Closed (grey).</li>
+    </ul>
+
+    <h3 class="govuk-heading-s">Assumptions to confirm</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>How staff check that a contact can act for a software provider. There is no policy, so the methods offered are examples.</li>
+      <li>The values for provider type, developer type and size. They are placeholders for the columns in the team spreadsheet.</li>
+      <li>A secret is sent as a one-time link by email. The software provider’s side is not built, and “sent” is the only delivery status.</li>
+      <li>After a security breach, the service tells a Defra security team mailbox automatically.</li>
+      <li>Access can be suspended without changing the secrets.</li>
+      <li>Client names are made by the service and do not change when an organisation is renamed or a software package moves.</li>
+      <li>A message to a group of software providers is sent from a team mailbox, not by this service.</li>
+      <li>An audit is 10 random actions, and one audit is under way at a time.</li>
+      <li>A removed software provider’s case file is kept. How long to keep contacts’ personal details needs a decision.</li>
+      <li>Both roles are needed. Whether an auditor should see contact details has not been decided.</li>
+    </ul>
+
+    <h3 class="govuk-heading-s">Not built</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Allocation, which is out of scope.</li>
+      <li>The production approval test submissions (the link goes to a placeholder page), and approval for each API capability.</li>
+      <li>Service metrics, a view of data quality, and nudging a software provider who is stuck, apart from the “Days in status” column.</li>
+      <li>Real sign-in, session time-out, and paging for long lists.</li>
+      <li>The Waste organisations report is copied from version 9 without changes.</li>
+    </ul>
+
+    <h3 class="govuk-heading-s">Risks to test first</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Sending secrets straight to a contact, checking contacts and audit are the least certain parts. Test them with the service team first.</li>
+      <li>Six statuses, and a reason on every change, both add work for staff. GOV.UK guidance is to start with the fewest statuses you can.</li>
+    </ul>
 
   </div>
 </div>

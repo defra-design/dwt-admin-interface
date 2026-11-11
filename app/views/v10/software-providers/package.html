@@ -89,6 +89,8 @@
           ]
         }) }}
 
+        {# MoJ scrollable pane: on a small screen the table scrolls sideways, so the page does not. It can be focused, so it can be scrolled with the keyboard. app-scrollable-pane is explained in application.scss. #}
+        <div class="moj-scrollable-pane app-scrollable-pane" tabindex="0" role="region" aria-label="Client secrets for {{ environment.lower }}">
         <table class="govuk-table">
           <caption class="govuk-table__caption govuk-table__caption--s">Client secrets for {{ environment.lower }}</caption>
           <thead class="govuk-table__head">
@@ -118,6 +120,7 @@
             {% endfor %}
           </tbody>
         </table>
+        </div>
 
         {% if canEdit and pkg.active %}
           {{ govukButton({

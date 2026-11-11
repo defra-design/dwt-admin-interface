@@ -81,6 +81,8 @@
       {# MoJ sortable table: the MoJ script turns each header with aria-sort into a sort
          button. The rows arrive sorted by software provider, A to Z. data-sort-value gives
          the script a value that sorts correctly where the text shown would not. #}
+      {# MoJ scrollable pane: on a small screen the table scrolls sideways, so the page does not. It can be focused, so it can be scrolled with the keyboard. app-scrollable-pane is explained in application.scss. #}
+      <div class="moj-scrollable-pane app-scrollable-pane" tabindex="0" role="region" aria-label="Software providers">
       <table class="govuk-table" data-module="moj-sortable-table">
         <caption class="govuk-table__caption govuk-table__caption--m">{{ rows.length }} software package{{ "s" if rows.length != 1 }}{{ " found" if filtered }}</caption>
         <thead class="govuk-table__head">
@@ -116,6 +118,7 @@
           {% endfor %}
         </tbody>
       </table>
+      </div>
     {% else %}
       <h2 class="govuk-heading-m">No software providers found</h2>
       <p class="govuk-body">Check the spelling, or try a different search. You can search by organisation, reference, software package, client name, client ID or contact.</p>
