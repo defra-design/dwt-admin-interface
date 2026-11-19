@@ -1,0 +1,41 @@
+{#
+  Idea B: landing page with more reassurance. Says what the user can do after
+  signing in, what to expect (the Microsoft sign-in page, then back here), and
+  where to get help before they try.
+#}
+{% extends "layouts/v9.html" %}
+
+{% set version = "v9" %}
+{% set pageName = "Sign in" %}
+{% set activeSection = "" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">Sign in to the DWT admin portal</h1>
+
+    <p class="govuk-body">This is an internal Defra service for the Digital Waste Tracking team. You can use it to:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>manage software providers and their credentials</li>
+      <li>view waste organisations</li>
+    </ul>
+
+    {{ govukInsetText({
+      text: "You will sign in with your Defra account on a Microsoft page. You will come back to this service when you have signed in."
+    }) }}
+
+    {{ govukButton({
+      text: "Sign in with your Defra account",
+      href: "/" + version + "/sign-in/microsoft",
+      isStartButton: true
+    }) }}
+
+    <h2 class="govuk-heading-m">If you cannot sign in</h2>
+
+    <p class="govuk-body">Only Defra staff who have been given access can use this service. If you think you should have access, contact the DWT service team.</p>
+
+  </div>
+</div>
+{% endblock %}

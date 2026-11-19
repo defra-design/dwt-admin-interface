@@ -12,9 +12,9 @@ const sp = require('./data/software-providers')
 const cc = require('./data/client-credentials')
 const ccV6 = require('./data/client-credentials-v6')
 const ccV7 = require('./data/client-credentials-v7')
-const ccV8 = require('./data/client-credentials-v8')
+const ccFutureSoftwareProviderPage = require('./data/future-software-provider-page-credentials')
 const ccV9 = require('./data/client-credentials-v9')
-const cf = require('./data/case-files-v10')
+const cf = require('./data/future-case-files')
 const { paginate } = require('./data/pagination')
 const {
   formatDateObj,
@@ -2911,29 +2911,29 @@ function registerV7Routes () {
 
 registerV7Routes()
 
-// --- Version 8 -----------------------------------------------------------
+// --- Future state: software provider page concept -----------------------------------------------------------
 // A copy of version 7, with no changes yet. It has its own function and its
 // own session data key, so version 7 stays frozen while this is edited.
-function registerV8Routes () {
-  const base = '/v8'
-  const view = (page) => `v8/${page}`
+function registerFutureSoftwareProviderPageRoutes () {
+  const base = '/future/software-provider-page'
+  const view = (page) => `future/software-provider-page/${page}`
 
   router.use(base, (req, res, next) => {
-    res.locals.version = 'v8'
+    res.locals.version = 'future/software-provider-page'
     next()
   })
 
   // Credentials created or changed in this session. See data/client-credentials.js.
   function credentialList (req) {
-    if (!Array.isArray(req.session.data.clientCredentialsV8)) {
-      req.session.data.clientCredentialsV8 = []
+    if (!Array.isArray(req.session.data.clientCredentialsFutureSoftwareProviderPage)) {
+      req.session.data.clientCredentialsFutureSoftwareProviderPage = []
     }
-    return req.session.data.clientCredentialsV8
+    return req.session.data.clientCredentialsFutureSoftwareProviderPage
   }
 
   // The environment comes from the URL: /test or /production.
   function environmentFor (key) {
-    const match = ccV8.ENVIRONMENTS.find((e) => e.value.toLowerCase() === key)
+    const match = ccFutureSoftwareProviderPage.ENVIRONMENTS.find((e) => e.value.toLowerCase() === key)
     return match ? { key: match.value.toLowerCase(), label: match.value } : null
   }
 
@@ -3072,7 +3072,7 @@ function registerV8Routes () {
     // Client name, A to Z. The page marks "Client name" as sorted.
     // Production credentials are hidden and Test is shown as "External test".
     // Only the label changes here, so the shared data stays as it is.
-    const credentials = ccV8.listCredentials(credentialList(req))
+    const credentials = ccFutureSoftwareProviderPage.listCredentials(credentialList(req))
       .filter((c) => c.environment !== 'Production')
       .map((c) => Object.assign({}, c, { environment: 'External test' }))
       .sort((a, b) => a.clientName.localeCompare(b.clientName))
@@ -3108,19 +3108,19 @@ function registerV8Routes () {
     const environment = environmentFor(req.params.environment)
     if (!environment) return res.redirect(`${base}/software-providers`)
     const values = { clientName: (req.body.clientName || '').trim() }
-    const errors = ccV8.validateClientName(values.clientName, credentialList(req))
+    const errors = ccFutureSoftwareProviderPage.validateClientName(values.clientName, credentialList(req))
     if (Object.keys(errors).length) {
       return renderClientNameForm(res, {
         environment,
         mode: 'create',
         values,
         errors,
-        errorList: ccV8.clientNameErrorList(errors)
+        errorList: ccFutureSoftwareProviderPage.clientNameErrorList(errors)
       })
     }
 
     // The environment is set from the page the user started on, not the form.
-    const credential = ccV8.createCredential({
+    const credential = ccFutureSoftwareProviderPage.createCredential({
       clientName: values.clientName,
       environment: environment.label
     })
@@ -3130,7 +3130,7 @@ function registerV8Routes () {
 
   // The edit page is the create page with the current client name filled in.
   router.get(`${base}/client-credentials/:id/edit`, (req, res) => {
-    const credential = ccV8.getCredential(credentialList(req), req.params.id)
+    const credential = ccFutureSoftwareProviderPage.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     renderClientNameForm(res, {
       environment: environmentFor(credential.environment.toLowerCase()),
@@ -3141,11 +3141,11 @@ function registerV8Routes () {
   })
 
   router.post(`${base}/client-credentials/:id/edit`, (req, res) => {
-    const credential = ccV8.getCredential(credentialList(req), req.params.id)
+    const credential = ccFutureSoftwareProviderPage.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     const values = { clientName: (req.body.clientName || '').trim() }
     // The credential's own name does not count as "already exists".
-    const errors = ccV8.validateClientName(values.clientName, credentialList(req), credential.id)
+    const errors = ccFutureSoftwareProviderPage.validateClientName(values.clientName, credentialList(req), credential.id)
     if (Object.keys(errors).length) {
       return renderClientNameForm(res, {
         environment: environmentFor(credential.environment.toLowerCase()),
@@ -3153,14 +3153,14 @@ function registerV8Routes () {
         credential,
         values,
         errors,
-        errorList: ccV8.clientNameErrorList(errors)
+        errorList: ccFutureSoftwareProviderPage.clientNameErrorList(errors)
       })
     }
 
     // Only a real change counts as a change, so "Last changed" stays put if
     // the user saves without editing.
     if (values.clientName !== credential.clientName) {
-      const toChange = ccV8.credentialToChange(credentialList(req), credential.id)
+      const toChange = ccFutureSoftwareProviderPage.credentialToChange(credentialList(req), credential.id)
       toChange.clientName = values.clientName
       toChange.lastChanged = new Date().toISOString()
     }
@@ -3172,7 +3172,7 @@ function registerV8Routes () {
   // table rather than showing the secret again.
   // When each secret was generated, newest first, as text for the page.
   function secretLabels (credential) {
-    return ccV8.secretDates(credential)
+    return ccFutureSoftwareProviderPage.secretDates(credential)
       .slice()
       .sort((a, b) => new Date(b) - new Date(a))
       .map((d) => formatDateTimeObj(new Date(d)))
@@ -3189,7 +3189,7 @@ function registerV8Routes () {
   }
 
   router.get(`${base}/client-credentials/:id/created`, (req, res) => {
-    const credential = ccV8.getCredential(credentialList(req), req.params.id)
+    const credential = ccFutureSoftwareProviderPage.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     if (!credential.pendingSecret) return res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
     renderReveal(res, credential)
@@ -3226,7 +3226,7 @@ function registerV8Routes () {
 
   // Closing goes to the software provider page, which confirms what was created.
   router.post(`${base}/client-credentials/:id/created`, (req, res) => {
-    const credential = ccV8.getCredential(credentialList(req), req.params.id)
+    const credential = ccFutureSoftwareProviderPage.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     delete credential.pendingSecret
     delete credential.pendingAction
@@ -3291,7 +3291,7 @@ function registerV8Routes () {
   }
 
   router.get(`${base}/client-credentials/:id/software-provider-detail`, (req, res) => {
-    const credential = ccV8.getCredential(credentialList(req), req.params.id)
+    const credential = ccFutureSoftwareProviderPage.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     res.render(view('client-credentials/software-provider-detail'), {
       credential,
@@ -3312,12 +3312,12 @@ function registerV8Routes () {
   })
 
   router.post(`${base}/client-credentials/:id/rotate`, (req, res) => {
-    if (!ccV8.getCredential(credentialList(req), req.params.id)) {
+    if (!ccFutureSoftwareProviderPage.getCredential(credentialList(req), req.params.id)) {
       return res.redirect(`${base}/software-providers`)
     }
-    const credential = ccV8.credentialToChange(credentialList(req), req.params.id)
+    const credential = ccFutureSoftwareProviderPage.credentialToChange(credentialList(req), req.params.id)
     if (credential.pendingAction !== 'rotated') {
-      ccV8.rotateSecret(credential)
+      ccFutureSoftwareProviderPage.rotateSecret(credential)
       // Replacing leaves one secret, generated now.
       delete credential.secrets
     }
@@ -3327,12 +3327,12 @@ function registerV8Routes () {
   // Adding a secret changes data, so it is a POST. Two secrets at most. Goes
   // straight to the page where the new secret is shown once.
   router.post(`${base}/client-credentials/:id/add-secret`, (req, res) => {
-    if (!ccV8.getCredential(credentialList(req), req.params.id)) {
+    if (!ccFutureSoftwareProviderPage.getCredential(credentialList(req), req.params.id)) {
       return res.redirect(`${base}/software-providers`)
     }
-    const credential = ccV8.credentialToChange(credentialList(req), req.params.id)
-    if (ccV8.secretDates(credential).length < ccV8.MAX_SECRETS && credential.pendingAction !== 'added') {
-      ccV8.addSecret(credential)
+    const credential = ccFutureSoftwareProviderPage.credentialToChange(credentialList(req), req.params.id)
+    if (ccFutureSoftwareProviderPage.secretDates(credential).length < ccFutureSoftwareProviderPage.MAX_SECRETS && credential.pendingAction !== 'added') {
+      ccFutureSoftwareProviderPage.addSecret(credential)
     }
     res.redirect(`${base}/client-credentials/${credential.id}/created`)
   })
@@ -3341,7 +3341,7 @@ function registerV8Routes () {
   // recent secret stays. Only the POST removes it, then the user goes back to
   // the manage page, which now shows one secret.
   router.get(`${base}/client-credentials/:id/remove`, (req, res) => {
-    const credential = ccV8.getCredential(credentialList(req), req.params.id)
+    const credential = ccFutureSoftwareProviderPage.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     const labels = secretLabels(credential)
     if (labels.length < 2) return res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
@@ -3349,11 +3349,11 @@ function registerV8Routes () {
   })
 
   router.post(`${base}/client-credentials/:id/remove`, (req, res) => {
-    if (!ccV8.getCredential(credentialList(req), req.params.id)) {
+    if (!ccFutureSoftwareProviderPage.getCredential(credentialList(req), req.params.id)) {
       return res.redirect(`${base}/software-providers`)
     }
-    const credential = ccV8.credentialToChange(credentialList(req), req.params.id)
-    const dates = ccV8.secretDates(credential)
+    const credential = ccFutureSoftwareProviderPage.credentialToChange(credentialList(req), req.params.id)
+    const dates = ccFutureSoftwareProviderPage.secretDates(credential)
     if (dates.length > 1) credential.secrets = dates.slice(-1)
     res.redirect(`${base}/client-credentials/${credential.id}/software-provider-detail`)
   })
@@ -3361,13 +3361,13 @@ function registerV8Routes () {
   // Replacing the secret asks the user to confirm first. The form on this page
   // posts to the rotate route above, which is what replaces the secret.
   router.get(`${base}/client-credentials/:id/replace`, (req, res) => {
-    const credential = ccV8.getCredential(credentialList(req), req.params.id)
+    const credential = ccFutureSoftwareProviderPage.getCredential(credentialList(req), req.params.id)
     if (!credential) return res.redirect(`${base}/software-providers`)
     res.render(view('client-credentials/replace'), { credential })
   })
 }
 
-registerV8Routes()
+registerFutureSoftwareProviderPageRoutes()
 
 // --- Version 9 -----------------------------------------------------------
 // A copy of version 7, with no changes yet. It has its own function and its
@@ -3432,6 +3432,81 @@ function registerV9Routes () {
   function tablePath (environmentLabel) {
     return `${base}/software-providers`
   }
+
+  // --- Sign in with Microsoft Entra ID (ideas only, not enforced) -----------------
+  // Nothing else in version 9 asks for sign in, so the existing journeys still
+  // work. Three ideas, kept separate: A is minimal (one generic error page), B
+  // gives more context on the landing page and a specific error for each cause,
+  // C is the landing page every user sees until they have signed in (with B's errors).
+  // The landing page the user last saw decides which error page they get.
+  // The Microsoft page is a mock: the real one is hosted by Microsoft, so we
+  // only design the page before it and the pages it sends the user back to.
+
+  // Only return to pages inside this version, so the link can't send anyone elsewhere.
+  function safeReturnTo (value) {
+    return typeof value === 'string' && /^\/v9\/[A-Za-z0-9/_\-?=&.]*$/.test(value) ? value : `${base}/start`
+  }
+
+  function signInLanding (variant) {
+    return (req, res) => {
+      req.session.data.signInVariantV9 = variant
+      if (req.query.returnTo) req.session.data.signInReturnToV9 = safeReturnTo(req.query.returnTo)
+      res.render(view(`sign-in/landing-${variant}`), { hideNavigation: true })
+    }
+  }
+  router.get(`${base}/sign-in`, signInLanding('a'))
+  router.get(`${base}/sign-in/b`, signInLanding('b'))
+  router.get(`${base}/sign-in/c`, signInLanding('c'))
+
+  // Demo: the user opens a page (default: Software providers) without being signed in.
+  router.get(`${base}/sign-in/try`, (req, res) => {
+    req.session.data.signedInV9 = false
+    req.session.data.signInReturnToV9 = safeReturnTo(req.query.page || `${base}/software-providers`)
+    const suffix = ['b', 'c'].includes(req.query.variant) ? `/${req.query.variant}` : ''
+    res.redirect(`${base}/sign-in${suffix}`)
+  })
+
+  // Idea C has its own mock Microsoft pages: pick an account, then enter a
+  // password. Any password signs in. The outcome links on the password page are
+  // for the prototype only, to see each error.
+  router.get(`${base}/sign-in/c/account`, (req, res) => {
+    req.session.data.signInVariantV9 = 'c'
+    res.render(view('sign-in/microsoft-c-account'))
+  })
+  router.get(`${base}/sign-in/c/password`, (req, res) => {
+    res.render(view('sign-in/microsoft-c-password'))
+  })
+  router.post(`${base}/sign-in/c/password`, (req, res) => {
+    req.session.data.signedInV9 = true
+    // Idea C uses the environment idea "Tag in the header, link under a Change
+    // environment heading". It is switched on here, not on the sign in pages,
+    // because the landing page heading already names the environment.
+    req.session.data.environmentConceptV9 = 'header-heading'
+    res.redirect(safeReturnTo(req.session.data.signInReturnToV9))
+  })
+  router.get(`${base}/sign-in/c/outcome/:outcome(no-access|cancelled|problem)`, (req, res) => {
+    res.redirect(`${base}/sign-in/error-c?reason=${req.params.outcome}`)
+  })
+
+  router.get(`${base}/sign-in/microsoft`, (req, res) => {
+    res.render(view('sign-in/microsoft'), { hideNavigation: true })
+  })
+
+  router.post(`${base}/sign-in/microsoft`, (req, res) => {
+    const outcome = req.body.outcome
+    const variant = ['b', 'c'].includes(req.session.data.signInVariantV9) ? req.session.data.signInVariantV9 : 'a'
+    if (outcome === 'success') {
+      req.session.data.signedInV9 = true
+      return res.redirect(safeReturnTo(req.session.data.signInReturnToV9))
+    }
+    const reason = ['cancelled', 'no-access'].includes(outcome) ? outcome : 'problem'
+    res.redirect(`${base}/sign-in/error-${variant}?reason=${reason}`)
+  })
+
+  router.get(`${base}/sign-in/error-:variant(a|b|c)`, (req, res) => {
+    const reason = ['cancelled', 'no-access'].includes(req.query.reason) ? req.query.reason : 'problem'
+    res.render(view(`sign-in/error-${req.params.variant}`), { hideNavigation: true, reason })
+  })
 
   // --- Reporting (same as version 4.1) -----------------------------------------
 
@@ -3916,14 +3991,14 @@ function registerV9Routes () {
 
 registerV9Routes()
 
-// --- Version 10 ----------------------------------------------------------
+// --- Future state: case file concept ----------------------------------------------------------
 // A future-state concept, built around the October 2026 task flows: one case
 // file for each software provider. It has its own function, its own data file
-// (data/case-files-v10.js) and its own session data keys, so version 9 stays
+// (data/future-case-files.js) and its own session data keys, so version 9 stays
 // frozen. Allocation is out of scope.
-function registerV10Routes () {
-  const base = '/v10'
-  const view = (page) => `v10/${page}`
+function registerFutureCaseFilesRoutes () {
+  const base = '/future/case-files'
+  const view = (page) => `future/case-files/${page}`
 
   // Data in session, with its own keys for this version — no backend. Each
   // session starts with a copy of the example case files.
@@ -3931,23 +4006,23 @@ function registerV10Routes () {
   // always set up together.
   function caseFiles (req) {
     const data = req.session.data
-    if (!Array.isArray(data.caseFilesV10) || !Array.isArray(data.systemActionsV10) || !data.auditsV10) {
-      data.caseFilesV10 = cf.exampleCaseFiles()
-      data.systemActionsV10 = cf.exampleSystemActions()
-      data.auditsV10 = cf.exampleAudits()
+    if (!Array.isArray(data.caseFilesFutureCaseFiles) || !Array.isArray(data.systemActionsFutureCaseFiles) || !data.auditsFutureCaseFiles) {
+      data.caseFilesFutureCaseFiles = cf.exampleCaseFiles()
+      data.systemActionsFutureCaseFiles = cf.exampleSystemActions()
+      data.auditsFutureCaseFiles = cf.exampleAudits()
     }
-    return data.caseFilesV10
+    return data.caseFilesFutureCaseFiles
   }
   // Messages sent to a group of software providers (Contact providers).
-  const systemActions = (req) => caseFiles(req) && req.session.data.systemActionsV10
+  const systemActions = (req) => caseFiles(req) && req.session.data.systemActionsFutureCaseFiles
   // The audit under way, if there is one, and the completed audits.
-  const audits = (req) => caseFiles(req) && req.session.data.auditsV10
+  const audits = (req) => caseFiles(req) && req.session.data.auditsFutureCaseFiles
 
   // Mock sign-in with two roles (see USERS in the data file). Anyone who opens
   // a page without signing in is the case worker, so links from the prototype
   // index still work.
   function currentUser (req) {
-    return cf.USERS[req.session.data.userV10] || cf.USERS.caseworker
+    return cf.USERS[req.session.data.userFutureCaseFiles] || cf.USERS.caseworker
   }
 
   // Who did an action, for the history.
@@ -3955,7 +4030,7 @@ function registerV10Routes () {
 
   // A message shown once, on the next page the user sees. For example "Case file created".
   function flash (req, title, text) {
-    req.session.data.flashV10 = { title, text }
+    req.session.data.flashFutureCaseFiles = { title, text }
   }
 
   // The pages an auditor can open under Software providers: the list, and a
@@ -3966,14 +4041,14 @@ function registerV10Routes () {
   router.use(base, (req, res, next) => {
     const user = currentUser(req)
     const path = req.path.replace(/\/$/, '')
-    res.locals.version = 'v10'
+    res.locals.version = 'future/case-files'
     res.locals.user = user
     res.locals.signedIn = path !== '/sign-in'
     // Pages hide their action links and buttons when this is false.
     res.locals.canEdit = user.key === 'caseworker'
     if (req.method === 'GET') {
-      res.locals.flash = req.session.data.flashV10
-      delete req.session.data.flashV10
+      res.locals.flash = req.session.data.flashFutureCaseFiles
+      delete req.session.data.flashFutureCaseFiles
     }
     const blocked = user.key === 'auditor'
       ? (path.startsWith('/software-providers') && !VIEW_ONLY.test(path)) || path.startsWith('/contact-providers')
@@ -4000,12 +4075,12 @@ function registerV10Routes () {
         errorList: [{ text, href: '#signInAs' }]
       })
     }
-    req.session.data.userV10 = req.body.signInAs
+    req.session.data.userFutureCaseFiles = req.body.signInAs
     res.redirect(`${base}/start`)
   })
 
   router.get(`${base}/sign-out`, (req, res) => {
-    delete req.session.data.userV10
+    delete req.session.data.userFutureCaseFiles
     res.redirect(`${base}/sign-in`)
   })
 
@@ -4234,8 +4309,8 @@ function registerV10Routes () {
   // "Check your answers", a changed step goes straight back there.
   // These routes must stay above the `/software-providers/:id` routes.
   function draft (req) {
-    if (!req.session.data.newCaseFileV10) req.session.data.newCaseFileV10 = {}
-    return req.session.data.newCaseFileV10
+    if (!req.session.data.newCaseFileFutureCaseFiles) req.session.data.newCaseFileFutureCaseFiles = {}
+    return req.session.data.newCaseFileFutureCaseFiles
   }
   const createHref = (step) => `${base}/software-providers/create${step ? `/${step}` : ''}`
   const afterStep = (req, step) => createHref(draft(req).checked ? 'check' : step)
@@ -4252,7 +4327,7 @@ function registerV10Routes () {
   router.get(createHref(), (req, res) => {
     // "Create a case file" on the list adds ?new=yes, to start with empty answers.
     if (req.query.new) {
-      delete req.session.data.newCaseFileV10
+      delete req.session.data.newCaseFileFutureCaseFiles
       return res.redirect(createHref())
     }
     form(res, 'software-providers/create/name', { values: { name: draft(req).name || '' } })
@@ -4304,7 +4379,7 @@ function registerV10Routes () {
       return renderMatches(req, res, { errors, errorList: cf.errorList(errors, [['match', '#match']]) })
     }
     // The organisation already has a case file, so a new one is not needed.
-    delete req.session.data.newCaseFileV10
+    delete req.session.data.newCaseFileFutureCaseFiles
     res.redirect(`${base}/software-providers/${match.id}`)
   })
 
@@ -4413,7 +4488,7 @@ function registerV10Routes () {
       verifyMethod: answers.verifyMethod,
       reason: answers.reason.text
     }, answers.details), by(req))
-    delete req.session.data.newCaseFileV10
+    delete req.session.data.newCaseFileFutureCaseFiles
     flash(req, 'Case file created', `The reference for ${provider.name} is ${provider.reference}. Add a software package so you can create credentials.`)
     res.redirect(`${base}/software-providers/${provider.id}`)
   })
@@ -4495,10 +4570,10 @@ function registerV10Routes () {
 
   // An answer that is waiting for the user to confirm it on the next page.
   function setPending (req, action, provider, values) {
-    req.session.data.pendingV10 = Object.assign({ action, providerId: provider.id }, values)
+    req.session.data.pendingFutureCaseFiles = Object.assign({ action, providerId: provider.id }, values)
   }
   function getPending (req, action, provider) {
-    const pending = req.session.data.pendingV10
+    const pending = req.session.data.pendingFutureCaseFiles
     return pending && pending.action === action && pending.providerId === provider.id ? pending : null
   }
 
@@ -4756,7 +4831,7 @@ function registerV10Routes () {
     const pending = getPending(req, 'remove-provider', provider)
     if (!pending) return res.redirect(`${overviewHref(provider)}/remove`)
     cf.closeProvider(provider, pending.reason, by(req))
-    delete req.session.data.pendingV10
+    delete req.session.data.pendingFutureCaseFiles
     flash(req, 'Software provider removed', `The credentials for ${provider.name} have been deleted and its case file is closed.`)
     res.redirect(`${base}/software-providers`)
   }))
@@ -4839,7 +4914,7 @@ function registerV10Routes () {
     const contact = pending && cf.findContact(provider, pending.contactId)
     if (!environment.canCreate || !contact || !contact.verified) return res.redirect(credentialHref(provider, pkg, environment, 'create'))
     cf.createCredentials(provider, pkg, environment.key, contact, by(req))
-    delete req.session.data.pendingV10
+    delete req.session.data.pendingFutureCaseFiles
     flash(req, `${environment.text} credentials created`, `We have sent the client ID and a one-time link to the client secret to ${contact.name} (${contact.email}).`)
     res.redirect(packageHref(provider, pkg))
   }))
@@ -4899,7 +4974,7 @@ function registerV10Routes () {
     if (!canReplace(res.locals.pkg, environment) || !contact || !contact.verified) return res.redirect(credentialHref(provider, pkg, environment, 'replace'))
     const breach = pending.type === 'breach'
     cf.replaceSecret(provider, pkg, environment.key, contact, { breach, details: pending.details }, by(req))
-    delete req.session.data.pendingV10
+    delete req.session.data.pendingFutureCaseFiles
     flash(req, `${environment.text} secret replaced`, breach
       ? `The earlier secret has stopped working. We have sent a one-time link to the new secret to ${contact.name} (${contact.email}).`
       : `We have sent a one-time link to the new secret to ${contact.name} (${contact.email}). Remove the old secret when they have changed over.`)
@@ -5059,7 +5134,7 @@ function registerV10Routes () {
     router.post(`${path}/confirm`, changePackage((req, res, provider, pkg) => {
       const pending = pendingFor(req, provider, pkg)
       if (!res.locals.pkg[action.can] || !pending) return res.redirect(`${packageHref(provider, pkg)}/${key}`)
-      delete req.session.data.pendingV10
+      delete req.session.data.pendingFutureCaseFiles
       finish(req, res, provider, pkg, pending.reason, pending.message)
     }))
   })
@@ -5119,7 +5194,7 @@ function registerV10Routes () {
     const to = pending && moveTargets(req, provider).find((other) => other.id === pending.toId)
     if (!res.locals.pkg.canMove || !to) return res.redirect(`${packageHref(provider, pkg)}/move`)
     cf.movePackage(provider, pkg, to, pending.reason, by(req))
-    delete req.session.data.pendingV10
+    delete req.session.data.pendingFutureCaseFiles
     flash(req, 'Software package moved', `${pkg.name} is now on the case file for ${to.name}. Its client names have not changed. Replace its secrets if the new software provider should not use the old ones.`)
     res.redirect(packageHref(to, pkg))
   }))
@@ -5133,7 +5208,7 @@ function registerV10Routes () {
   const CONTACT_STATUSES = cf.STATUSES.filter((status) => status.key !== 'revoked')
   const CONTACT_WHO = ['key', 'all']
 
-  const bulkChoice = (req) => req.session.data.bulkContactV10 || null
+  const bulkChoice = (req) => req.session.data.bulkContactFutureCaseFiles || null
   const bulkRows = (req, choice) => cf.contactsForStatuses(caseFiles(req), choice.statuses, choice.who)
 
   // "in test or in production", for the history.
@@ -5179,7 +5254,7 @@ function registerV10Routes () {
         errorList: cf.errorList(errors, [['statuses', '#statuses'], ['who', '#who']])
       })
     }
-    req.session.data.bulkContactV10 = values
+    req.session.data.bulkContactFutureCaseFiles = values
     res.redirect(`${base}/contact-providers/review`)
   })
 
@@ -5235,7 +5310,7 @@ function registerV10Routes () {
       summary,
       reason: reason.text
     }, by(req))
-    delete req.session.data.bulkContactV10
+    delete req.session.data.bulkContactFutureCaseFiles
     flash(req, 'Contact recorded', `We have recorded the message on ${providerIds.length} case file${providerIds.length === 1 ? '' : 's'}.`)
     res.redirect(`${base}/contact-providers`)
   })
@@ -5375,7 +5450,7 @@ function registerV10Routes () {
   })
 }
 
-registerV10Routes()
+registerFutureCaseFilesRoutes()
 
 // --- Design page ------------------------------------------------------------
 //

@@ -1,0 +1,25 @@
+{#
+  Idea A: one error page for every failure, in the GOV.UK "problem with the
+  service" pattern. Does not say why, so it cannot give the wrong advice.
+#}
+{% extends "layouts/v9.html" %}
+
+{% set version = "v9" %}
+{% set pageName = "Sorry, there is a problem with signing in" %}
+{% set activeSection = "" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">Sorry, there is a problem with signing in</h1>
+
+    <p class="govuk-body">You have not been signed in.</p>
+
+    <p class="govuk-body">Try signing in again. If the problem continues, contact the DWT service team.</p>
+
+    {{ govukButton({ text: "Try signing in again", href: "/" + version + "/sign-in" }) }}
+
+  </div>
+</div>
+{% endblock %}

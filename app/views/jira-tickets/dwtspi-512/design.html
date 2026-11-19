@@ -1,6 +1,6 @@
 {#
   Design reference for DWTSPI-512: the Software providers page with a long client name.
-  A copy of v8/software-providers/index.html with fixed, synthetic rows. The Production row
+  A copy of future/software-provider-page/software-providers/index.html with fixed, synthetic rows. The Production row
   has a client name of 67 characters, the longest in use. The Client name column is half the
   table width, and the client name and client ID can wrap (app-break-word, as for the
   email addresses on the software provider page). No wbr elements after the underscores:
@@ -33,7 +33,7 @@
   classes: "govuk-button--secondary govuk-!-margin-bottom-7"
 }) }}
 
-{# MoJ sortable table, as in version 8. Rows are sorted by Client name, A to Z. #}
+{# MoJ sortable table, as in the software provider page concept. Rows are sorted by Client name, A to Z. #}
 <table class="govuk-table" data-module="moj-sortable-table">
   <caption class="govuk-table__caption govuk-table__caption--m">Client credentials</caption>
   <thead class="govuk-table__head">

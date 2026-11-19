@@ -16,7 +16,7 @@
     </h1>
 
     <p class="govuk-body">
-      <span class="govuk-!-font-weight-bold">Date of last change:</span> 9 November 2026<br>
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 17 November 2026<br>
       <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
     </p>
 
@@ -47,8 +47,8 @@
       rows: [
         [
           { text: "Scope" },
-          { text: "A copy of version 7, not version 8. Changes are recorded here as they are made." },
-          { text: "Version 8 was a concept for a technical discussion. Version 9 starts from the version 7 journeys for the next batch of tickets." },
+          { text: "A copy of version 7, not the software provider page concept. Changes are recorded here as they are made." },
+          { text: "The software provider page concept (previously version 8) was a concept for a technical discussion. Version 9 starts from the version 7 journeys for the next batch of tickets." },
           { html: '<a class="govuk-link" href="/v9/software-providers">/v9/software-providers</a>' }
         ],
         [
@@ -56,6 +56,12 @@
           { text: "Pages for a software provider now follow the pattern from the developers: /software-providers/{clientId}, with any action as a subpath, for example /software-providers/{clientId}/delete. The software provider page is at /software-providers/{clientId}. The other actions are /edit, /replace, /remove, /add-secret, /rotate and /created. “Create new credentials” is at /software-providers/create. The old /client-credentials/ and /software-provider-detail URLs are not used. The client ID is the identifier in the URL (in version 7 it was a separate id such as client-1), so the example clients’ URLs now use their client ID. The demo error pages are at /software-providers/example/created-panel and /software-providers/example/created-warning." },
           { text: "To match the URL pattern the developers will build, so the prototype and the service use the same addresses." },
           { html: '<a class="govuk-link" href="/v9/software-providers">/v9/software-providers</a> (select a client name)' }
+        ],
+        [
+          { text: "Sign in" },
+          { text: "Three ideas for signing in with Microsoft Entra ID, not enforced on the rest of the prototype. Idea C: the page every user sees until they have signed in. The heading names the environment (External test), with a short list of what the portal is for and one “Continue to sign in” button. It uses the same error pages as idea B, and once you have signed in the Software providers page uses the environment idea “Tag in the header, link under a Change environment heading”. Idea A: a short landing page, one generic error page. Idea B: a landing page that says what you can do, what to expect and what to do if you cannot sign in, with a different error page for no access, cancelled sign in and a technical problem. The Microsoft page is a mock; the real one is hosted by Microsoft. After signing in, the user returns to the page they were on. The service navigation is hidden on these pages." },
+          { text: "Staff need to know they are in the right place (and which environment) before signing in, and to know what to do when sign in fails. Not yet tested with users: the two ideas are for discussion." },
+          { html: '<a class="govuk-link" href="/v9/sign-in/try">Try the journey: open Software providers while signed out (idea A)</a><br><a class="govuk-link" href="/v9/sign-in/try?variant=b">Try the journey (idea B)</a><br><a class="govuk-link" href="/v9/sign-in/try?variant=c">Try the journey (idea C)</a><br><a class="govuk-link" href="/v9/sign-in/c">Landing page C</a><br><a class="govuk-link" href="/v9/sign-in/error-c?reason=no-access">Error C: no access</a><br><a class="govuk-link" href="/v9/sign-in">Landing page A</a><br><a class="govuk-link" href="/v9/sign-in/b">Landing page B</a><br><a class="govuk-link" href="/v9/sign-in/error-a">Error A</a><br><a class="govuk-link" href="/v9/sign-in/error-b?reason=no-access">Error B: no access</a><br><a class="govuk-link" href="/v9/sign-in/error-b?reason=cancelled">Error B: cancelled</a><br><a class="govuk-link" href="/v9/sign-in/error-b?reason=problem">Error B: problem</a>' }
         ],
         [
           { text: "Environment" },

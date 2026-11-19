@@ -1,0 +1,104 @@
+{#
+  Record a conversation with the software provider, so the next person can see
+  what has happened (today this is in emails and Jira tickets). Each contact
+  shows whether they have been checked as able to act for the organisation,
+  which is the task flow step "Verify person can act for provider".
+  One page, because it is done often and during or just after a call.
+#}
+{% extends "layouts/future-case-files.html" %}
+
+{% set version = "future/case-files" %}
+{% set pageName = ("Error: " if errorList.length else "") + "Record a contact - " + provider.name %}
+{% set activeSection = "providers" %}
+{% set caseFileHref = "/" + version + "/software-providers/" + provider.id %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: caseFileHref }) }}
+  {% include version + "/software-providers/_identity.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l">Record a contact</h1>
+
+    <form method="post" action="{{ caseFileHref }}/record-contact" novalidate>
+
+      {% set otherNameHtml %}
+        {{ govukInput({
+          id: "otherName",
+          name: "otherName",
+          label: { text: "Their full name" },
+          classes: "govuk-!-width-two-thirds",
+          value: values.otherName,
+          errorMessage: { text: errors.otherName } if errors.otherName else undefined,
+          autocomplete: "off",
+          spellcheck: false
+        }) }}
+      {% endset %}
+      {% set whoItems = [] %}
+      {% for contact in provider.contacts %}
+        {% set whoItems = (whoItems.push({
+          value: contact.id,
+          text: contact.name + (", " + contact.jobTitle if contact.jobTitle else ""),
+          hint: { text: ("Checked on " + contact.verifiedOn + ": can act for the organisation") if contact.verifiedOn else "Not checked: we do not know if they can act for the organisation" },
+          checked: values.who === contact.id
+        }), whoItems) %}
+      {% endfor %}
+      {% set whoItems = (whoItems.push({ divider: "or" }, {
+        value: "other",
+        text: "Someone else",
+        hint: { text: "Not a contact on this case file, so not checked" },
+        checked: values.who === "other",
+        conditional: { html: otherNameHtml }
+      }), whoItems) %}
+
+      {{ govukRadios({
+        name: "who",
+        idPrefix: "who",
+        fieldset: { legend: { text: "Who were you in contact with?", classes: "govuk-fieldset__legend--m" } },
+        hint: { text: "Only share information with, or act on a request from, someone we have checked can act for the organisation." },
+        errorMessage: { text: errors.who } if errors.who else undefined,
+        items: whoItems
+      }) }}
+
+      {% set channelItems = [] %}
+      {% for channel in channels %}
+        {% set channelItems = (channelItems.push({ value: channel, text: channel, checked: values.channel === channel }), channelItems) %}
+      {% endfor %}
+      {{ govukRadios({
+        name: "channel",
+        idPrefix: "channel",
+        classes: "govuk-radios--inline",
+        fieldset: { legend: { text: "How were you in contact?", classes: "govuk-fieldset__legend--m" } },
+        errorMessage: { text: errors.channel } if errors.channel else undefined,
+        items: channelItems
+      }) }}
+
+      {% include version + "/software-providers/_reason.html" %}
+
+      {{ govukTextarea({
+        id: "summary",
+        name: "summary",
+        rows: 5,
+        label: { text: "Summary", classes: "govuk-label--m" },
+        hint: { text: "Say what was asked or agreed, and anything that needs to happen next. Do not include a client secret." },
+        value: values.summary,
+        errorMessage: { text: errors.summary } if errors.summary else undefined
+      }) }}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Record contact", preventDoubleClick: true }) }}
+        <a class="govuk-link" href="{{ caseFileHref }}">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

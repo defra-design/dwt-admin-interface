@@ -31,11 +31,11 @@ module.exports = [
     summary: 'The landing page after the start of the service.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/start',
+        href: '/future/case-files/start',
         difference: 'Future-state concept. A search box for case files, and links to software packages by status with a count for each. The header shows who is signed in.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       },
       {
         label: 'Version 5',
@@ -80,17 +80,17 @@ module.exports = [
     summary: 'The page you reach from “Software providers” in the navigation.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/software-providers',
+        href: '/future/case-files/software-providers',
         difference: 'Future-state concept. One row for each software package, with the software provider, its reference, status, days in that status and key contact. A search box and a status filter (MoJ filter) beside the table. “Create a case file” replaces “Create new credentials”.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       },
       {
         label: 'DWTSPI-512 design',
         source: 'Jira design',
         href: '/jira-tickets/dwtspi-512/design',
-        difference: 'The version 8 table with a 67-character client name in Production. The Client name column is half the table width on tablet and wider screens, and the client name and client ID wrap instead of making the page scroll sideways.',
+        difference: 'The table in the software provider page concept with a 67-character client name in Production. The Client name column is half the table width on tablet and wider screens, and the client name and client ID wrap instead of making the page scroll sideways.',
         rationaleHref: '/jira-tickets/dwtspi-512'
       },
       {
@@ -238,14 +238,14 @@ module.exports = [
   {
     id: 'software-provider-detail',
     name: 'Software provider detail',
-    summary: 'A single software provider company, with its email addresses and notes. Built in version 3, and as a case file in version 10.',
+    summary: 'A single software provider company, with its email addresses and notes. Built in version 3, and as a case file in the case file concept.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/software-providers/sp-1001',
+        href: '/future/case-files/software-providers/sp-1001',
         difference: 'Future-state concept. A case file with three pages: Overview, Contacts and History (MoJ sub navigation), with the name and reference at the top of each (MoJ identity bar). Software packages are summary cards with their status. History is a timeline of every action, with who did it and why.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       },
       {
         label: 'Version 3',
@@ -267,15 +267,15 @@ module.exports = [
   {
     id: 'add-software-provider',
     name: 'Add a software provider',
-    summary: 'Adding a company to the list. Built in version 3, and as “Create a case file” in version 10.',
+    summary: 'Adding a company to the list. Built in version 3, and as “Create a case file” in the case file concept.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/software-providers/create?new=yes',
+        href: '/future/case-files/software-providers/create?new=yes',
         linkNote: 'Enter “Greenlane Digital” to see the similar names page.',
         difference: 'Future-state concept, called “Create a case file”. Organisation name, a check for case files with a similar name, organisation details, key contact, how the contact was checked, then check your answers.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       },
       {
         label: 'Version 3',
@@ -292,11 +292,11 @@ module.exports = [
     summary: 'The question page for the client name, reached from the Create credentials button.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/software-providers/sp-1003/packages/sp-1003-p1/credentials/production/create',
+        href: '/future/case-files/software-providers/sp-1003/packages/sp-1003-p1/credentials/production/create',
         difference: 'Future-state concept. No client name question: the service makes the client name. The page asks which checked contact to send the client secret to, then has a check page. The environment comes from the button on the software package page.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       },
       {
         label: 'DWTSPI-493 edit client name error design',
@@ -416,11 +416,11 @@ module.exports = [
     summary: 'Shown once, after credentials are created or a secret is rotated. Needs session data, so these links open the list.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/software-providers/sp-1001/packages/sp-1001-p1',
+        href: '/future/case-files/software-providers/sp-1001/packages/sp-1001-p1',
         difference: 'Future-state concept. There is no page that shows the secret. The service sends it to a checked contact, and the software package page records when it was generated, who it was sent to and who sent it.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       },
       {
         label: 'Copy credentials page ticket design',
@@ -491,11 +491,11 @@ module.exports = [
     summary: 'Reached from the Rotate link in the table.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/software-providers/sp-1004/packages/sp-1004-p1/credentials/production/replace',
+        href: '/future/case-files/software-providers/sp-1004/packages/sp-1004-p1/credentials/production/replace',
         difference: 'Future-state concept. One page asks why the secret is being replaced. Routine keeps the current secret until it is removed. Security breach stops it immediately. Then who to send the new secret to, and a check page.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       },
       {
         label: 'DWTSPI-505 replace secret design',
@@ -512,12 +512,12 @@ module.exports = [
         rationaleHref: '/jira-tickets/dwtspi-505'
       },
       {
-        label: 'Version 8',
+        label: 'Software provider page concept',
         source: 'Prototype',
-        href: '/v8/software-providers',
+        href: '/future/software-provider-page/software-providers',
         linkNote: 'Select a client name.',
         difference: 'Concept for a technical discussion. Four sets of secrets on one page: receipt of waste software and collection of waste software, each with a test and a production environment. Each has its own client name, client ID and two secrets. The page heading is the software provider name. No External test tag. Grey overview column with a status for each type of software and email addresses. Notes in an MoJ timeline. Mocked data. Remove goes to a placeholder page.',
-        rationaleHref: '/versions/v8'
+        rationaleHref: '/versions/future-software-provider-page'
       },
       {
         label: 'DWTSPI-493 software provider page error design',
@@ -656,85 +656,136 @@ module.exports = [
   {
     id: 'software-package',
     name: 'Software package',
-    summary: 'One software package on a case file, with its approval and credentials. Only built in version 10.',
+    summary: 'One software package on a case file, with its approval and credentials. Only built in the case file concept.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/software-providers/sp-1002/packages/sp-1002-p1',
+        href: '/future/case-files/software-providers/sp-1002/packages/sp-1002-p1',
         difference: 'Status tag with days in that status, approval for production, and the credentials for external test and production on one page. A table of secrets shows when each was generated and who it was sent to. Links to suspend, revoke or move the software package.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       }
     ]
   },
   {
     id: 'approve-for-production',
     name: 'Approve for production',
-    summary: 'Recording the production approval test (PAT) result and approving a software package. Only built in version 10.',
+    summary: 'Recording the production approval test (PAT) result and approving a software package. Only built in the case file concept.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/software-providers/sp-1008/packages/sp-1008-p1/pat-result',
+        href: '/future/case-files/software-providers/sp-1008/packages/sp-1008-p1/pat-result',
         difference: 'Passed, Failed or Exception agreed, with details that are needed for an exception. “Approve for production” is offered after a pass or an exception, and shows what the approval is based on.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       }
     ]
   },
   {
     id: 'access',
     name: 'Suspend, reactivate or revoke access',
-    summary: 'Stopping or restoring a software package’s access. Only built in version 10.',
+    summary: 'Stopping or restoring a software package’s access. Only built in the case file concept.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/software-providers/sp-1001/packages/sp-1001-p1/suspend',
+        href: '/future/case-files/software-providers/sp-1001/packages/sp-1001-p1/suspend',
         difference: 'One page each, with what will happen, the reason and a message to the software provider. Revoke has an “Are you sure?” page (MoJ interruption card).',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       }
     ]
   },
   {
     id: 'record-contact',
     name: 'Record a contact',
-    summary: 'Recording a conversation with a software provider on its case file. Only built in version 10.',
+    summary: 'Recording a conversation with a software provider on its case file. Only built in the case file concept.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/software-providers/sp-1001/record-contact',
+        href: '/future/case-files/software-providers/sp-1001/record-contact',
         difference: 'One page: who the contact was with and whether they have been checked, how, what it was about and a summary. It is added to the history.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       }
     ]
   },
   {
     id: 'contact-providers',
     name: 'Contact providers',
-    summary: 'Contacting a group of software providers, for an incident or a mailshot. Only built in version 10.',
+    summary: 'Contacting a group of software providers, for an incident or a mailshot. Only built in the case file concept.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/contact-providers',
+        href: '/future/case-files/contact-providers',
         difference: 'Choose software providers by the status of their software packages, check the contact list, download it as a CSV file, then record the message on every case file. The service does not send the message.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
       }
     ]
   },
   {
     id: 'audit',
     name: 'Audit',
-    summary: 'Auditing a random sample of actions. Auditor only. Only built in version 10.',
+    summary: 'Auditing a random sample of actions. Auditor only. Only built in the case file concept.',
     variants: [
       {
-        label: 'Version 10',
+        label: 'Case file concept',
         source: 'Prototype',
-        href: '/v10/sign-in',
+        href: '/future/case-files/sign-in',
         linkNote: 'Sign in as the auditor, then select Audit.',
         difference: 'A random sample of 10 actions as a GOV.UK task list. Each action shows who did it, when and why, and is marked “No concerns” or “Needs follow-up”. Completing the audit records that it was done. “All actions” lists every action with filters.',
-        rationaleHref: '/versions/v10'
+        rationaleHref: '/versions/future-case-files'
+      }
+    ]
+  },
+  {
+    id: 'sign-in',
+    name: 'Sign in with Microsoft Entra ID',
+    summary: 'The landing page before sign in, and the page shown when sign in fails.',
+    variants: [
+      {
+        label: 'Version 9, idea C: landing page',
+        source: 'Prototype',
+        href: '/v9/sign-in/c',
+        difference: 'The page every user sees until they have signed in. The heading names the environment (External test), then a short list of what the portal is for and one “Continue to sign in” button.',
+        rationaleHref: '/versions/v9'
+      },
+      {
+        label: 'Version 9, idea C: errors',
+        source: 'Prototype',
+        href: '/v9/sign-in/error-c?reason=no-access',
+        linkNote: 'Also reason=cancelled and reason=problem.',
+        difference: 'The same three error pages as idea B, with links back to landing page C.',
+        rationaleHref: '/versions/v9'
+      },
+      {
+        label: 'Version 9, idea B: landing page',
+        source: 'Prototype',
+        href: '/v9/sign-in/b',
+        difference: 'Says what you can do in the service, what to expect (a Microsoft page, then back here) and what to do if you cannot sign in.',
+        rationaleHref: '/versions/v9'
+      },
+      {
+        label: 'Version 9, idea A: landing page',
+        source: 'Prototype',
+        href: '/v9/sign-in',
+        difference: 'A short GOV.UK start page: what the service is, who it is for and one sign in button.',
+        rationaleHref: '/versions/v9'
+      },
+      {
+        label: 'Version 9, idea B: errors',
+        source: 'Prototype',
+        href: '/v9/sign-in/error-b?reason=no-access',
+        linkNote: 'Also reason=cancelled and reason=problem.',
+        difference: 'A different page for no access, cancelled sign in and a technical problem, each with its own next step.',
+        rationaleHref: '/versions/v9'
+      },
+      {
+        label: 'Version 9, idea A: error',
+        source: 'Prototype',
+        href: '/v9/sign-in/error-a',
+        difference: 'One generic “problem with signing in” page for every failure.',
+        rationaleHref: '/versions/v9'
       }
     ]
   },

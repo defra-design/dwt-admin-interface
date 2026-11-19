@@ -1,0 +1,167 @@
+{#
+  One software package: its status, its approval for production and its
+  credentials for both environments on one page, so there are no separate
+  addresses to mix up (a risk on the task flows).
+  A client secret is never shown: the system sends it straight to a contact.
+  The table records when each secret was generated and who it was sent to.
+  One secret: "Replace secret". Two secrets (a routine replacement is under
+  way): the older one has "Remove old secret".
+  What can be done depends on the status (see toPackageView in
+  data/future-case-files.js) and on the user's role (`canEdit`).
+#}
+{% extends "layouts/future-case-files.html" %}
+
+{% set version = "future/case-files" %}
+{% set pageName = pkg.name + " - " + provider.name %}
+{% set activeSection = "providers" %}
+{% set caseFileHref = "/" + version + "/software-providers/" + provider.id %}
+{% set packageHref = caseFileHref + "/packages/" + pkg.id %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to overview", href: caseFileHref }) }}
+  {% include version + "/software-providers/_identity.html" %}
+{% endblock %}
+
+{% block content %}
+{% include version + "/software-providers/_flash.html" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Software package</span>
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{{ pkg.name }}</h1>
+
+    {# The tag is a status label, so it sits under the heading, as in version 9. #}
+    <p class="govuk-body govuk-!-margin-bottom-6">
+      {{ govukTag({ text: pkg.status.text, classes: pkg.status.tag }) }}
+      <span class="govuk-!-margin-left-1">since {{ pkg.since }} ({{ pkg.daysText }})</span>
+    </p>
+
+    {% if pkg.status.key === "suspended" %}
+      {{ govukInsetText({ text: "Access is suspended. This software package cannot connect to the external test or production environment until you reactivate it." }) }}
+    {% elif pkg.status.key === "revoked" %}
+      {{ govukInsetText({ text: "Access was revoked and the credentials were deleted. To give access again, add a new software package to the case file." }) }}
+    {% endif %}
+
+    {% if pkg.status.key !== "revoked" and pkg.status.key !== "closed" %}
+
+    {# --- Approval for production --- #}
+    <h2 class="govuk-heading-m govuk-!-margin-top-8">Approval for production</h2>
+
+    {% set patHtml %}
+      {% if pkg.pat %}
+        {{ pkg.pat.text }}, recorded on {{ pkg.pat.on }} by {{ pkg.pat.by }}
+        {% if pkg.pat.details %}<br>{{ pkg.pat.details }}{% endif %}
+      {% else %}
+        Not recorded
+      {% endif %}
+    {% endset %}
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { text: "Production approval test (PAT)" },
+          value: { html: patHtml },
+          actions: { items: [{ href: packageHref + "/pat-result", text: "Change" if pkg.pat else "Record", visuallyHiddenText: "production approval test result" }] } if (canEdit and pkg.canRecordPat) else undefined
+        },
+        {
+          key: { text: "Approval" },
+          value: { text: ("Approved on " + pkg.approval.on + " by " + pkg.approval.by) if pkg.approval else "Not approved" }
+        }
+      ]
+    }) }}
+
+    {% if canEdit and pkg.canApprove %}
+      {{ govukButton({ text: "Approve for production", href: packageHref + "/approve" }) }}
+    {% elif canEdit and pkg.canRecordPat %}
+      <p class="govuk-body">Record a passed production approval test, or an exception, before you approve this software package.</p>
+    {% endif %}
+
+    {# --- Credentials, one section for each environment --- #}
+    {% for environment in pkg.environments %}
+      <h2 class="govuk-heading-m govuk-!-margin-top-8">{{ environment.text }} credentials</h2>
+
+      {% if environment.credential %}
+        {{ govukSummaryList({
+          classes: "govuk-summary-list--no-border",
+          rows: [
+            { key: { text: "Client name" }, value: { text: environment.credential.clientName, classes: "app-break-word" } },
+            { key: { text: "Client ID" }, value: { text: environment.credential.clientId, classes: "app-break-word" } }
+          ]
+        }) }}
+
+        {# MoJ scrollable pane: on a small screen the table scrolls sideways, so the page does not. It can be focused, so it can be scrolled with the keyboard. app-scrollable-pane is explained in application.scss. #}
+        <div class="moj-scrollable-pane app-scrollable-pane" tabindex="0" role="region" aria-label="Client secrets for {{ environment.lower }}">
+        <table class="govuk-table">
+          <caption class="govuk-table__caption govuk-table__caption--s">Client secrets for {{ environment.lower }}</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Generated on</th>
+              <th scope="col" class="govuk-table__header">Sent to</th>
+              <th scope="col" class="govuk-table__header">Sent by</th>
+              {% if canEdit and pkg.active and environment.credential.oldSecretWaiting %}
+                <th scope="col" class="govuk-table__header">Action</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for secret in environment.credential.secrets %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">{{ secret.generatedOn }}{% if secret.old %}<div class="govuk-hint govuk-!-margin-top-1 govuk-!-margin-bottom-0">Old secret, still working</div>{% endif %}</td>
+                <td class="govuk-table__cell">{{ secret.sentTo }}</td>
+                <td class="govuk-table__cell">{{ secret.sentBy }}</td>
+                {% if canEdit and pkg.active and environment.credential.oldSecretWaiting %}
+                  <td class="govuk-table__cell">
+                    {% if secret.old %}
+                      <a class="govuk-link" href="{{ packageHref }}/credentials/{{ environment.key }}/remove-secret">Remove old secret<span class="govuk-visually-hidden"> for {{ environment.lower }}, generated on {{ secret.generatedOn }}</span></a>
+                    {% endif %}
+                  </td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+
+        {% if canEdit and pkg.active %}
+          {{ govukButton({
+            html: 'Replace<span class="govuk-visually-hidden"> ' + environment.lower + '</span> secret',
+            href: packageHref + "/credentials/" + environment.key + "/replace",
+            classes: "govuk-button--secondary"
+          }) }}
+        {% endif %}
+      {% elif environment.canCreate %}
+        <p class="govuk-body">No {{ environment.lower }} credentials yet.</p>
+        {% if canEdit %}
+          {{ govukButton({
+            text: "Create " + environment.lower + " credentials",
+            href: packageHref + "/credentials/" + environment.key + "/create",
+            classes: "govuk-button--secondary"
+          }) }}
+        {% endif %}
+      {% elif environment.needsApproval %}
+        <p class="govuk-body">You can create production credentials when this software package is approved for production.</p>
+      {% else %}
+        <p class="govuk-body">No {{ environment.lower }} credentials.</p>
+      {% endif %}
+    {% endfor %}
+
+    {# --- Access --- #}
+    {% if canEdit and (pkg.canSuspend or pkg.canReactivate or pkg.canRevoke or pkg.canMove) %}
+      <h2 class="govuk-heading-m govuk-!-margin-top-8">Access and ownership</h2>
+      <ul class="govuk-list">
+        {% if pkg.canSuspend %}<li><a class="govuk-link" href="{{ packageHref }}/suspend">Suspend access</a></li>{% endif %}
+        {% if pkg.canReactivate %}<li><a class="govuk-link" href="{{ packageHref }}/reactivate">Reactivate access</a></li>{% endif %}
+        {% if pkg.canRevoke %}<li><a class="govuk-link" href="{{ packageHref }}/revoke">Revoke access</a></li>{% endif %}
+        {% if pkg.canMove %}<li><a class="govuk-link" href="{{ packageHref }}/move">Move to another software provider</a></li>{% endif %}
+      </ul>
+    {% endif %}
+
+    {% endif %}
+
+    <p class="govuk-body govuk-!-margin-top-8">
+      <a class="govuk-link" href="{{ caseFileHref }}/history?package={{ pkg.id }}">View history for {{ pkg.name }}</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{#
+  Shown when a role opens a page it cannot use (see the router.use block in
+  routes.js): an auditor on a page that changes a case file, or a case worker
+  on an audit page. The navigation and the pages hide these links, so this is
+  only reached from an old link or a typed address.
+#}
+{% extends "layouts/future-case-files.html" %}
+
+{% set version = "future/case-files" %}
+{% set pageName = "You do not have permission to use this page" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">You do not have permission to use this page</h1>
+
+    <p class="govuk-body">You are signed in as {{ user.name }} ({{ user.role | lower }}).</p>
+
+    {% if user.key === "auditor" %}
+      <p class="govuk-body">An auditor can view case files and audit actions, but cannot change a case file or contact software providers.</p>
+    {% else %}
+      <p class="govuk-body">Only an auditor can use the audit pages. You can see the history of any case file.</p>
+    {% endif %}
+
+    <p class="govuk-body"><a class="govuk-link" href="/{{ version }}/start">Go to the DWT admin portal home page</a></p>
+
+  </div>
+</div>
+{% endblock %}

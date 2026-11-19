@@ -1,0 +1,53 @@
+{#
+  Add a software package to a case file, so its credentials are kept with the
+  software provider (not possible today). The name and the reason are on one
+  page. The package starts as "Created", with no credentials.
+#}
+{% extends "layouts/future-case-files.html" %}
+
+{% set version = "future/case-files" %}
+{% set pageName = ("Error: " if errorList.length else "") + "Add a software package - " + provider.name %}
+{% set activeSection = "providers" %}
+{% set caseFileHref = "/" + version + "/software-providers/" + provider.id %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: caseFileHref }) }}
+  {% include version + "/software-providers/_identity.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l">Add a software package</h1>
+
+    <form method="post" action="{{ caseFileHref }}/add-package" novalidate>
+
+      {{ govukInput({
+        id: "name",
+        name: "name",
+        label: { text: "Software package name", classes: "govuk-label--m" },
+        hint: { text: "The name the software provider uses for the product, for example Waste Manager Pro" },
+        classes: "govuk-!-width-two-thirds",
+        value: values.name,
+        errorMessage: { text: errors.name } if errors.name else undefined,
+        autocomplete: "off",
+        spellcheck: false
+      }) }}
+
+      {% include version + "/software-providers/_reason.html" %}
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Add software package", preventDoubleClick: true }) }}
+        <a class="govuk-link" href="{{ caseFileHref }}">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

@@ -27,7 +27,7 @@
   {% set otherEnvironmentHref = "/" + version + "/software-providers" + ("" if onProduction else "/production") %}
   {# A div, not a header: the kit already wraps this block in a header, and a
      second one would give the page two banner landmarks. #}
-  <div class="app-defra-header app-defra-header--service app-defra-header--v5">
+  <div class="app-defra-header app-defra-header--service app-defra-header--v5{% if hideNavigation %} app-defra-header--green-line{% endif %}">
     <div class="govuk-width-container">
       <div class="app-defra-header__inner{% if environmentHeader %} app-defra-header__inner--environment{% endif %}">
         <a href="/" class="app-defra-header__link">
@@ -53,6 +53,8 @@
     {# Mobile menu: the GOV.UK service navigation pattern. The button is hidden until
        GOV.UK Frontend's script (data-module) shows it on small screens, so without
        JavaScript the links are always shown. The styles are our own (app-defra-service-nav). #}
+    {# Signed-out pages (sign in and its errors) set hideNavigation: there is nothing to navigate to yet. #}
+    {% if not hideNavigation %}
     <nav class="app-defra-service-nav app-defra-service-nav--v5 app-defra-service-nav--menu" aria-label="Menu" data-module="govuk-service-navigation">
       <div class="govuk-width-container">
         <button type="button" class="app-defra-service-nav__toggle govuk-js-service-navigation-toggle" aria-controls="v9-navigation" hidden aria-hidden="true">Menu</button>
@@ -69,6 +71,7 @@
         </ul>
       </div>
     </nav>
+    {% endif %}
   </div>
   {# Alternative to the tag on the list page: the environment banner shows on every
      page. Turned on at /v9/environment-banner/on (off again at .../off). #}

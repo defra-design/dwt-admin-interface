@@ -1,0 +1,30 @@
+{#
+  Idea A: minimal landing page, in the GOV.UK start page pattern. Says what
+  the service is and who it is for, then one button. The button goes to the
+  mock Microsoft page, which stands in for the real Entra ID sign-in.
+#}
+{% extends "layouts/v9.html" %}
+
+{% set version = "v9" %}
+{% set pageName = "Sign in" %}
+{% set activeSection = "" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">DWT admin portal</h1>
+
+    <p class="govuk-body">Use this service to manage software providers and their credentials, and to view waste organisations, for Digital Waste Tracking.</p>
+
+    <p class="govuk-body">You must be a member of Defra staff with access to this service.</p>
+
+    {{ govukButton({
+      text: "Sign in with your Defra account",
+      href: "/" + version + "/sign-in/microsoft",
+      isStartButton: true
+    }) }}
+
+  </div>
+</div>
+{% endblock %}

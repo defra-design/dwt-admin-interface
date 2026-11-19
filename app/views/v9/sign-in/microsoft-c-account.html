@@ -1,0 +1,40 @@
+{#
+  Idea C: mock of the Microsoft "Pick an account" page. The real page is hosted
+  by Microsoft (Entra ID), so this only stands in for it. The email address is
+  made up.
+#}
+{% extends "layouts/main.html" %}
+
+{% set version = "v9" %}
+{% set pageName = "Pick an account" %}
+{% set bodyClasses = "app-ms-body" %}
+
+{% block header %}{% endblock %}
+
+{% block main %}
+<main class="app-ms" id="main-content">
+  <div class="app-ms__card">
+    <img src="/public/images/defra-logo.svg" alt="Department for Environment, Food and Rural Affairs" class="app-ms__logo" width="86" height="45">
+    <h1 class="app-ms__heading">Pick an account</h1>
+    <ul class="app-ms__accounts">
+      <li>
+        <a class="app-ms__account app-ms__account--selected" href="/{{ version }}/sign-in/c/password">
+          <span class="app-ms__account-name">sam.example@example.com</span>
+        </a>
+      </li>
+      <li>
+        <a class="app-ms__account" href="/{{ version }}/sign-in/c/password">
+          <span class="app-ms__account-name">Use another account</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</main>
+{% endblock %}
+
+{% block footer %}
+  <div class="app-ms__footer">
+    <span>Terms of use</span>
+    <span>Privacy &amp; cookies</span>
+  </div>
+{% endblock %}

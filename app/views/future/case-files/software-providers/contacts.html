@@ -1,0 +1,71 @@
+{#
+  The people at the software provider. Each card says whether we have checked
+  that the person can act for the organisation, because credentials are only
+  sent to a contact who has been checked. The key contact is first and cannot
+  be removed (make another contact the key contact first).
+#}
+{% extends "layouts/future-case-files.html" %}
+
+{% set version = "future/case-files" %}
+{% set pageName = "Contacts - " + provider.name %}
+{% set activeSection = "providers" %}
+{% set caseFileSection = "contacts" %}
+{% set caseFileHref = "/" + version + "/software-providers/" + provider.id %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to software providers", href: "/" + version + "/software-providers" }) }}
+  {% include version + "/software-providers/_identity.html" %}
+{% endblock %}
+
+{% block content %}
+{% include version + "/software-providers/_flash.html" %}
+{% include version + "/software-providers/_sub-navigation.html" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">Contacts</h1>
+
+    <p class="govuk-body">Only send credentials to, or act on a request from, a contact we have checked can act for the organisation.</p>
+
+    {% if canEdit %}
+      {{ govukButton({
+        text: "Add a contact",
+        href: caseFileHref + "/contacts/add",
+        classes: "govuk-button--secondary govuk-!-margin-bottom-7"
+      }) }}
+    {% endif %}
+
+    {% for contact in provider.contacts %}
+      {% set contactHref = caseFileHref + "/contacts/" + contact.id %}
+      {% set contactActions = [] %}
+      {% if canEdit %}
+        {% if not contact.verifiedOn %}
+          {% set contactActions = (contactActions.push({ href: contactHref + "/verify", text: "Check", visuallyHiddenText: "that " + contact.name + " can act for the organisation" }), contactActions) %}
+        {% endif %}
+        {% set contactActions = (contactActions.push({ href: contactHref + "/change", text: "Change", visuallyHiddenText: contact.name }), contactActions) %}
+        {% if not contact.keyContact %}
+          {% set contactActions = (contactActions.push({ href: contactHref + "/remove", text: "Remove", visuallyHiddenText: contact.name }), contactActions) %}
+        {% endif %}
+      {% endif %}
+      {% set emailHtml %}<span class="app-break-word">{{ contact.email }}</span>{% endset %}
+      {{ govukSummaryList({
+        card: {
+          title: { text: contact.name + (" (key contact)" if contact.keyContact else ""), headingLevel: 2 },
+          actions: { items: contactActions }
+        },
+        rows: [
+          { key: { text: "Job title" }, value: { text: contact.jobTitle or "Not given" } },
+          { key: { text: "Email address" }, value: { html: emailHtml } },
+          { key: { text: "Phone number" }, value: { text: contact.phone or "Not given" } },
+          {
+            key: { text: "Can act for the organisation" },
+            value: { text: ("Checked on " + contact.verifiedOn + " by " + contact.verifiedBy + ". " + contact.verifiedMethod + ".") if contact.verifiedOn else "Not checked yet" }
+          }
+        ]
+      }) }}
+    {% endfor %}
+
+  </div>
+</div>
+{% endblock %}

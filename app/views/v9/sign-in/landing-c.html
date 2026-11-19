@@ -1,0 +1,32 @@
+{#
+  Idea C: the page every user sees until they have signed in. It names the
+  environment in the heading, lists what the service is for, and has one
+  button to the mock Microsoft page.
+#}
+{% extends "layouts/v9.html" %}
+
+{% set version = "v9" %}
+{% set pageName = "Sign in to DWT admin portal - External test environment" %}
+{% set activeSection = "" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">{{ pageName }}</h1>
+
+    <p class="govuk-body">DWT admin portal allows you to:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>manage software provider credentials</li>
+      <li>search waste organisations</li>
+    </ul>
+
+    {{ govukButton({
+      text: "Continue to sign in",
+      href: "/" + version + "/sign-in/c/account"
+    }) }}
+
+  </div>
+</div>
+{% endblock %}

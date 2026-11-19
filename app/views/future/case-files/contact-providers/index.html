@@ -1,0 +1,78 @@
+{#
+  Contact providers, step 1: choose who to contact, by the status of their
+  software packages (the task flow "Contact all providers", for an incident
+  or a mailshot). Today this means filtering the team spreadsheet.
+  This service does not send the message: the user downloads the contact
+  list, sends the message from the team mailbox, then records it.
+  The timeline shows the messages already recorded.
+  Case worker only (see the router.use block in routes.js).
+#}
+{% extends "layouts/future-case-files.html" %}
+
+{% set version = "future/case-files" %}
+{% set pageName = ("Error: " if errorList.length else "") + "Contact providers" %}
+{% set activeSection = "contact" %}
+
+{% block content %}
+{% include version + "/software-providers/_flash.html" %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <h1 class="govuk-heading-l">Contact providers</h1>
+
+    <p class="govuk-body">Use this to contact a group of software providers, for example about an incident, planned maintenance or a change to the service.</p>
+    <p class="govuk-body">To contact one software provider, record the contact on their case file.</p>
+
+    <form method="post" action="/{{ version }}/contact-providers" novalidate>
+
+      {{ govukCheckboxes({
+        name: "statuses",
+        idPrefix: "statuses",
+        fieldset: { legend: { text: "Which software providers do you want to contact?", classes: "govuk-fieldset__legend--m" } },
+        hint: { text: "Select the status of their software packages. Select all that apply." },
+        errorMessage: { text: errors.statuses } if errors.statuses else undefined,
+        items: statusItems
+      }) }}
+
+      {{ govukRadios({
+        name: "who",
+        idPrefix: "who",
+        fieldset: { legend: { text: "Who do you want to contact at each software provider?", classes: "govuk-fieldset__legend--m" } },
+        errorMessage: { text: errors.who } if errors.who else undefined,
+        items: [
+          { value: "key", text: "Key contacts only", checked: values.who === "key" },
+          { value: "all", text: "All contacts", checked: values.who === "all" }
+        ]
+      }) }}
+
+      {{ govukButton({ text: "Continue" }) }}
+
+    </form>
+
+  </div>
+</div>
+
+{# Spacing unit 9 (60px) separates the form from the record of what has been sent.
+   The record is the same timeline as a case file's History page, because each
+   entry is sentences, which do not fit a table on a small screen. #}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-9">Messages recorded</h2>
+
+    {% if sent.length %}
+      {% set timelineEntries = sent %}
+      {% set timelineHeadingLevel = 3 %}
+      {% include version + "/software-providers/_timeline.html" %}
+    {% else %}
+      <p class="govuk-body">No messages to a group of software providers have been recorded.</p>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

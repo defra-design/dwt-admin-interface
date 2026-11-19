@@ -89,6 +89,12 @@
   border-bottom: 0;
 }
 
+// Pages with no navigation bar (the sign in pages in v9) would otherwise end the
+// header on white. This adds the same green line as the top of the footer.
+.app-defra-header--green-line {
+  border-bottom: 10px solid #008531; // Defra footer green, as .app-defra-footer
+}
+
 .app-defra-header__inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -257,7 +263,7 @@
   }
 }
 
-// Signed-in user in the header (v10): the name, role and a "Sign out" link, at the
+// Signed-in user in the header (case file concept): the name, role and a "Sign out" link, at the
 // right of the header on large screens and under the service name on small ones.
 // It uses the third column added for the v9 environment tag. No GOV.UK or Defra
 // class puts account links in this header.
@@ -277,7 +283,7 @@
   }
 }
 
-// Case file identity bar (v10): the MoJ identity bar adds its own page gutters,
+// Case file identity bar (case file concept): the MoJ identity bar adds its own page gutters,
 // because MoJ services put it outside the page container. Here it sits inside
 // the container, so the gutters are removed to line it up with the page.
 .app-identity-bar .moj-identity-bar__container {
@@ -285,7 +291,7 @@
   margin: 0;
 }
 
-// Tables in an MoJ scrollable pane (v10). Two fixes, because the MoJ styles do
+// Tables in an MoJ scrollable pane (case file concept). Two fixes, because the MoJ styles do
 // not cover them:
 // 1. Visually hidden text in a cell (for example in a link) is positioned
 //    outside the pane, which makes the whole page scroll sideways on a small
@@ -724,14 +730,14 @@
   gap: 0 20px;
 }
 
-// v8: long email addresses in the narrow overview column. They wrap at any
+// Software provider page concept: long email addresses in the narrow overview column. They wrap at any
 // character if they do not fit, so they never run into the page edge. No GOV.UK
 // class does this.
 .app-break-word {
   overflow-wrap: anywhere;
 }
 
-// v8: grey panel for the overview column, to set it apart from the page. GOV.UK
+// Software provider page concept: grey panel for the overview column, to set it apart from the page. GOV.UK
 // light grey (#f3f2f1) with the standard text colour (#0b0c0c) is about 17:1, well
 // above the 4.5:1 AA minimum. Use the standard text colour on this panel.
 // Padding is spacing unit 3 (15px) on small screens and unit 4 (20px) on larger ones.
@@ -745,4 +751,142 @@
   .app-overview {
     padding: 20px;
   }
+}
+
+// --- Mock Microsoft sign in (version 9, idea C) -------------------------------
+// A stand-in for the Microsoft Entra ID pages, which are hosted by Microsoft, so
+// there is no GOV.UK component for them. Prototype only. The sky is a gradient,
+// not a photo, to keep the prototype free of extra image files.
+.app-ms-body {
+  background: radial-gradient(ellipse at 30% 40%, #8a9bb3 0%, #3d5272 45%, #1e2c44 100%);
+}
+
+.app-ms {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 85vh;
+  padding: 15px;
+}
+
+.app-ms__card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 440px;
+  padding: 30px 30px 40px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.app-ms__logo {
+  display: block;
+  height: 45px;
+  width: auto;
+  margin-bottom: 20px;
+}
+
+.app-ms__heading {
+  margin: 0 0 20px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1b1b1b;
+}
+
+.app-ms__back {
+  display: block;
+  margin-bottom: 15px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #1b1b1b;
+  text-decoration: none;
+}
+
+.app-ms__accounts {
+  margin: 0 -30px;
+  padding: 0;
+  list-style: none;
+}
+
+.app-ms__account {
+  display: block;
+  padding: 15px 30px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #1b1b1b;
+  text-decoration: none;
+
+  &:hover {
+    background: #f2f2f2;
+  }
+
+  &:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: -3px;
+  }
+}
+
+.app-ms__account--selected {
+  background: #e6e6e6;
+}
+
+.app-ms__input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px solid #0067b8;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 1rem;
+
+  &:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 2px;
+  }
+}
+
+.app-ms__link {
+  margin: 15px 0 30px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.8125rem;
+  color: #0067b8;
+}
+
+.app-ms__actions {
+  text-align: right;
+}
+
+.app-ms__button {
+  min-width: 108px;
+  padding: 8px 20px;
+  border: 1px solid #0067b8;
+  background: #0067b8;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 1rem;
+  color: #ffffff;
+  cursor: pointer;
+
+  &:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 2px;
+  }
+}
+
+// White panel so the note stays readable on the dark background.
+.app-ms__prototype {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 440px;
+  margin-top: 20px;
+  padding: 15px;
+  background: #ffffff;
+}
+
+.app-ms__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+  padding: 15px 20px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.75rem;
+  color: #ffffff;
 }

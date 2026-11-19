@@ -1,0 +1,56 @@
+{#
+  Approve a software package for production. Only reached once a passed PAT
+  or an exception is recorded (see canApprove in data/future-case-files.js). The
+  page shows what the approval is based on. No reason is asked for: the PAT
+  result or the exception is the reason, and it is recorded in the history.
+#}
+{% extends "layouts/future-case-files.html" %}
+
+{% set version = "future/case-files" %}
+{% set heading = "Approve " + pkg.name + " for production" %}
+{% set pageName = heading %}
+{% set activeSection = "providers" %}
+{% set caseFileHref = "/" + version + "/software-providers/" + provider.id %}
+{% set packageHref = caseFileHref + "/packages/" + pkg.id %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: packageHref }) }}
+  {% include version + "/software-providers/_identity.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+    {% set rows = [
+      { key: { text: "Software provider" }, value: { text: provider.name } },
+      {
+        key: { text: "Production approval test (PAT)" },
+        value: { text: pkg.pat.text + ", recorded on " + pkg.pat.on + " by " + pkg.pat.by },
+        actions: { items: [{ href: packageHref + "/pat-result", text: "Change", visuallyHiddenText: "production approval test result" }] }
+      }
+    ] %}
+    {% if pkg.pat.details %}
+      {% set rows = (rows.push({ key: { text: "Details" }, value: { text: pkg.pat.details } }), rows) %}
+    {% endif %}
+    {{ govukSummaryList({ rows: rows }) }}
+
+    <p class="govuk-body">If you approve {{ pkg.name }}:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>its status changes to ‘Approved for production’</li>
+      <li>you can create production credentials for it</li>
+      <li>the approval is recorded on the case file with your name</li>
+    </ul>
+
+    <form method="post" action="{{ packageHref }}/approve" novalidate>
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Approve for production", preventDoubleClick: true }) }}
+        <a class="govuk-link" href="{{ packageHref }}">Cancel</a>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{#
+  Mock only. The real sign-in page is hosted by Microsoft (Entra ID), so we do
+  not design it. This page lets you choose what happens next, to see the
+  journey back to the service and each error.
+#}
+{% extends "layouts/v9.html" %}
+
+{% set version = "v9" %}
+{% set pageName = "Microsoft sign in (prototype only)" %}
+{% set activeSection = "" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">Microsoft sign in (prototype only)</h1>
+
+    {{ govukInsetText({
+      text: "In the real service, Microsoft hosts this page and the user signs in with their Defra account. It is not part of our design. Choose what happens next."
+    }) }}
+
+    <form method="post" action="/{{ version }}/sign-in/microsoft" novalidate>
+
+      {{ govukRadios({
+        name: "outcome",
+        idPrefix: "outcome",
+        fieldset: { legend: { text: "What happens when the user signs in?", classes: "govuk-fieldset__legend--m" } },
+        items: [
+          { value: "success", text: "They sign in and have access", checked: true, hint: { text: "Returns to the page they were on" } },
+          { value: "no-access", text: "They sign in, but their account has no access to this service" },
+          { value: "cancelled", text: "They cancel, or close the Microsoft page" },
+          { value: "problem", text: "Something goes wrong" }
+        ]
+      }) }}
+
+      {{ govukButton({ text: "Continue" }) }}
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

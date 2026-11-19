@@ -41,36 +41,8 @@
     <div class="govuk-summary-card">
       <div class="govuk-summary-card__title-wrapper">
         <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 10
-          {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 10</span>',
-            href: "/v10/sign-in",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">A future-state concept: a case file for each software provider, built around the October 2026 task flows. Not for the next tickets, which continue in version 9.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 11 November 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v10">Changes and design rationale for version 10</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
           Version 9
+          {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
         </h3>
       </div>
       <div class="govuk-summary-card__content">
@@ -85,12 +57,15 @@
         <p class="govuk-body-s">A copy of version 7, with the developers’ URL pattern for software providers. For the next batch of tickets.</p>
 
         <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 9 November 2026<br>
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 17 November 2026<br>
           <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
         </p>
 
         <ul class="govuk-list govuk-list--bullet govuk-body-s">
           <li><a class="govuk-link" href="/versions/v9">Changes and design rationale for version 9</a></li>
+          <li><a class="govuk-link" href="/v9/sign-in/try">Sign in ideas: Entra ID landing page, return to page and errors (idea A)</a></li>
+          <li><a class="govuk-link" href="/v9/sign-in/try?variant=b">Sign in ideas (idea B)</a></li>
+          <li><a class="govuk-link" href="/v9/sign-in/try?variant=c">Sign in ideas: landing page for all users, External test (idea C)</a></li>
         </ul>
 
         <p class="govuk-body-s govuk-!-margin-bottom-1">Ideas for showing the environment on the Software providers page:</p>
@@ -100,34 +75,6 @@
           <li><a class="govuk-link" href="/v9/environment-header/on">Tag and link in the header</a></li>
           <li><a class="govuk-link" href="/v9/environment-header-page-link/on">Tag in the header, link above the Create button</a></li>
           <li><a class="govuk-link" href="/v9/environment-header-heading/on">Tag in the header, link under a “Change environment” heading</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 8
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 8</span>',
-            href: "/v8/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">A copy of version 7, for a concept of the software provider detail page. For an internal technical discussion with another team. Not based on research.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 29 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v8">Changes and design rationale for version 8</a></li>
         </ul>
       </div>
     </div>
@@ -357,6 +304,66 @@
 
         <ul class="govuk-list govuk-list--bullet govuk-body-s">
           <li><a class="govuk-link" href="/versions/v1">Changes in version 1</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 class="govuk-heading-l govuk-!-margin-top-9">Future state exploration</h2>
+
+    <p class="govuk-body">Concepts for how the service could work in future. They are not part of the numbered versions, which build on each other, and are not designs for the next tickets.</p>
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
+          Case file concept
+        </h3>
+      </div>
+      <div class="govuk-summary-card__content">
+        <div>
+          {{ govukButton({
+            html: 'View prototype<span class="govuk-visually-hidden"> for the case file concept</span>',
+            href: "/future/case-files/sign-in",
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+
+        <p class="govuk-body-s">A future-state concept: a case file for each software provider, built around the October 2026 task flows. Not for the next tickets, which continue in version 9. Previously called version 10.</p>
+
+        <p class="govuk-body-s">
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 11 November 2026<br>
+          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-body-s">
+          <li><a class="govuk-link" href="/versions/future-case-files">Changes and design rationale for the case file concept</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
+          Software provider page concept
+        </h3>
+      </div>
+      <div class="govuk-summary-card__content">
+        <div>
+          {{ govukButton({
+            html: 'View prototype<span class="govuk-visually-hidden"> for the software provider page concept</span>',
+            href: "/future/software-provider-page/start",
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+
+        <p class="govuk-body-s">Built from version 7, for a concept of the software provider detail page. For an internal technical discussion with another team. Not based on research. Previously called version 8.</p>
+
+        <p class="govuk-body-s">
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 29 October 2026<br>
+          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-body-s">
+          <li><a class="govuk-link" href="/versions/future-software-provider-page">Changes and design rationale for the software provider page concept</a></li>
         </ul>
       </div>
     </div>
