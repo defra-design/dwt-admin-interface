@@ -3482,10 +3482,15 @@ function registerV9Routes () {
     // environment heading". It is switched on here, not on the sign in pages,
     // because the landing page heading already names the environment.
     req.session.data.environmentConceptV9 = 'header-heading'
-    res.redirect(safeReturnTo(req.session.data.signInReturnToV9))
+    // Idea C always lands on the home page, not the page the user was on.
+    res.redirect(`${base}/start`)
   })
   router.get(`${base}/sign-in/c/outcome/:outcome(no-access|cancelled|problem)`, (req, res) => {
     res.redirect(`${base}/sign-in/error-c?reason=${req.params.outcome}`)
+  })
+  // Placeholder error page for idea C, until the error content is designed.
+  router.get(`${base}/sign-in/c/error`, (req, res) => {
+    res.render(view('sign-in/error-c-placeholder'), { hideNavigation: true })
   })
 
   router.get(`${base}/sign-in/microsoft`, (req, res) => {

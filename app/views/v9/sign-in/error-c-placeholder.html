@@ -1,0 +1,27 @@
+{#
+  Idea C: placeholder error page for when sign in fails. The content is not
+  designed yet. The route sets hideNavigation, so the header shows the green
+  line instead of the service navigation, as on landing page C.
+#}
+{% extends "layouts/v9.html" %}
+
+{% set version = "v9" %}
+{% set pageName = "There was a problem with sign in" %}
+{% set activeSection = "" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">{{ pageName }}</h1>
+
+    <p class="govuk-body">You have not been signed in. You will need to try again.</p>
+
+    {{ govukButton({
+      text: "Try signing in again",
+      href: "/" + version + "/sign-in/c"
+    }) }}
+
+  </div>
+</div>
+{% endblock %}

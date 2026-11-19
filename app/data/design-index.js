@@ -744,6 +744,13 @@ module.exports = [
     summary: 'The landing page before sign in, and the page shown when sign in fails.',
     variants: [
       {
+        label: 'Version 9, idea C: placeholder error',
+        source: 'Prototype',
+        href: '/v9/sign-in/c/error',
+        difference: 'One placeholder error page for when sign in fails, with the green line under the header instead of the navigation. The content is not designed yet.',
+        rationaleHref: '/versions/v9'
+      },
+      {
         label: 'Version 9, idea C: landing page',
         source: 'Prototype',
         href: '/v9/sign-in/c',
