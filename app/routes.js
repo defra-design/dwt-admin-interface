@@ -3485,9 +3485,6 @@ function registerV9Routes () {
     // Idea C always lands on the home page, not the page the user was on.
     res.redirect(`${base}/start`)
   })
-  router.get(`${base}/sign-in/c/outcome/:outcome(no-access|cancelled|problem)`, (req, res) => {
-    res.redirect(`${base}/sign-in/error-c?reason=${req.params.outcome}`)
-  })
   // Placeholder error page for idea C, until the error content is designed.
   router.get(`${base}/sign-in/c/error`, (req, res) => {
     res.render(view('sign-in/error-c-placeholder'), { hideNavigation: true })
@@ -3505,10 +3502,12 @@ function registerV9Routes () {
       return res.redirect(safeReturnTo(req.session.data.signInReturnToV9))
     }
     const reason = ['cancelled', 'no-access'].includes(outcome) ? outcome : 'problem'
+    // Idea C has one placeholder error page.
+    if (variant === 'c') return res.redirect(`${base}/sign-in/c/error`)
     res.redirect(`${base}/sign-in/error-${variant}?reason=${reason}`)
   })
 
-  router.get(`${base}/sign-in/error-:variant(a|b|c)`, (req, res) => {
+  router.get(`${base}/sign-in/error-:variant(a|b)`, (req, res) => {
     const reason = ['cancelled', 'no-access'].includes(req.query.reason) ? req.query.reason : 'problem'
     res.render(view(`sign-in/error-${req.params.variant}`), { hideNavigation: true, reason })
   })

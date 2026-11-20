@@ -1,0 +1,178 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "DWTSPI-532: Sign in to the DWT admin portal with a Defra account" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to Jira tickets", href: "/jira-tickets" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">DWTSPI-532</span>
+    <h1 class="govuk-heading-l">Sign in to the DWT admin portal with a Defra account</h1>
+
+    <p class="govuk-body"><strong>Clickable prototype:</strong> <a class="govuk-link" href="/v9/sign-in/try?variant=c">Version 9, sign in idea C</a>. Select “Continue to sign in”, pick the account and enter any password to reach the DWT admin portal page. To see the error page, select “Sign in fails” under the password page.</p>
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: "View the design reference page",
+        href: "/jira-tickets/dwtspi-532/design-sign-in",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the DWT admin portal page design reference",
+        href: "/jira-tickets/dwtspi-532/design-home",
+        classes: "govuk-button--secondary"
+      }) }}
+      {{ govukButton({
+        text: "View the error page design reference",
+        href: "/jira-tickets/dwtspi-532/design-error",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+    <h2 class="govuk-heading-m">User story</h2>
+    <p class="govuk-body"><strong>As a</strong> member of Defra staff who uses the DWT admin portal,<br><strong>I want</strong> to sign in with my Defra account,<br><strong>so that</strong> I can get into the portal with the account I already use at Defra, and only staff who have been given access can see and change credentials.</p>
+
+    <h2 class="govuk-heading-m">Context</h2>
+    <p class="govuk-body">This story replaces the current sign in screen, which does not use Microsoft Entra ID, with sign in through Entra ID.</p>
+    <p class="govuk-body">Users who have not signed in see a sign in page. It says what the portal is for and has one button that takes them to the Microsoft sign in pages. After signing in, users land on the DWT admin portal page, which now lists what the portal is for. If sign in fails, users see an error page and can try again.</p>
+    <p class="govuk-body">This story assumes the environment tag in the header from DWTSPI-517 has been built. The tag shows on all 3 pages in this story.</p>
+
+    <h2 class="govuk-heading-m">Components and patterns</h2>
+    {{ govukTable({
+      caption: "Components and patterns used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Component or pattern" },
+        { text: "Source" },
+        { text: "Notes" }
+      ],
+      rows: [
+        [
+          { text: "Button" },
+          { text: "GOV.UK Design System" },
+          { html: 'The primary button, as a link (the macro with <code>href</code>). On the sign in page and the error page. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/button/">Button</a>. No JavaScript.' }
+        ],
+        [
+          { text: "Tag" },
+          { text: "GOV.UK Design System" },
+          { html: 'The environment tag in the header, as built for DWTSPI-517. No change to the tag itself. Guidance: <a class="govuk-link" href="https://design-system.service.gov.uk/components/tag/">Tag</a>.' }
+        ],
+        [
+          { text: "<code>app-defra-header--green-line</code>" | safe },
+          { text: "Bespoke" },
+          { text: "Adds a green line along the bottom of the header on the sign in page and the error page, which have no navigation. Without it, the header would end on white. The Defra header has no signed-out variant." }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Colours</h2>
+    {{ govukTable({
+      caption: "Colours used",
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Name" },
+        { text: "Value" },
+        { text: "Source" },
+        { text: "Used for" }
+      ],
+      rows: [
+        [
+          { html: "<code>defra-green-dark</code>" },
+          { text: "#008531" },
+          { text: "Defra" },
+          { text: "Green line along the bottom of the header on the sign in page and the error page. The same colour as the navigation bar and the top of the footer." }
+        ]
+      ]
+    }) }}
+
+    <h2 class="govuk-heading-m">Design acceptance criteria</h2>
+
+    <h3 class="govuk-heading-s">Header, on the sign in page and the error page</h3>
+    <ol class="govuk-list govuk-list--number">
+      <li>The header shows the Defra logo, “DWT admin portal” and the environment tag, as on the other pages (DWTSPI-517).</li>
+      <li>There is no navigation bar.</li>
+      <li>A 10px line in <code>defra-green-dark</code> runs along the bottom of the header, across the full width of the page.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Sign in page (new page)</h3>
+    <ol class="govuk-list govuk-list--number" start="4">
+      <li>The H1 is “Sign in to DWT admin portal”, in the large heading size (<code>govuk-heading-l</code>).</li>
+      <li>Below the H1 is a paragraph, “DWT admin portal allows you to:”, then a bulleted list: “manage software provider credentials” and “search waste organisations”.</li>
+      <li>Below the list is a primary button, “Continue to sign in”.</li>
+      <li>The content is in a two-thirds width column.</li>
+      <li>All spacing is the GOV.UK default for headings, paragraphs, lists and buttons. There are no spacing overrides.</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">DWT admin portal page</h3>
+    <ol class="govuk-list govuk-list--number" start="9">
+      <li>The paragraph under the H1 is replaced with a paragraph, “This site allows the Digital waste tracking service team to:”, then a bulleted list: “manage software provider credentials” and “search waste organisations”.</li>
+      <li>The environment tag shows in the header, as on the Software provider pages (DWTSPI-517).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">Error page (new page)</h3>
+    <ol class="govuk-list govuk-list--number" start="11">
+      <li>The H1 is “There was a problem signing you in”, in the large heading size (<code>govuk-heading-l</code>).</li>
+      <li>Below the H1 is one paragraph: “You have not been signed in. You will need to try again.”</li>
+      <li>Below the paragraph is a primary button, “Try signing in again”.</li>
+      <li>The content is in a two-thirds width column.</li>
+      <li>All spacing is the GOV.UK default for headings, paragraphs and buttons. There are no spacing overrides.</li>
+    </ol>
+
+    <ol class="govuk-list govuk-list--number" start="16">
+      <li>The pages match the design reference.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Acceptance criteria</h2>
+    <ol class="govuk-list govuk-list--number">
+      <li>Given a user has not signed in, when they open any page in the portal, then they see the sign in page.</li>
+      <li>Given a user is on the sign in page, when they select “Continue to sign in”, then they go to the Microsoft Entra ID sign in.</li>
+      <li>Given a user signs in with a Defra account that has access, then they land on the DWT admin portal page.</li>
+      <li>Given a user’s sign in fails, then they see the error page and are not signed in.</li>
+      <li>Given a user is on the error page, when they select “Try signing in again”, then they go straight to the Microsoft Entra ID sign in, not the sign in page.</li>
+      <li>Given a user has signed in, then the navigation shows on every page, with “DWT admin portal” as the current page on the DWT admin portal page.</li>
+      <li>The page titles are “Sign in - External test - DWT admin portal”, “External test - DWT admin portal” and “Error: There was a problem signing you in - External test - DWT admin portal”. In Production, “Production” replaces “External test”.</li>
+    </ol>
+
+    <h2 class="govuk-heading-m">Accessibility acceptance criteria</h2>
+    <p class="govuk-body">Meets WCAG 2.2 AA:</p>
+    <ol class="govuk-list govuk-list--number">
+      <li>Each page has one banner (header), one main and one contentinfo (footer) landmark. The sign in page and the error page have no navigation landmark. The DWT admin portal page has one, labelled “Menu” (1.3.1).</li>
+      <li>Each page has one H1, which is the first heading in the main content (1.3.1, 2.4.6).</li>
+      <li>Each page has a unique title, with the page name, then the environment, then the service name. The error page title starts with “Error: ” (2.4.2).</li>
+      <li>The lists are marked up as lists (<code>ul</code> and <code>li</code>), not as separate paragraphs (1.3.1).</li>
+      <li>The button text, “Continue to sign in” or “Try signing in again”, says what the button does (2.4.4, 2.4.6).</li>
+      <li>The buttons work with a keyboard and have the GOV.UK focus style, with a <code>yellow</code> background and a <code>black</code> bar (2.1.1, 2.4.7).</li>
+      <li>The environment is shown in the tag text, not by colour alone. The green line is decorative and carries no meaning (1.4.1).</li>
+      <li>At 320px wide and at 200% zoom, the pages do not scroll sideways, and the logo, service name and tag do not overlap or get cut off (1.4.4, 1.4.10).</li>
+    </ol>
+
+    <h3 class="govuk-heading-s">How to test</h3>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Run an automated check, such as axe or WAVE.</li>
+      <li>With only a keyboard, sign in, and go through the error page.</li>
+      <li>Check the pages with a screen reader, such as NVDA or VoiceOver. The page title and the environment in the header are read out, and the lists are read as lists.</li>
+      <li>Check the pages at 320px wide and at 200% zoom.</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Questions for refinement</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>Should the error page say why sign in failed (for example, no access or cancelled)? This story has one error page for all causes.</li>
+      <li>Should users go back to the page they first asked for after signing in, rather than always to the DWT admin portal page?</li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Out of scope</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>The Microsoft sign in pages. They are hosted by Microsoft.</li>
+      <li>Signing out, and showing who is signed in.</li>
+      <li>Giving staff access to the portal.</li>
+    </ul>
+
+  </div>
+</div>
+{% endblock %}

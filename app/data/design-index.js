@@ -744,25 +744,31 @@ module.exports = [
     summary: 'The landing page before sign in, and the page shown when sign in fails.',
     variants: [
       {
-        label: 'Version 9, idea C: placeholder error',
+        label: 'DWTSPI-532: sign in page',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-532/design-sign-in',
+        difference: 'Idea C, with the environment tag from DWTSPI-517 in the header and the green line instead of the navigation.',
+        rationaleHref: '/jira-tickets/dwtspi-532'
+      },
+      {
+        label: 'DWTSPI-532: error page',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-532/design-error',
+        difference: 'One error page for every cause, with a button that goes straight back to the Microsoft sign in.',
+        rationaleHref: '/jira-tickets/dwtspi-532'
+      },
+      {
+        label: 'Version 9, idea C: error page',
         source: 'Prototype',
         href: '/v9/sign-in/c/error',
-        difference: 'One placeholder error page for when sign in fails, with the green line under the header instead of the navigation. The content is not designed yet.',
+        difference: 'One error page for when sign in fails, with the green line under the header instead of the navigation.',
         rationaleHref: '/versions/v9'
       },
       {
         label: 'Version 9, idea C: landing page',
         source: 'Prototype',
         href: '/v9/sign-in/c',
-        difference: 'The page every user sees until they have signed in. The heading names the environment (External test), then a short list of what the portal is for and one “Continue to sign in” button.',
-        rationaleHref: '/versions/v9'
-      },
-      {
-        label: 'Version 9, idea C: errors',
-        source: 'Prototype',
-        href: '/v9/sign-in/error-c?reason=no-access',
-        linkNote: 'Also reason=cancelled and reason=problem.',
-        difference: 'The same three error pages as idea B, with links back to landing page C.',
+        difference: 'The page every user sees until they have signed in. The heading is “Sign in to DWT admin portal”, then a short list of what the portal is for and one “Continue to sign in” button.',
         rationaleHref: '/versions/v9'
       },
       {

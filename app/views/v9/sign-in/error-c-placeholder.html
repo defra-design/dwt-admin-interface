@@ -6,7 +6,7 @@
 {% extends "layouts/v9.html" %}
 
 {% set version = "v9" %}
-{% set pageName = "There was a problem with sign in" %}
+{% set pageName = "There was a problem signing you in" %}
 {% set activeSection = "" %}
 
 {% block content %}
@@ -19,7 +19,7 @@
 
     {{ govukButton({
       text: "Try signing in again",
-      href: "/" + version + "/sign-in/c"
+      href: "/" + version + "/sign-in/c/account"
     }) }}
 
   </div>

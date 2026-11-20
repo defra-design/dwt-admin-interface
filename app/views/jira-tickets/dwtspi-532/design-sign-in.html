@@ -1,0 +1,33 @@
+{#
+  Design reference for DWTSPI-532: the sign in page every user sees until they
+  have signed in. A copy of v9/sign-in/landing-c.html. The button goes to #,
+  because the next page is hosted by Microsoft (Entra ID).
+#}
+{% extends "layouts/jira-dwtspi-532.html" %}
+
+{% set pageName = "Sign in to DWT admin portal" %}
+{% set titleName = "Sign in" %}
+{% set environment = "External test" %}
+{% set hideNavigation = true %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">{{ pageName }}</h1>
+
+    <p class="govuk-body">DWT admin portal allows you to:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>manage software provider credentials</li>
+      <li>search waste organisations</li>
+    </ul>
+
+    {{ govukButton({
+      text: "Continue to sign in",
+      href: "#"
+    }) }}
+
+  </div>
+</div>
+{% endblock %}

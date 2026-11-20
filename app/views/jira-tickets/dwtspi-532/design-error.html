@@ -1,0 +1,28 @@
+{#
+  Design reference for DWTSPI-532: the page shown when sign in fails. A copy of
+  v9/sign-in/error-c-placeholder.html. The button goes to #, because it starts
+  the Microsoft (Entra ID) sign in again.
+#}
+{% extends "layouts/jira-dwtspi-532.html" %}
+
+{% set pageName = "There was a problem signing you in" %}
+{% set titleName = "Error: " + pageName %}
+{% set environment = "External test" %}
+{% set hideNavigation = true %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h1 class="govuk-heading-l">{{ pageName }}</h1>
+
+    <p class="govuk-body">You have not been signed in. You will need to try again.</p>
+
+    {{ govukButton({
+      text: "Try signing in again",
+      href: "#"
+    }) }}
+
+  </div>
+</div>
+{% endblock %}
