@@ -1,0 +1,98 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 10" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 10
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 26 November 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested. For user research on 26 November 2026
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 10</span>',
+        href: "/v10/software-providers",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A copy of version 9 for user research. The sign in pages are removed, and nothing asks the user to sign in." },
+          { text: "The research is about finding a software provider in the list, not about signing in." },
+          { html: '<a class="govuk-link" href="/v10/software-providers">/v10/software-providers</a>' }
+        ],
+        [
+          { text: "Environment" },
+          { text: "Only one of the version 9 ideas: the environment tag in the header (teal for External test, purple for Production), and the link to the other environment under a “Change environment” heading below the Create button. The other ideas and the links that switch between them are removed." },
+          { text: "To test this idea with users. Chosen by the team from the version 9 ideas." },
+          { html: '<a class="govuk-link" href="/v10/software-providers">/v10/software-providers</a><br><a class="govuk-link" href="/v10/software-providers/production">/v10/software-providers/production</a>' }
+        ],
+        [
+          { text: "Production" },
+          { text: "Production works the same as External test. In version 9 only the Production list was built, and every other Production page went to a placeholder. Production pages are under /software-providers/production: the software provider page (/software-providers/production/{clientId}), create, edit, the copy page, add, replace and remove a secret, and delete. Each environment only lists and opens its own clients. The wording names the environment the user is in, for example “Client secrets for production environment”. A client name only has to be unique in its own environment, so the same name can be used in both. The Production address on the copy page (https://waste-tracking.api.defra.gov.uk/) is made up for the prototype." },
+          { text: "So participants can open and act on clients in either environment, and the research shows whether they notice which environment they are in." },
+          { html: '<a class="govuk-link" href="/v10/software-providers/production">/v10/software-providers/production</a> (select a client name)' }
+        ],
+        [
+          { text: "Example clients" },
+          { text: "The two demo clients that always fail (Error_Demo_Test and Error_Demo_Two_Test) are removed. The list has 50 External test and 30 Production clients from 28 made-up software providers. Client names mix the provider name alone, the provider and a software package, and the provider and a place in Scotland, Wales or England. Some providers have more than one client. Production clients are a subset of the External test ones, but often have a different client name (for example Kerbside_Collect_Scotland_Test in External test and Kerbside_Collect_Glasgow in Production). 13 clients have two secrets. Meridian Software Ltd (ResourceHub Enterprise) is in External test only, as Meridian_ResourceHub_Enterprise. Meridian_ResourceHub_Lite, Meridian_Software and Meridian Waste Group (a different provider, in both environments) are there to be confused with it." },
+          { text: "In research, participants look for one provider (Meridian Software Ltd, ResourceHub Enterprise). A realistic number of clients and inconsistent naming shows whether they can find it, and whether they look in the right environment. In the service, the clients will be set up at different times and by different people, so names will not always match between environments." },
+          { html: '<a class="govuk-link" href="/v10/software-providers">/v10/software-providers</a>' }
+        ],
+        [
+          { text: "Sorting" },
+          { text: "Bug fix: the table now loads sorted by client name, A to Z. In version 9 it was sorted by client ID, because the sort used the link in the Client name cell. Version 9 still has this bug." },
+          { text: "The Client name header said the table was sorted by name, which was not true. With 50 rows this made the list hard to scan." },
+          { html: '<a class="govuk-link" href="/v10/software-providers">/v10/software-providers</a>' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">This version is not tested with users yet. Other design decisions are the same as in
+      <a class="govuk-link" href="/versions/v9#design-rationale">version 9</a>, except for the changes recorded in the table above.</p>
+
+    <p class="govuk-body">This version has its own session data. Credentials created in this version are not
+      shown in version 9, and the other way round. Clear prototype data between research sessions.</p>
+
+  </div>
+</div>
+{% endblock %}

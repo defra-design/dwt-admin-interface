@@ -80,6 +80,13 @@ module.exports = [
     summary: 'The page you reach from “Software providers” in the navigation.',
     variants: [
       {
+        label: 'Version 10',
+        source: 'Prototype',
+        href: '/v10/software-providers',
+        difference: 'For user research. The environment tag is in the header and the link to the other environment is under a “Change environment” heading. 50 External test and 30 Production clients, with client names that often differ between the environments.',
+        rationaleHref: '/versions/v10'
+      },
+      {
         label: 'Case file concept',
         source: 'Prototype',
         href: '/future/case-files/software-providers',
@@ -240,6 +247,14 @@ module.exports = [
     name: 'Software provider detail',
     summary: 'A single software provider company, with its email addresses and notes. Built in version 3, and as a case file in the case file concept.',
     variants: [
+      {
+        label: 'Version 10 (Production)',
+        source: 'Prototype',
+        href: '/v10/software-providers/production',
+        linkNote: 'Select a client name.',
+        difference: 'The first Production software provider page. The same as External test, with the Production tag in the header and “Client secrets for production environment”.',
+        rationaleHref: '/versions/v10'
+      },
       {
         label: 'Case file concept',
         source: 'Prototype',
