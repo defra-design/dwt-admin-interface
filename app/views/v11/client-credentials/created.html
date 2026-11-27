@@ -1,0 +1,67 @@
+{#
+  Send the credentials, for new credentials, a replaced secret and an added
+  secret. The secret is never shown to the admin user: the service emails it to
+  the software provider. Sending goes to the software provider page, which
+  confirms what was sent (see routes.js).
+
+  - One question, the email address, with the GOV.UK email address pattern.
+    It is someone else's address, so the browser does not fill it in.
+  - The credentials are a plain summary list: Client ID, Client secret ("[Hidden]"),
+    External test environment, Generated on.
+  - One button, "Send".
+#}
+{% extends "layouts/v11.html" %}
+
+{% set version = "v11" %}
+{% set pageName = ("Error: " if errorList.length else "") + "Send credentials" %}
+{% set activeSection = "providers" %}
+{# The Production address is made up for the prototype. Confirm it with the developers. #}
+{% set apiUrl = "https://waste-tracking.api.defra.gov.uk/" if currentEnvironment === "production" else "http://waste-tracking.integration.api.defra.gov.uk/" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if errorList.length %}
+      {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {% endif %}
+
+    <span class="govuk-caption-l">{{ credential.clientName }}</span>
+    <h1 class="govuk-heading-l">Send credentials</h1>
+
+    <p class="govuk-body">Enter the software provider’s email address and send them the credentials.</p>
+
+    <form method="post" action="{{ providersPath }}/{{ credential.id }}/created" novalidate>
+
+      {{ govukInput({
+        id: "email",
+        name: "email",
+        type: "email",
+        label: { text: "Email address", classes: "govuk-label--s" },
+        classes: "govuk-!-width-two-thirds",
+        value: values.email,
+        errorMessage: { text: errors.email } if errors.email else undefined,
+        autocomplete: "off",
+        spellcheck: false,
+        formGroup: { classes: "govuk-!-margin-bottom-8" }
+      }) }}
+
+      <h2 class="govuk-heading-m">Credentials</h2>
+
+      {{ govukSummaryList({
+        classes: "govuk-!-margin-bottom-8",
+        rows: [
+          { key: { text: "Client ID" }, value: { text: credential.clientId } },
+          { key: { text: "Client secret" }, value: { text: "[Hidden]" } },
+          { key: { text: environmentName + " environment" }, value: { text: apiUrl } },
+          { key: { text: "Generated on" }, value: { text: generatedOn } }
+        ]
+      }) }}
+
+      {{ govukButton({ text: "Send", preventDoubleClick: true }) }}
+
+    </form>
+
+  </div>
+</div>
+{% endblock %}

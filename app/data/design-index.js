@@ -247,6 +247,14 @@ module.exports = [
         rationaleHref: '/as-built'
       },
       {
+        label: 'Version 11',
+        source: 'Prototype',
+        href: '/v11/software-providers/bz6e6zajp1r2o43ha1yzx8p81p',
+        linkNote: 'The success alerts show after sending credentials or removing a secret.',
+        difference: 'A MoJ success alert at the top, shown once: “Credentials sent” after the Send credentials page, or “Secret removed” after removing a secret. Otherwise the same as version 10.',
+        rationaleHref: '/versions/v11'
+      },
+      {
         label: 'Version 10 (External test)',
         source: 'Prototype',
         href: '/v10/software-providers/bz6e6zajp1r2o43ha1yzx8p81p',
@@ -491,6 +499,14 @@ module.exports = [
     name: 'Client secret created',
     summary: 'Shown once, after credentials are created or a secret is rotated. Needs session data, so these links open the list.',
     variants: [
+      {
+        label: 'Version 11',
+        source: 'Prototype',
+        href: '/v11/software-providers/create',
+        linkNote: 'Enter a client name and select Generate credentials.',
+        difference: 'Send credentials: the service emails the credentials. Asks for the software provider’s email address, lists the credentials with the client secret as “[Hidden]”, and has one Send button. No copy button or warning alert.',
+        rationaleHref: '/versions/v11'
+      },
       {
         label: 'Case file concept',
         source: 'Prototype',

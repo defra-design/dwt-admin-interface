@@ -4465,6 +4465,462 @@ function registerV10Routes () {
 
 registerV10Routes()
 
+// --- Version 11 -----------------------------------------------------------
+// A copy of version 10 where the service emails the credentials. The admin user
+// enters the software provider's email address on the Send credentials page and
+// never sees the secret. Uses the version 10 example clients
+// (data/client-credentials-v10.js), with its own session data.
+function registerV11Routes () {
+  const base = '/v11'
+  const view = (page) => `v11/${page}`
+
+  // The two environments. `label` is the value stored on a credential, `name`
+  // is what the user sees, and `path` is that environment's Software providers page.
+  const ENVIRONMENTS_V11 = [
+    { key: 'test', label: 'Test', name: 'External test', path: `${base}/software-providers` },
+    { key: 'production', label: 'Production', name: 'Production', path: `${base}/software-providers/production` }
+  ]
+
+  router.use(base, (req, res, next) => {
+    res.locals.version = 'v11'
+    // The environment tag is always in the header. Software provider pages set
+    // the environment from their address; every other page keeps showing the
+    // last one chosen.
+    res.locals.environmentHeader = true
+    if (req.path === '/software-providers/production' || req.path.startsWith('/software-providers/production/')) {
+      req.session.data.environmentV11 = 'production'
+    } else if (req.path.startsWith('/software-providers')) {
+      req.session.data.environmentV11 = 'test'
+    }
+    const env = ENVIRONMENTS_V11.find((e) => e.key === req.session.data.environmentV11) || ENVIRONMENTS_V11[0]
+    res.locals.currentEnvironment = env.key
+    // Used by the software provider pages for their links and wording.
+    res.locals.providersPath = env.path
+    res.locals.environmentName = env.name
+    next()
+  })
+
+  // Credentials created or changed in this session. See data/client-credentials-v10.js.
+  function credentialList (req) {
+    if (!Array.isArray(req.session.data.clientCredentialsV11) ) {
+      req.session.data.clientCredentialsV11 = []
+    }
+    return req.session.data.clientCredentialsV11
+  }
+
+  // --- Reporting (same as version 4.1) -----------------------------------------
+
+  // Waste organisations report. Rows carry the values the MoJ sortable table
+  // needs: dates and periods sort on a number, not on the text shown.
+  // The payment year ending is shown as "Sep 2025" (the cycle always ends in September).
+  function orgRows (orgs) {
+    const byId = new Map(orgs.map((o) => [o.id, o]))
+    return mapOrgRows(orgs).map((row) => {
+      const match = /(\d{2})$/.exec(row.paymentPeriod)
+      return Object.assign({}, row, {
+        registeredSort: byId.get(row.id).registeredDate.getTime(),
+        paymentPeriod: match ? `Sep 20${match[1]}` : '',
+        paymentPeriodSort: match ? Number(match[1]) : 0
+      })
+    })
+  }
+
+  // Checks one date (day, month, year) from the filter. Messages are the ones
+  // agreed in the Jira ticket. `parts` lists the inputs to highlight: only the
+  // missing or wrong ones, as the GOV.UK dates pattern asks.
+  // Returns { error, href, parts, date }.
+  function checkReportDate (query, key, label, today) {
+    const prefix = `period-${key}`
+    const part = (name) => (query[`${prefix}-${name}`] || '').trim()
+    const values = { day: part('day'), month: part('month'), year: part('year') }
+    const all = ['day', 'month', 'year']
+    const missing = all.filter((name) => !values[name])
+    const fail = (error, parts) => ({ error, parts, href: `#${prefix}-${parts[0]}` })
+    const name = `‘${label}’ date`
+
+    if (missing.length === 3) {
+      return fail(`Enter or select a ${name}`, all)
+    }
+    if (missing.length === 2) {
+      return fail(`${name} must include a day, month and year`, all)
+    }
+    if (missing.length === 1) {
+      return fail(`${name} must include a ${missing[0]}`, missing)
+    }
+    // Letters or other characters, or a year that is not 4 numbers (for example 26).
+    const wrong = all.filter((n) => !/^\d+$/.test(values[n]) || (n === 'year' && values[n].length !== 4))
+    if (wrong.length) {
+      return fail(`Enter the ${name} in the correct format`, wrong)
+    }
+    const checked = validateDateParts(values.day, values.month, values.year)
+    if (checked.error) {
+      return fail(`${name} must be a real date`, all)
+    }
+    if (checked.date > today) {
+      return fail(`${name} must be today or in the past`, all)
+    }
+    return { date: checked.date }
+  }
+
+  // The filter is shown first. Results only appear once both dates are valid.
+  // Nothing is filled in or swapped for the user.
+  function checkReportPeriod (query) {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const raw = (key) => ({
+      day: (query[`period-${key}-day`] || '').trim(),
+      month: (query[`period-${key}-month`] || '').trim(),
+      year: (query[`period-${key}-year`] || '').trim()
+    })
+    const period = {
+      values: { from: raw('from'), to: raw('to') },
+      errors: {},
+      errorParts: { from: [], to: [] },
+      errorList: []
+    }
+    const from = checkReportDate(query, 'from', 'From', today)
+    const to = checkReportDate(query, 'to', 'To', today)
+    // The 'To' date error names the 'From' date the user entered.
+    if (!to.error && from.date && from.date > to.date) {
+      Object.assign(to, {
+        error: `‘To’ date must be the same as or after ${formatDateObj(from.date)}`,
+        parts: ['day', 'month', 'year'],
+        href: '#period-to-day'
+      })
+    }
+    for (const [key, result] of [['from', from], ['to', to]]) {
+      if (result.error) {
+        period.errors[key] = result.error
+        period.errorParts[key] = result.parts
+        period.errorList.push({ text: result.error, href: result.href })
+      }
+    }
+    if (!period.errorList.length) {
+      period.from = from.date
+      period.to = to.date
+    }
+    return period
+  }
+
+  router.get(`${base}/regulators`, (req, res) => {
+    const submitted = [
+      'period-from-day', 'period-from-month', 'period-from-year',
+      'period-to-day', 'period-to-month', 'period-to-year'
+    ].some((key) => key in req.query)
+    const period = submitted ? checkReportPeriod(req.query) : emptyPeriod
+    // Every row is shown on one page, so sorting reorders all of them.
+    const searched = submitted && !period.errorList.length
+    const rows = searched ? orgRows(reg.listRegisteredInPeriod(period.from, period.to)) : []
+    res.render(view('regulators/index'), {
+      period,
+      rows,
+      count: rows.length,
+      // All registered organisations, shown beside the count for the period.
+      totalCount: reg.listAllOrganisations().length,
+      filtered: submitted,
+      searched,
+      periodLabel: searched ? periodLabel(period) : null
+    })
+  })
+
+  // Download CSV is not built yet — goes to the placeholder page.
+  router.get(`${base}/regulators/download`, (req, res) => {
+    res.render(view('placeholder'), {
+      heading: 'Download CSV',
+      activeSection: 'regulators',
+      backHref: `${base}/regulators`
+    })
+  })
+
+  // --- Software providers --------------------------------------------------
+  // External test and Production work the same way. Production pages are under
+  // /software-providers/production, so the address says which environment the
+  // user is in (see ENVIRONMENTS_V11 above). Each environment only lists and
+  // opens its own credentials.
+
+  // Deleted software providers. The fixed example rows cannot be removed from
+  // the shared data, so deleted ids are kept in the session and hidden.
+  function deletedIds (req) {
+    if (!Array.isArray(req.session.data.deletedCredentialsV11)) {
+      req.session.data.deletedCredentialsV11 = []
+    }
+    return req.session.data.deletedCredentialsV11
+  }
+
+  // Names that start with "Error_" always fail, so the service error alert can
+  // be shown. None of the version 10 example clients start with "Error_".
+  function isDemoError (clientName) {
+    return /^error_/i.test(clientName || '')
+  }
+
+  // When each secret was generated, newest first, as text for the page.
+  function secretLabels (credential) {
+    return ccV10.secretDates(credential)
+      .slice()
+      .sort((a, b) => new Date(b) - new Date(a))
+      .map((d) => formatDateTimeObj(new Date(d)))
+  }
+
+  function renderDetail (res, credential, extras) {
+    res.render(view('client-credentials/software-provider-detail'), Object.assign({
+      credential,
+      showNew: false,
+      secretLabels: secretLabels(credential),
+      canAddSecret: ccV10.secretDates(credential).length < ccV10.MAX_SECRETS
+    }, extras))
+  }
+
+  // The create and edit pages share one form. Only the client name is asked for.
+  function renderClientNameForm (res, options) {
+    res.render(view('client-credentials/create'), Object.assign({
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  // The success alert shown once on the software provider page after sending,
+  // for each journey. Wording from the content design (some of it is still a draft).
+  const SENT_MESSAGES = {
+    created: (name) => `New credentials were emailed to ${name}.`,
+    added: (name) => `The new secret was emailed to ${name}.`,
+    rotated: (name) => `The replacement secret was emailed to ${name}.`
+  }
+
+  // Standard GOV.UK email address messages. Only checks the shape of the address.
+  function validateEmail (email) {
+    if (!email) return { email: 'Enter an email address' }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return { email: 'Enter an email address in the correct format, like name@example.com' }
+    }
+    return {}
+  }
+
+  function renderSendForm (res, credential, options) {
+    res.render(view('client-credentials/created'), Object.assign({
+      credential,
+      generatedOn: formatDateTimeObj(new Date(credential.lastChanged)),
+      values: { email: '' },
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  // The same pages for each environment. `list` is that environment's
+  // Software providers page, and every other page is under it.
+  function registerEnvironmentRoutes (env) {
+    const list = env.path
+    const other = ENVIRONMENTS_V11.find((e) => e !== env)
+
+    // Only this environment's credentials, so a Production client ID does not
+    // open in External test, and the other way round.
+    function findCredential (req, id) {
+      const credential = ccV10.getCredential(credentialList(req), id)
+      if (!credential || credential.environment !== env.label || deletedIds(req).includes(credential.id)) return null
+      return credential
+    }
+
+    // Client name, A to Z. The page marks "Client name" as sorted.
+    router.get(list, (req, res) => {
+      const credentials = ccV10.listCredentials(credentialList(req))
+        .filter((c) => c.environment === env.label)
+        .filter((c) => !deletedIds(req).includes(c.id))
+        .map((c) => Object.assign({}, c, { environment: env.name }))
+        .sort((a, b) => a.clientName.localeCompare(b.clientName))
+      // The "deleted" message shows once, then is cleared.
+      const deletedName = req.session.data.deletedClientNameV11
+      delete req.session.data.deletedClientNameV11
+      res.render(view('software-providers/index'), {
+        credentials,
+        deletedName,
+        environmentLabel: env.name,
+        otherEnvironmentLabel: other.name,
+        otherEnvironmentHref: other.path
+      })
+    })
+
+    // --- Create and edit ---
+
+    router.get(`${list}/create`, (req, res) => {
+      renderClientNameForm(res, { mode: 'create', values: { clientName: '' } })
+    })
+
+    router.post(`${list}/create`, (req, res) => {
+      const values = { clientName: (req.body.clientName || '').trim() }
+      const errors = ccV10.validateClientName(values.clientName, credentialList(req), null, env.label)
+      if (Object.keys(errors).length) {
+        return renderClientNameForm(res, { mode: 'create', values, errors, errorList: ccV10.clientNameErrorList(errors) })
+      }
+      // Demo failure: a client name that starts with "Error_" is not created.
+      if (isDemoError(values.clientName)) {
+        return renderClientNameForm(res, { mode: 'create', values, serviceError: 'Try again. We have not created client credentials.' })
+      }
+      // The environment is set from the page the user started on, not the form.
+      const credential = ccV10.createCredential({ clientName: values.clientName, environment: env.label })
+      credentialList(req).push(credential)
+      res.redirect(`${list}/${credential.id}/created`)
+    })
+
+    // The edit page is the create page with the current client name filled in.
+    router.get(`${list}/:id/edit`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      renderClientNameForm(res, { mode: 'edit', credential, values: { clientName: credential.clientName } })
+    })
+
+    router.post(`${list}/:id/edit`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      const values = { clientName: (req.body.clientName || '').trim() }
+      // The credential's own name does not count as "already exists".
+      const errors = ccV10.validateClientName(values.clientName, credentialList(req), credential.id, env.label)
+      if (Object.keys(errors).length) {
+        return renderClientNameForm(res, { mode: 'edit', credential, values, errors, errorList: ccV10.clientNameErrorList(errors) })
+      }
+      if (isDemoError(credential.clientName)) {
+        return renderClientNameForm(res, { mode: 'edit', credential, values, serviceError: 'Try again. We have not changed the client name.' })
+      }
+      // Only a real change counts as a change. lastChanged is not updated: with one
+      // secret it is also the date that secret was generated, which a rename must not change.
+      if (values.clientName !== credential.clientName) {
+        ccV10.credentialToChange(credentialList(req), credential.id).clientName = values.clientName
+      }
+      res.redirect(`${list}/${credential.id}`)
+    })
+
+    // --- Send the credentials ---
+
+    // Once sent there is nothing left to send, so this goes to the software
+    // provider page. The secret is never shown on the page.
+    router.get(`${list}/:id/created`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      if (!credential.pendingSecret) return res.redirect(`${list}/${credential.id}`)
+      renderSendForm(res, credential)
+    })
+
+    // Nothing is emailed: the prototype has no backend, and the email address
+    // is not kept. Sending goes to the software provider page, which shows the
+    // success alert and tags the new secret, once.
+    router.post(`${list}/:id/created`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      if (!credential.pendingSecret) return res.redirect(`${list}/${credential.id}`)
+      const values = { email: (req.body.email || '').trim() }
+      const errors = validateEmail(values.email)
+      if (errors.email) {
+        return renderSendForm(res, credential, { values, errors, errorList: [{ text: errors.email, href: '#email' }] })
+      }
+      const message = SENT_MESSAGES[credential.pendingAction] || SENT_MESSAGES.created
+      credential.successAlert = { title: 'Credentials sent', text: message(credential.clientName) }
+      delete credential.pendingSecret
+      delete credential.pendingAction
+      credential.showNewTag = true
+      res.redirect(`${list}/${credential.id}`)
+    })
+
+    // --- Delete ---
+
+    router.get(`${list}/:id/delete`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      res.render(view('client-credentials/delete'), { credential })
+    })
+
+    router.post(`${list}/:id/delete`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (credential && isDemoError(credential.clientName)) {
+        return renderDetail(res, credential, { serviceError: 'Try again. We have not deleted the software provider.' })
+      }
+      if (credential) {
+        deletedIds(req).push(credential.id)
+        req.session.data.deletedClientNameV11 = credential.clientName
+      }
+      res.redirect(list)
+    })
+
+    // --- Secrets ---
+
+    // Replacing asks the user to confirm first. The form posts to /rotate.
+    router.get(`${list}/:id/replace`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      res.render(view('client-credentials/replace'), { credential })
+    })
+
+    // A refresh of the send page keeps the same new secret, because it is only
+    // replaced once the user has sent it.
+    router.post(`${list}/:id/rotate`, (req, res) => {
+      const target = findCredential(req, req.params.id)
+      if (!target) return res.redirect(list)
+      if (isDemoError(target.clientName)) {
+        return renderDetail(res, target, { serviceError: 'Try again. We have not replaced the secret.' })
+      }
+      const credential = ccV10.credentialToChange(credentialList(req), target.id)
+      if (credential.pendingAction !== 'rotated') {
+        ccV10.rotateSecret(credential)
+        // Replacing leaves one secret, generated now.
+        delete credential.secrets
+      }
+      res.redirect(`${list}/${credential.id}/created`)
+    })
+
+    // Two secrets at most. Goes straight to the page where the new secret is sent.
+    router.post(`${list}/:id/add-secret`, (req, res) => {
+      const target = findCredential(req, req.params.id)
+      if (!target) return res.redirect(list)
+      if (isDemoError(target.clientName)) {
+        return renderDetail(res, target, { serviceError: 'Try again. We have not added a secret.' })
+      }
+      const credential = ccV10.credentialToChange(credentialList(req), target.id)
+      if (ccV10.secretDates(credential).length < ccV10.MAX_SECRETS && credential.pendingAction !== 'added') {
+        ccV10.addSecret(credential)
+      }
+      res.redirect(`${list}/${credential.id}/created`)
+    })
+
+    // Removing the older of two secrets asks the user to confirm first. The most recent secret stays.
+    router.get(`${list}/:id/remove`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      const labels = secretLabels(credential)
+      if (labels.length < 2) return res.redirect(`${list}/${credential.id}`)
+      res.render(view('client-credentials/remove'), { credential, olderSecretDate: labels[1] })
+    })
+
+    router.post(`${list}/:id/remove`, (req, res) => {
+      const target = findCredential(req, req.params.id)
+      if (!target) return res.redirect(list)
+      if (isDemoError(target.clientName)) {
+        return renderDetail(res, target, { serviceError: 'Try again. We have not removed the secret.' })
+      }
+      const credential = ccV10.credentialToChange(credentialList(req), target.id)
+      const dates = ccV10.secretDates(credential)
+      if (dates.length > 1) credential.secrets = dates.slice(-1)
+      credential.successAlert = { title: 'Secret removed', text: 'The secret you removed no longer works.' }
+      res.redirect(`${list}/${credential.id}`)
+    })
+
+    // --- Software provider page ---
+
+    router.get(`${list}/:id`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      const showNew = Boolean(credential.showNewTag)
+      const success = credential.successAlert
+      delete credential.showNewTag
+      delete credential.successAlert
+      renderDetail(res, credential, { showNew, success })
+    })
+  }
+
+  // Production first: otherwise /software-providers/production would be read as
+  // an External test client ID.
+  registerEnvironmentRoutes(ENVIRONMENTS_V11[1])
+  registerEnvironmentRoutes(ENVIRONMENTS_V11[0])
+}
+
+registerV11Routes()
+
 // --- As built -----------------------------------------------------------
 // The designs from Jira tickets marked Built: DWTA-455, 456 and 458, DWTSPI-466,
 // 469, 480, 496 and 505. A copy of version 10 without what is not built: no

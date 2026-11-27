@@ -1,0 +1,104 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Version 11" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/design-and-build" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
+    <h1 class="govuk-heading-l">
+      Version 11
+      {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+    </h1>
+
+    <p class="govuk-body">
+      <span class="govuk-!-font-weight-bold">Date of last change:</span> 27 November 2026<br>
+      <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
+    </p>
+
+    <div>
+      {{ govukButton({
+        html: 'View prototype<span class="govuk-visually-hidden"> for version 11</span>',
+        href: "/v11/software-providers",
+        classes: "govuk-button--secondary"
+      }) }}
+    </div>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {{ govukTable({
+      caption: "Changes in this version",
+      captionClasses: "govuk-table__caption--m",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Area" },
+        { text: "Change" },
+        { text: "Reason for change" },
+        { text: "URLs" }
+      ],
+      rows: [
+        [
+          { text: "Scope" },
+          { text: "A copy of version 10. Only the credentials journeys change: create credentials, add another secret, replace a secret and remove a secret." },
+          { text: "Decision: the service will email the credentials to the software provider, instead of showing them to the admin user to copy and paste." },
+          { html: '<a class="govuk-link" href="/v11/software-providers">/v11/software-providers</a>' }
+        ],
+        [
+          { text: "Send credentials page" },
+          { text: "The “Copy the client credentials” page is now “Send credentials”. It asks for the software provider’s email address and has one Send button. The credentials are still listed, but the client secret is “[Hidden]”. The warning alert, the Copy credentials button and the Close button are removed. The earlier copy page designs (created-panel and created-warning) are not in this version." },
+          { text: "The admin user no longer copies the secret, so it does not need to be shown, and nobody at Defra sees it." },
+          { html: '<a class="govuk-link" href="/v11/software-providers/create">/v11/software-providers/create</a> (then Generate credentials)' }
+        ],
+        [
+          { text: "Email address" },
+          { text: "The email address uses the GOV.UK email address pattern. If it is empty or not in the correct format, the page shows an error: “Enter an email address” or “Enter an email address in the correct format, like name@example.com”. Nothing is emailed, and the address is not kept." },
+          { text: "These are the standard GOV.UK messages. The content design did not include error messages for this field. To confirm with the team." },
+          { html: '<a class="govuk-link" href="/v11/software-providers/create">/v11/software-providers/create</a>' }
+        ],
+        [
+          { text: "Success alerts" },
+          { text: "After Send, the software provider page shows a MoJ success alert, “Credentials sent”, with a message for each journey: “New credentials were emailed to [client name].”, “The new secret was emailed to [client name].” or “The replacement secret was emailed to [client name].” After “Yes, remove secret”, it shows “Secret removed” and “The secret you removed no longer works.” Each alert shows once. The “New” tag on the newest secret stays." },
+          { text: "The admin user cannot see what was sent, so the page confirms the action has been completed. Wording from the content design. The created, replaced and removed messages are still drafts." },
+          { html: '<a class="govuk-link" href="/v11/software-providers/bz6e6zajp1r2o43ha1yzx8p81p">/v11/software-providers/{clientId}</a>' }
+        ],
+        [
+          { text: "Error alerts" },
+          { text: "No change. The service error alerts and the “Software provider deleted” alert match the content design. Client names that start with “Error_” still fail, to show the error alerts." },
+          { text: "Checked against the content design." },
+          { html: '<a class="govuk-link" href="/v11/software-providers">/v11/software-providers</a>' }
+        ]
+      ]
+    }) }}
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="govuk-heading-m" id="design-rationale">Design rationale</h2>
+
+    <p class="govuk-body">The client secret is only sent by email, so the Send credentials page shows it as “[Hidden]”, in the same way as the software provider page. The other credentials stay on the page, so the admin user can check what they are sending before they send it.</p>
+
+    <p class="govuk-body">The page asks one question, the email address. It is someone else’s address, so the browser does not offer to fill it in.</p>
+
+    <p class="govuk-body">The success alerts are on the software provider page the user goes to next, as the “Software provider deleted” alert is on the Software providers page.</p>
+
+    <p class="govuk-body">Other design decisions are the same as in
+      <a class="govuk-link" href="/versions/v10#design-rationale">version 10</a>.</p>
+
+    <p class="govuk-body">This version has its own session data. Credentials created in this version are not
+      shown in version 10, and the other way round. Clear prototype data between research sessions.</p>
+
+  </div>
+</div>
+{% endblock %}
