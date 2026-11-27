@@ -6,7 +6,7 @@
   on GOV.UK.
   See https://digital.defra.gov.uk/design/branding
   Visual reference: https://digital.defra.gov.uk/design/prototyping
-  (logo and green band only — no service navigation.)
+  Hub pages also have a GOV.UK service navigation (see below).
 #}
 
 {% extends "layouts/main.html" %}
@@ -15,7 +15,7 @@
   {# A div, not a header: the kit already wraps this block in a header, and a
      second one would give the page two banner landmarks. #}
   <div class="app-defra-header">
-    <div class="govuk-width-container govuk-!-padding-top-3 govuk-!-padding-bottom-3">
+    <div class="govuk-width-container app-hub-header govuk-!-padding-top-3 govuk-!-padding-bottom-3">
       <a href="/" class="app-defra-header__link">
         {# Crest is decorative; the visible name is in the SVG. Hidden text
            is the accessible name of the link (Defra branding: ignore the
@@ -23,11 +23,43 @@
         <img src="/public/images/defra-logo.svg" alt="" role="presentation" class="app-defra-header__logo" width="86" height="45">
         <span class="govuk-visually-hidden">Department for Environment, Food and Rural Affairs</span>
       </a>
+      {# Replaces the phase banner on hub pages. The hidden text gives screen reader
+         users the rest of the banner's message. #}
+      {{ govukTag({ html: 'Prototype<span class="govuk-visually-hidden">: this is not a real service</span>' }) }}
     </div>
   </div>
 {% endblock %}
 
-{% block govukServiceNavigation %}{% endblock %}
+{# GOV.UK service navigation for the hub pages only, in its default style, so it
+   does not look like the green in-service navigation. routes.js sets hubSection
+   from the address. The in-service layouts extend this one but get no hubSection,
+   so they show no hub navigation. #}
+{% block govukServiceNavigation %}
+  {% if hubSection %}
+    {% set hubItems = [
+      { href: "/", text: "Home", section: "home" },
+      { href: "/tested-with-users", text: "Tested with users", section: "tested" },
+      { href: "/design-and-build", text: "Design iterations", section: "build" },
+      { href: "/concepts", text: "Concepts", section: "concepts" },
+      { href: "/as-built", text: "As built", section: "built" },
+      { href: "/jira-tickets", text: "Jira tickets", section: "jira" },
+      { href: "/design", text: "Design history", section: "design" }
+    ] %}
+    {% set navigation = [] %}
+    {% for item in hubItems %}
+      {% set navigation = (navigation.push({
+        href: item.href,
+        text: item.text,
+        active: hubSection === item.section,
+        current: hubPath === item.href
+      }), navigation) %}
+    {% endfor %}
+    {{ govukServiceNavigation({
+      navigation: navigation,
+      navigationLabel: "Prototype hub"
+    }) }}
+  {% endif %}
+{% endblock %}
 
 {% block govukFooter %}
   {# A div, not a footer: the kit already wraps this block in a footer. #}

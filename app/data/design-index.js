@@ -18,14 +18,6 @@
 
 module.exports = [
   {
-    label: 'Version 9',
-    source: 'Prototype',
-    href: '/v9/software-providers',
-    linkNote: 'Select a client name.',
-    difference: 'A copy of version 7 with the developers’ URL pattern: /software-providers/{clientId}, with actions as subpaths such as /delete. No change to the screens.',
-    rationaleHref: '/versions/v9'
-  },
-  {
     id: 'home',
     name: 'Home',
     summary: 'The landing page after the start of the service.',
@@ -245,14 +237,27 @@ module.exports = [
   {
     id: 'software-provider-detail',
     name: 'Software provider detail',
-    summary: 'A single software provider company, with its email addresses and notes. Built in version 3, and as a case file in the case file concept.',
+    summary: 'The page for one client: client name, client ID and its secrets. Since version 6 it is reached from the client name in the table. In versions 3 and 4 it was a page for a software provider company, with email addresses and notes.',
     variants: [
+      {
+        label: 'As built',
+        source: 'Prototype',
+        href: '/as-built/software-providers/bz6e6zajp1r2o43ha1yzx8p81p',
+        difference: 'The page as it is in the live service: the DWTSPI-496 page with Delete software provider (DWTSPI-469). External test only, so the “External test” tag stays under the heading. No Edit link, because DWTSPI-502 is not built.',
+        rationaleHref: '/as-built'
+      },
+      {
+        label: 'Version 10 (External test)',
+        source: 'Prototype',
+        href: '/v10/software-providers/bz6e6zajp1r2o43ha1yzx8p81p',
+        difference: 'The tag under the heading is removed, because the environment tag is now in the header. Otherwise the same as version 9, with the address /software-providers/{clientId}.',
+        rationaleHref: '/versions/v10'
+      },
       {
         label: 'Version 10 (Production)',
         source: 'Prototype',
-        href: '/v10/software-providers/production',
-        linkNote: 'Select a client name.',
-        difference: 'The first Production software provider page. The same as External test, with the Production tag in the header and “Client secrets for production environment”.',
+        href: '/v10/software-providers/production/vjm7a7ot260hv8m2ow9wzu07yx',
+        difference: 'The first Production software provider page. The same as External test: no tag under the heading, because the Production tag is in the header. The secrets heading is “Client secrets for production environment”.',
         rationaleHref: '/versions/v10'
       },
       {
@@ -261,6 +266,62 @@ module.exports = [
         href: '/future/case-files/software-providers/sp-1001',
         difference: 'Future-state concept. A case file with three pages: Overview, Contacts and History (MoJ sub navigation), with the name and reference at the top of each (MoJ identity bar). Software packages are summary cards with their status. History is a timeline of every action, with who did it and why.',
         rationaleHref: '/versions/future-case-files'
+      },
+      {
+        label: 'Software provider page concept',
+        source: 'Prototype',
+        href: '/future/software-provider-page/client-credentials/client-1/software-provider-detail',
+        difference: 'Concept for a technical discussion. Four sets of secrets on one page: receipt of waste software and collection of waste software, each with a test and a production environment. Each has its own client name, client ID and two secrets. The page heading is the software provider name. No External test tag. Grey overview column with a status for each type of software and email addresses. Notes in an MoJ timeline. Mocked data. Remove goes to a placeholder page.',
+        rationaleHref: '/versions/future-software-provider-page'
+      },
+      {
+        label: 'DWTSPI-493 software provider page error design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-493/design-provider',
+        difference: 'The software provider page with a MoJ error alert above the caption, for a failed add, replace, remove or delete. The design shows “Try again. We have not added a secret.”',
+        rationaleHref: '/jira-tickets/dwtspi-493'
+      },
+      {
+        label: 'DWTSPI-469 software provider page design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-469/design-provider',
+        difference: 'The software provider page with a “Delete software provider” link at the bottom.',
+        rationaleHref: '/jira-tickets/dwtspi-469'
+      },
+      {
+        label: 'DWTSPI-502 software provider page design',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-502/design-provider',
+        difference: 'The software provider page with an “Edit” link on the same line as the heading.',
+        rationaleHref: '/jira-tickets/dwtspi-502'
+      },
+      {
+        label: 'Version 7',
+        source: 'Prototype',
+        href: '/v7/client-credentials/client-1/software-provider-detail',
+        difference: 'The version 6 software provider page with a Back link to the Software providers page. The Replace secret and Remove secret links no longer say “secret” twice to screen readers. Matches the software provider page ticket design.',
+        rationaleHref: '/versions/v7'
+      },
+      {
+        label: 'Software provider page ticket design, two secrets',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-496/design-provider-two',
+        difference: 'As shown straight after adding a secret: a green “New” tag on the newest secret, “Remove secret” on the older one, and no Add another secret button.',
+        rationaleHref: '/jira-tickets/dwtspi-496'
+      },
+      {
+        label: 'Software provider page ticket design, one secret',
+        source: 'Jira design',
+        href: '/jira-tickets/dwtspi-496/design-provider',
+        difference: 'Replaces the Manage client credentials page. Back link, caption “Software provider”, client name as the H1, environment tag, client ID, and a table of secrets shown as “[Hidden]” with a “Replace secret” link. Add another secret below the table.',
+        rationaleHref: '/jira-tickets/dwtspi-496'
+      },
+      {
+        label: 'Version 6',
+        source: 'Prototype',
+        href: '/v6/client-credentials/client-1/software-provider-detail',
+        difference: 'The first software provider page. It replaces Manage client credentials and is reached from the client name in the table. Client name as the H1, “External test” tag under it, client ID, and a table of secrets shown as “[Hidden]” with Replace or Remove. A “New” tag on the newest secret.',
+        rationaleHref: '/versions/v6'
       },
       {
         label: 'Version 3',
@@ -527,48 +588,11 @@ module.exports = [
         rationaleHref: '/jira-tickets/dwtspi-505'
       },
       {
-        label: 'Software provider page concept',
-        source: 'Prototype',
-        href: '/future/software-provider-page/software-providers',
-        linkNote: 'Select a client name.',
-        difference: 'Concept for a technical discussion. Four sets of secrets on one page: receipt of waste software and collection of waste software, each with a test and a production environment. Each has its own client name, client ID and two secrets. The page heading is the software provider name. No External test tag. Grey overview column with a status for each type of software and email addresses. Notes in an MoJ timeline. Mocked data. Remove goes to a placeholder page.',
-        rationaleHref: '/versions/future-software-provider-page'
-      },
-      {
-        label: 'DWTSPI-493 software provider page error design',
-        source: 'Jira design',
-        href: '/jira-tickets/dwtspi-493/design-provider',
-        difference: 'The software provider page with a MoJ error alert above the caption, for a failed add, replace, remove or delete. The design shows “Try again. We have not added a secret.”',
-        rationaleHref: '/jira-tickets/dwtspi-493'
-      },
-      {
         label: 'DWTSPI-469 delete confirmation design',
         source: 'Jira design',
         href: '/jira-tickets/dwtspi-469/design-confirm',
         difference: 'A MoJ interruption card: “Are you sure you want to delete the software provider?” and “You will delete the entire record for [client name], including all the credentials, in [environment] only.”, with the button “Yes, delete software provider”.',
         rationaleHref: '/jira-tickets/dwtspi-469'
-      },
-      {
-        label: 'DWTSPI-469 software provider page design',
-        source: 'Jira design',
-        href: '/jira-tickets/dwtspi-469/design-provider',
-        difference: 'The software provider page with a “Delete software provider” link at the bottom.',
-        rationaleHref: '/jira-tickets/dwtspi-469'
-      },
-      {
-        label: 'DWTSPI-502 software provider page design',
-        source: 'Jira design',
-        href: '/jira-tickets/dwtspi-502/design-provider',
-        difference: 'The software provider page with an “Edit” link on the same line as the heading.',
-        rationaleHref: '/jira-tickets/dwtspi-502'
-      },
-      {
-        label: 'Version 7',
-        source: 'Prototype',
-        href: '/v7/software-providers',
-        linkNote: 'Select Create new credentials, save, then select Close.',
-        difference: 'The version 6 software provider page with a Back link to the Software providers page. The Replace secret and Remove secret links no longer say “secret” twice to screen readers. Matches the software provider page ticket design.',
-        rationaleHref: '/versions/v7'
       },
       {
         label: 'Software provider page ticket remove confirmation design',
@@ -582,20 +606,6 @@ module.exports = [
         source: 'Jira design',
         href: '/jira-tickets/dwtspi-496/design-replace',
         difference: 'The DWTA-466 replace confirmation, with the link “Go back to software provider”.',
-        rationaleHref: '/jira-tickets/dwtspi-496'
-      },
-      {
-        label: 'Software provider page ticket design, two secrets',
-        source: 'Jira design',
-        href: '/jira-tickets/dwtspi-496/design-provider-two',
-        difference: 'As shown straight after adding a secret: a green “New” tag on the newest secret, “Remove secret” on the older one, and no Add another secret button.',
-        rationaleHref: '/jira-tickets/dwtspi-496'
-      },
-      {
-        label: 'Software provider page ticket design, one secret',
-        source: 'Jira design',
-        href: '/jira-tickets/dwtspi-496/design-provider',
-        difference: 'Replaces the Manage client credentials page. Back link, caption “Software provider”, client name as the H1, environment tag, client ID, and a table of secrets shown as “[Hidden]” with a “Replace secret” link. Add another secret below the table.',
         rationaleHref: '/jira-tickets/dwtspi-496'
       },
       {

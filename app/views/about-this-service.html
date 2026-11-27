@@ -3,10 +3,6 @@
 {% set pageName = "About this service" %}
 
 {% block beforeContent %}
-  {{ govukPhaseBanner({
-    tag: { text: "Prototype" },
-    html: 'This is a prototype. It is not a real service.'
-  }) }}
   {{ govukBackLink({
     text: "Back",
     href: "/"

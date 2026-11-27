@@ -1,0 +1,43 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "As built" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">As built</h1>
+
+    <p class="govuk-body">A prototype of the DWT admin portal as the developers have built it. It only has the designs from Jira tickets marked as built, so it shows what the live service does now.</p>
+
+    <p class="govuk-body govuk-!-margin-bottom-6"><span class="govuk-!-font-weight-bold">Last updated:</span> 27 November 2026</p>
+
+    {{ govukButton({
+      text: "View prototype",
+      href: "/as-built/start",
+      classes: "govuk-button--secondary govuk-!-margin-bottom-8"
+    }) }}
+
+    <h2 class="govuk-heading-m">Tickets in the live version</h2>
+    <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-8">
+      <li><a class="govuk-link" href="/jira-tickets/dwta-455">DWTSPI-455: Update branding to a Defra internal service</a></li>
+      <li><a class="govuk-link" href="/jira-tickets/dwta-456">DWTSPI-456: Build the Software providers page and client credentials table</a></li>
+      <li><a class="govuk-link" href="/jira-tickets/dwta-458">DWTSPI-458: Create new credentials</a></li>
+      <li><a class="govuk-link" href="/jira-tickets/dwta-466">DWTSPI-466: Replace or remove secrets</a></li>
+      <li><a class="govuk-link" href="/jira-tickets/dwtspi-469">DWTSPI-469: Delete a software provider</a></li>
+      <li><a class="govuk-link" href="/jira-tickets/dwtspi-480">DWTSPI-480: Find waste organisations by registration date</a></li>
+      <li><a class="govuk-link" href="/jira-tickets/dwtspi-496">DWTSPI-496: Manage a client’s secrets and copy new credentials</a></li>
+      <li><a class="govuk-link" href="/jira-tickets/dwtspi-505">DWTSPI-505: Tell users how to report exposed credentials</a></li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Not in this prototype yet</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>External test only: there is no Production list and no link between environments (<a class="govuk-link" href="/jira-tickets/dwtspi-517">DWTSPI-517</a>)</li>
+      <li>No Edit link for the client name (<a class="govuk-link" href="/jira-tickets/dwtspi-502">DWTSPI-502</a>)</li>
+      <li>No sign in (<a class="govuk-link" href="/jira-tickets/dwtspi-532">DWTSPI-532</a>)</li>
+      <li>Long client names are not wrapped in the table (<a class="govuk-link" href="/jira-tickets/dwtspi-512">DWTSPI-512</a>)</li>
+      <li>No error when a new secret could not be shown (<a class="govuk-link" href="/jira-tickets/dwtspi-490">DWTSPI-490</a>)</li>
+      <li>No service error messages (<a class="govuk-link" href="/jira-tickets/dwtspi-493">DWTSPI-493</a>)</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

@@ -8,12 +8,14 @@ alwaysApply: true
 The layout, new version steps and naming conventions are in `general/file-structure-and-versioning.mdc`. That file describes this repo — follow it. This file adds project-specific points only.
 
 - Structure is by **version** (`v1`–`v4`), then by **section** (`regulators/`, `software-providers/`). There are no phase or feature hubs, and no `designs.html` pages.
-- `app/views/index.html` is the only hub. Every new version needs a card there and a `versions/vN.html` page — don't leave new work unlinked.
+- The prototype hub has these areas in its service navigation (`layouts/prototype-hub.html`): Home (`index.html`), Tested with users (`tested-with-users.html`), Design iterations (`design-and-build.html`), Concepts (`concepts.html`, the future-state concepts), As built (`as-built.html`), Jira tickets (`jira-tickets.html`) and Design history (`design.html`, with a page per screen at `/design/{id}`). The highlighted item comes from `hubSection`, set by the "Prototype hub navigation" middleware at the top of `routes.js`.
+- As built (`/as-built/…`, `views/as-built/`, `layouts/as-built.html`, `registerAsBuiltRoutes()`) only has designs from Jira tickets marked Built. It is not a numbered version: when a ticket is built, add its design here in place, set its tag on `jira-tickets.html` to green "Built", and move it on `as-built.html` from "Not in this prototype yet" to "Tickets in the live version", and change "Last updated".
+- Every new version needs a card at the top of `design-and-build.html`, with a short descriptive title and the version number in bold above the description, and a `versions/vN.html` page — don't leave new work unlinked. When a version is tested with users, move its card to `tested-with-users.html` and add it to `TESTED_VERSIONS` in `routes.js`.
 - Shared partials are allowed but are per version, with a leading underscore (e.g. `v4/software-providers/_email-addresses.html`, included with `{% include version + "/software-providers/_email-addresses.html" %}`). Copy them into the new version rather than pointing at an older one.
 - Versions intentionally duplicate near-identical pages (`v3/` and `v4/` are copies). Follow the pattern rather than unifying them, unless asked.
-- `v1` and `v2` are the research versions — treat as frozen.
+- `v4` (with 4.1 to 4.4), `v5` and `v10` are the versions tested with users. Treat all earlier versions as frozen.
 - Links to something not built point to the `placeholder.html` page in that version's folder (only `v1` and `v2` have one, rendered by the "dead links" route in `routes.js`). Copy it into a new version if you need it. Don't use `#` or a dead link.
-- `app/views/versions/vN.html` and `app/views/index.html` extend `layouts/prototype-hub.html`, not the in-service layout.
+- `app/views/versions/vN.html` and the hub pages above extend `layouts/prototype-hub.html`, not the in-service layout.
 
 ## Creating new work
 

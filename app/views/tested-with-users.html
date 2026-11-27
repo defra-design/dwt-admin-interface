@@ -1,0 +1,128 @@
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = "Tested with users" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Tested with users</h1>
+
+    <p class="govuk-body govuk-!-margin-bottom-7">Prototypes shown to users in research sessions. Newest first.</p>
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title govuk-!-font-size-24">
+          Credentials journeys and links between environments
+          {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
+        </h2>
+      </div>
+      <div class="govuk-summary-card__content">
+        <div>
+          {{ govukButton({
+            html: 'View prototype<span class="govuk-visually-hidden"> for version 10</span>',
+            href: "/v10/software-providers",
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+
+        <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">Version 10</p>
+        <p class="govuk-body-s">For user research on 26 November 2026. Version 9 with the environment tag in the header and a “Change environment” heading, no sign in, and 50 External test and 30 Production clients.</p>
+
+        <p class="govuk-body-s">
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 26 November 2026<br>
+          <span class="govuk-!-font-weight-bold">User research status:</span> Shown in user research, 26 November 2026
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-body-s">
+          <li><a class="govuk-link" href="/versions/v10">Changes and design rationale for version 10</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title govuk-!-font-size-24">
+          Conceptual credential journeys
+        </h2>
+      </div>
+      <div class="govuk-summary-card__content">
+        <div>
+          {{ govukButton({
+            html: 'View prototype<span class="govuk-visually-hidden"> for version 5</span>',
+            href: "/v5/start",
+            classes: "govuk-button--secondary"
+          }) }}
+        </div>
+
+        <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">Version 5</p>
+        <p class="govuk-body-s">Moved from API keys to client credentials: a Manage client credentials page for each software provider and package. Built to test with users.</p>
+
+        <p class="govuk-body-s">
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 15 October 2026<br>
+          <span class="govuk-!-font-weight-bold">User research status:</span> Shown in two user research sessions, 20 to 22 October 2026
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet govuk-body-s">
+          <li><a class="govuk-link" href="/versions/v5">Changes and design rationale for version 5</a></li>
+        </ul>
+      </div>
+    </div>
+
+
+    <div class="govuk-summary-card">
+      <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title govuk-!-font-size-24">
+          Production and test credentials in one table
+        </h2>
+      </div>
+      <div class="govuk-summary-card__content">
+        <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">Version 4</p>
+        <p class="govuk-body-s">One table for Production and test credentials, then variations of the list and the create and rotate journeys (4.1 to 4.4). See the table for the focus of each.</p>
+
+        <p class="govuk-body-s">
+          <span class="govuk-!-font-weight-bold">Date of last change:</span> 9 October 2026<br>
+          <span class="govuk-!-font-weight-bold">User research status:</span> Shown in two user research sessions, 20 to 22 October 2026
+        </p>
+
+        <table class="govuk-table govuk-body-s">
+          <caption class="govuk-table__caption govuk-visually-hidden">Version 4 versions</caption>
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Version</th>
+              <th scope="col" class="govuk-table__header">Focus</th>
+              <th scope="col" class="govuk-table__header">Rationale</th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-4/start"><span class="govuk-visually-hidden">Version </span>4.4</a></td>
+              <td class="govuk-table__cell">Includes rotate journey</td>
+              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-4">View<span class="govuk-visually-hidden"> rationale for version 4.4</span></a></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-3/start"><span class="govuk-visually-hidden">Version </span>4.3</a></td>
+              <td class="govuk-table__cell">Credentials generated page has all credentials for copy</td>
+              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-3">View<span class="govuk-visually-hidden"> rationale for version 4.3</span></a></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-2/start"><span class="govuk-visually-hidden">Version </span>4.2</a></td>
+              <td class="govuk-table__cell">Edit client name and rotate secret links in list</td>
+              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-2">View<span class="govuk-visually-hidden"> rationale for version 4.2</span></a></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-1/start"><span class="govuk-visually-hidden">Version </span>4.1</a></td>
+              <td class="govuk-table__cell">Two tables and Create credentials with software provider name field</td>
+              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-1">View<span class="govuk-visually-hidden"> rationale for version 4.1</span></a></td>
+            </tr>
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell"><a class="govuk-link" href="/v4/start"><span class="govuk-visually-hidden">Version </span>4</a></td>
+              <td class="govuk-table__cell">One table for Production and test environments</td>
+              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4">View<span class="govuk-visually-hidden"> rationale for version 4</span></a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

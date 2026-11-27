@@ -1,0 +1,84 @@
+{#
+  Design history for one screen, from app/data/design-index.js (see the
+  /design/:id route). Newest variant first.
+#}
+{% extends "layouts/prototype-hub.html" %}
+
+{% set pageName = screen.name + " - Design history" %}
+
+{% block beforeContent %}
+  {{ govukBackLink({ text: "Back", href: "/design" }) }}
+{% endblock %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <span class="govuk-caption-l">Design history</span>
+    <h1 class="govuk-heading-l">{{ screen.name }}</h1>
+
+    <p class="govuk-body govuk-!-margin-bottom-7">{{ screen.summary }} The newest variant is first.</p>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+    {# Rows are built here so the data file stays plain. #}
+    {% set rows = [] %}
+    {% for variant in screen.variants %}
+      {% set hiddenText = variant.label + ", " + (screen.name | lower) %}
+
+      {% set variantHtml %}
+        {{ variant.label }}<br>
+        {# Only Jira designs are tagged: everything else is a prototype. #}
+        {% if variant.source === "Jira design" %}{{ govukTag({ text: "Jira design", classes: "govuk-tag--grey" }) }}{% endif %}
+      {% endset %}
+
+      {# The top of the page on a first visit, so pages that need session data show
+         where the link lands (see the link note). #}
+      {% set screenshotHtml %}
+        {% if variant.screenshot %}
+          <img class="app-screenshot" src="{{ variant.screenshot }}" alt="Screenshot of {{ hiddenText }}" loading="lazy" width="640" height="450">
+        {% else %}
+          <span class="govuk-hint govuk-!-margin-bottom-0">No screenshot yet</span>
+        {% endif %}
+      {% endset %}
+
+      {% set differenceHtml %}
+        {{ variant.difference }}
+        {% if variant.linkNote %}<br><span class="govuk-hint govuk-!-margin-bottom-0">{{ variant.linkNote }}</span>{% endif %}
+      {% endset %}
+
+      {% set linksHtml %}
+        <a class="govuk-link" href="{{ variant.href }}">View<span class="govuk-visually-hidden"> {{ hiddenText }}</span></a>
+        {% if variant.rationaleHref %}
+          <br><a class="govuk-link" href="{{ variant.rationaleHref }}">Why<span class="govuk-visually-hidden"> {{ hiddenText }} changed</span></a>
+        {% endif %}
+      {% endset %}
+
+      {% set rows = (rows.push([
+        { html: variantHtml },
+        { html: screenshotHtml },
+        { html: differenceHtml },
+        { html: linksHtml }
+      ]), rows) %}
+    {% endfor %}
+
+    {{ govukTable({
+      caption: "Variants of " + (screen.name | lower),
+      captionClasses: "govuk-visually-hidden",
+      firstCellIsHeader: true,
+      head: [
+        { text: "Variant", classes: "govuk-!-width-one-fifth" },
+        { text: "Screenshot", classes: "govuk-!-width-one-third" },
+        { text: "What was different" },
+        { text: "Links" }
+      ],
+      rows: rows
+    }) }}
+
+  </div>
+</div>
+{% endblock %}

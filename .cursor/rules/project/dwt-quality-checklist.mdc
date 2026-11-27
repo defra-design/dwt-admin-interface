@@ -5,7 +5,7 @@ alwaysApply: true
 
 # DWT quality checklist
 
-- [ ] Follows the existing version / section / page pattern, and any new version has an index card and a `versions/vN.html` page
+- [ ] Follows the existing version / section / page pattern, and any new version has a card on `design-and-build.html` and a `versions/vN.html` page
 - [ ] Extends the right layout for its version and sets `version`, `pageName` and `activeSection`; links are built from `version`, not hard-coded
 - [ ] Accessibility met: WCAG 2.2 AA, labelled inputs, `govukErrorSummary` pattern, `aria-live` for dynamic feedback, and the journey works without JavaScript
 - [ ] GOV.UK Design System components used via macros, with custom styles only as `app-*` classes in `application.scss`

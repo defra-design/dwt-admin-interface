@@ -15,6 +15,7 @@ const ccV7 = require('./data/client-credentials-v7')
 const ccFutureSoftwareProviderPage = require('./data/future-software-provider-page-credentials')
 const ccV9 = require('./data/client-credentials-v9')
 const ccV10 = require('./data/client-credentials-v10')
+const ccAsBuilt = require('./data/client-credentials-as-built')
 const cf = require('./data/future-case-files')
 const { paginate } = require('./data/pagination')
 const {
@@ -25,6 +26,31 @@ const {
   parseDateInput,
   defaultPeriod
 } = require('./data/dates')
+
+// --- Prototype hub navigation -------------------------------------------------
+// Which item in the hub navigation is highlighted (layouts/prototype-hub.html).
+// Only hub pages get a section, so the in-service layouts that extend the hub
+// layout show no hub navigation. When a version is tested with users, add it
+// here and move its card to tested-with-users.html.
+const TESTED_VERSIONS = ['v4', 'v4-1', 'v4-2', 'v4-3', 'v4-4', 'v5', 'v10']
+
+router.use((req, res, next) => {
+  const path = req.path.replace(/\/$/, '') || '/'
+  const page = path.split('/')[2]
+  let section = null
+  if (path === '/' || path === '/about-this-service') section = 'home'
+  else if (path === '/tested-with-users') section = 'tested'
+  else if (path === '/design-and-build') section = 'build'
+  else if (path === '/concepts' || /^\/versions\/future-[^/]+$/.test(path)) section = 'concepts'
+  else if (path === '/as-built') section = 'built'
+  else if (/^\/versions\/[^/]+$/.test(path)) section = TESTED_VERSIONS.includes(page) ? 'tested' : 'build'
+  // Ticket pages only: their design reference pages (one level down) look like the service.
+  else if (/^\/jira-tickets(\/[^/]+)?$/.test(path)) section = 'jira'
+  else if (/^\/design(\/[^/]+)?$/.test(path)) section = 'design'
+  res.locals.hubSection = section
+  res.locals.hubPath = path
+  next()
+})
 
 function periodLabel (period) {
   return `${formatDateObj(period.from)} to ${formatDateObj(period.to)}`
@@ -4439,6 +4465,345 @@ function registerV10Routes () {
 
 registerV10Routes()
 
+// --- As built -----------------------------------------------------------
+// The designs from Jira tickets marked Built: DWTA-455, 456 and 458, DWTSPI-466,
+// 469, 480, 496 and 505. A copy of version 10 without what is not built: no
+// Production or environment links (DWTSPI-517), no Edit client name (502), no
+// sign in (532) and no service error demos (493). External test only.
+function registerAsBuiltRoutes () {
+  const base = '/as-built'
+  const view = (page) => `as-built/${page}`
+
+  router.use(base, (req, res, next) => {
+    res.locals.version = 'as-built'
+    // Used by the software provider pages for their links and wording.
+    res.locals.currentEnvironment = 'test'
+    res.locals.providersPath = `${base}/software-providers`
+    res.locals.environmentName = 'External test'
+    next()
+  })
+
+  // Credentials created or changed in this session. See data/client-credentials-as-built.js.
+  function credentialList (req) {
+    if (!Array.isArray(req.session.data.clientCredentialsAsBuilt) ) {
+      req.session.data.clientCredentialsAsBuilt = []
+    }
+    return req.session.data.clientCredentialsAsBuilt
+  }
+
+  // --- Reporting (same as version 4.1) -----------------------------------------
+
+  // Waste organisations report. Rows carry the values the MoJ sortable table
+  // needs: dates and periods sort on a number, not on the text shown.
+  // The payment year ending is shown as "Sep 2025" (the cycle always ends in September).
+  function orgRows (orgs) {
+    const byId = new Map(orgs.map((o) => [o.id, o]))
+    return mapOrgRows(orgs).map((row) => {
+      const match = /(\d{2})$/.exec(row.paymentPeriod)
+      return Object.assign({}, row, {
+        registeredSort: byId.get(row.id).registeredDate.getTime(),
+        paymentPeriod: match ? `Sep 20${match[1]}` : '',
+        paymentPeriodSort: match ? Number(match[1]) : 0
+      })
+    })
+  }
+
+  // Checks one date (day, month, year) from the filter. Messages are the ones
+  // agreed in the Jira ticket. `parts` lists the inputs to highlight: only the
+  // missing or wrong ones, as the GOV.UK dates pattern asks.
+  // Returns { error, href, parts, date }.
+  function checkReportDate (query, key, label, today) {
+    const prefix = `period-${key}`
+    const part = (name) => (query[`${prefix}-${name}`] || '').trim()
+    const values = { day: part('day'), month: part('month'), year: part('year') }
+    const all = ['day', 'month', 'year']
+    const missing = all.filter((name) => !values[name])
+    const fail = (error, parts) => ({ error, parts, href: `#${prefix}-${parts[0]}` })
+    const name = `‘${label}’ date`
+
+    if (missing.length === 3) {
+      return fail(`Enter or select a ${name}`, all)
+    }
+    if (missing.length === 2) {
+      return fail(`${name} must include a day, month and year`, all)
+    }
+    if (missing.length === 1) {
+      return fail(`${name} must include a ${missing[0]}`, missing)
+    }
+    // Letters or other characters, or a year that is not 4 numbers (for example 26).
+    const wrong = all.filter((n) => !/^\d+$/.test(values[n]) || (n === 'year' && values[n].length !== 4))
+    if (wrong.length) {
+      return fail(`Enter the ${name} in the correct format`, wrong)
+    }
+    const checked = validateDateParts(values.day, values.month, values.year)
+    if (checked.error) {
+      return fail(`${name} must be a real date`, all)
+    }
+    if (checked.date > today) {
+      return fail(`${name} must be today or in the past`, all)
+    }
+    return { date: checked.date }
+  }
+
+  // The filter is shown first. Results only appear once both dates are valid.
+  // Nothing is filled in or swapped for the user.
+  function checkReportPeriod (query) {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const raw = (key) => ({
+      day: (query[`period-${key}-day`] || '').trim(),
+      month: (query[`period-${key}-month`] || '').trim(),
+      year: (query[`period-${key}-year`] || '').trim()
+    })
+    const period = {
+      values: { from: raw('from'), to: raw('to') },
+      errors: {},
+      errorParts: { from: [], to: [] },
+      errorList: []
+    }
+    const from = checkReportDate(query, 'from', 'From', today)
+    const to = checkReportDate(query, 'to', 'To', today)
+    // The 'To' date error names the 'From' date the user entered.
+    if (!to.error && from.date && from.date > to.date) {
+      Object.assign(to, {
+        error: `‘To’ date must be the same as or after ${formatDateObj(from.date)}`,
+        parts: ['day', 'month', 'year'],
+        href: '#period-to-day'
+      })
+    }
+    for (const [key, result] of [['from', from], ['to', to]]) {
+      if (result.error) {
+        period.errors[key] = result.error
+        period.errorParts[key] = result.parts
+        period.errorList.push({ text: result.error, href: result.href })
+      }
+    }
+    if (!period.errorList.length) {
+      period.from = from.date
+      period.to = to.date
+    }
+    return period
+  }
+
+  router.get(`${base}/regulators`, (req, res) => {
+    const submitted = [
+      'period-from-day', 'period-from-month', 'period-from-year',
+      'period-to-day', 'period-to-month', 'period-to-year'
+    ].some((key) => key in req.query)
+    const period = submitted ? checkReportPeriod(req.query) : emptyPeriod
+    // Every row is shown on one page, so sorting reorders all of them.
+    const searched = submitted && !period.errorList.length
+    const rows = searched ? orgRows(reg.listRegisteredInPeriod(period.from, period.to)) : []
+    res.render(view('regulators/index'), {
+      period,
+      rows,
+      count: rows.length,
+      // All registered organisations, shown beside the count for the period.
+      totalCount: reg.listAllOrganisations().length,
+      filtered: submitted,
+      searched,
+      periodLabel: searched ? periodLabel(period) : null
+    })
+  })
+
+  // Download CSV is not built yet — goes to the placeholder page.
+  router.get(`${base}/regulators/download`, (req, res) => {
+    res.render(view('placeholder'), {
+      heading: 'Download CSV',
+      activeSection: 'regulators',
+      backHref: `${base}/regulators`
+    })
+  })
+
+  // --- Software providers --------------------------------------------------
+  // External test only. Production clients in the example data are never shown.
+
+  // Deleted software providers. The fixed example rows cannot be removed from
+  // the shared data, so deleted ids are kept in the session and hidden.
+  function deletedIds (req) {
+    if (!Array.isArray(req.session.data.deletedCredentialsAsBuilt)) {
+      req.session.data.deletedCredentialsAsBuilt = []
+    }
+    return req.session.data.deletedCredentialsAsBuilt
+  }
+
+  // When each secret was generated, newest first, as text for the page.
+  function secretLabels (credential) {
+    return ccAsBuilt.secretDates(credential)
+      .slice()
+      .sort((a, b) => new Date(b) - new Date(a))
+      .map((d) => formatDateTimeObj(new Date(d)))
+  }
+
+  function renderDetail (res, credential, extras) {
+    res.render(view('client-credentials/software-provider-detail'), Object.assign({
+      credential,
+      showNew: false,
+      secretLabels: secretLabels(credential),
+      canAddSecret: ccAsBuilt.secretDates(credential).length < ccAsBuilt.MAX_SECRETS
+    }, extras))
+  }
+
+  // The create page. Only the client name is asked for.
+  function renderClientNameForm (res, options) {
+    res.render(view('client-credentials/create'), Object.assign({
+      errors: {},
+      errorList: []
+    }, options))
+  }
+
+  // `list` is the Software providers page, and every other page is under it.
+  {
+    const env = { label: 'Test', name: 'External test' }
+    const list = `${base}/software-providers`
+
+    // External test credentials only, so a Production client ID does not open.
+    function findCredential (req, id) {
+      const credential = ccAsBuilt.getCredential(credentialList(req), id)
+      if (!credential || credential.environment !== env.label || deletedIds(req).includes(credential.id)) return null
+      return credential
+    }
+
+    // Client name, A to Z. The page marks "Client name" as sorted.
+    router.get(list, (req, res) => {
+      const credentials = ccAsBuilt.listCredentials(credentialList(req))
+        .filter((c) => c.environment === env.label)
+        .filter((c) => !deletedIds(req).includes(c.id))
+        .map((c) => Object.assign({}, c, { environment: env.name }))
+        .sort((a, b) => a.clientName.localeCompare(b.clientName))
+      // The "deleted" message shows once, then is cleared.
+      const deletedName = req.session.data.deletedClientNameAsBuilt
+      delete req.session.data.deletedClientNameAsBuilt
+      res.render(view('software-providers/index'), {
+        credentials,
+        deletedName
+      })
+    })
+
+    // --- Create ---
+
+    router.get(`${list}/create`, (req, res) => {
+      renderClientNameForm(res, { mode: 'create', values: { clientName: '' } })
+    })
+
+    router.post(`${list}/create`, (req, res) => {
+      const values = { clientName: (req.body.clientName || '').trim() }
+      const errors = ccAsBuilt.validateClientName(values.clientName, credentialList(req), null, env.label)
+      if (Object.keys(errors).length) {
+        return renderClientNameForm(res, { mode: 'create', values, errors, errorList: ccAsBuilt.clientNameErrorList(errors) })
+      }
+      // The environment is set from the page the user started on, not the form.
+      const credential = ccAsBuilt.createCredential({ clientName: values.clientName, environment: env.label })
+      credentialList(req).push(credential)
+      res.redirect(`${list}/${credential.id}/created`)
+    })
+
+    router.get(`${list}/:id/created`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      if (!credential.pendingSecret) return res.redirect(`${list}/${credential.id}`)
+      res.render(view('client-credentials/created'), {
+        credential,
+        generatedOn: formatDateTimeObj(new Date(credential.lastChanged)),
+        added: credential.pendingAction === 'added',
+        rotated: credential.pendingAction === 'rotated'
+      })
+    })
+
+    // Closing goes to the software provider page, which tags the new secret once.
+    router.post(`${list}/:id/created`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      delete credential.pendingSecret
+      delete credential.pendingAction
+      credential.showNewTag = true
+      res.redirect(`${list}/${credential.id}`)
+    })
+
+    // --- Delete ---
+
+    router.get(`${list}/:id/delete`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      res.render(view('client-credentials/delete'), { credential })
+    })
+
+    router.post(`${list}/:id/delete`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (credential) {
+        deletedIds(req).push(credential.id)
+        req.session.data.deletedClientNameAsBuilt = credential.clientName
+      }
+      res.redirect(list)
+    })
+
+    // --- Secrets ---
+
+    // Replacing asks the user to confirm first. The form posts to /rotate.
+    router.get(`${list}/:id/replace`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      res.render(view('client-credentials/replace'), { credential })
+    })
+
+    // A refresh of the copy page keeps the same new secret, because it is only
+    // replaced once the user has closed that page.
+    router.post(`${list}/:id/rotate`, (req, res) => {
+      const target = findCredential(req, req.params.id)
+      if (!target) return res.redirect(list)
+      const credential = ccAsBuilt.credentialToChange(credentialList(req), target.id)
+      if (credential.pendingAction !== 'rotated') {
+        ccAsBuilt.rotateSecret(credential)
+        // Replacing leaves one secret, generated now.
+        delete credential.secrets
+      }
+      res.redirect(`${list}/${credential.id}/created`)
+    })
+
+    // Two secrets at most. Goes straight to the page where the new secret is shown once.
+    router.post(`${list}/:id/add-secret`, (req, res) => {
+      const target = findCredential(req, req.params.id)
+      if (!target) return res.redirect(list)
+      const credential = ccAsBuilt.credentialToChange(credentialList(req), target.id)
+      if (ccAsBuilt.secretDates(credential).length < ccAsBuilt.MAX_SECRETS && credential.pendingAction !== 'added') {
+        ccAsBuilt.addSecret(credential)
+      }
+      res.redirect(`${list}/${credential.id}/created`)
+    })
+
+    // Removing the older of two secrets asks the user to confirm first. The most recent secret stays.
+    router.get(`${list}/:id/remove`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      const labels = secretLabels(credential)
+      if (labels.length < 2) return res.redirect(`${list}/${credential.id}`)
+      res.render(view('client-credentials/remove'), { credential, olderSecretDate: labels[1] })
+    })
+
+    router.post(`${list}/:id/remove`, (req, res) => {
+      const target = findCredential(req, req.params.id)
+      if (!target) return res.redirect(list)
+      const credential = ccAsBuilt.credentialToChange(credentialList(req), target.id)
+      const dates = ccAsBuilt.secretDates(credential)
+      if (dates.length > 1) credential.secrets = dates.slice(-1)
+      res.redirect(`${list}/${credential.id}`)
+    })
+
+    // --- Software provider page ---
+
+    router.get(`${list}/:id`, (req, res) => {
+      const credential = findCredential(req, req.params.id)
+      if (!credential) return res.redirect(list)
+      const showNew = Boolean(credential.showNewTag)
+      delete credential.showNewTag
+      renderDetail(res, credential, { showNew })
+    })
+  }
+
+}
+
+registerAsBuiltRoutes()
+
 // --- Future state: case file concept ----------------------------------------------------------
 // A future-state concept, built around the October 2026 task flows: one case
 // file for each software provider. It has its own function, its own data file
@@ -5904,8 +6269,23 @@ registerFutureCaseFilesRoutes()
 //
 // Links out to screens in the versions and the Jira design pages. The list
 // lives in app/data/design-index.js, so adding a variant doesn't touch this.
+// Design history: one tile for each screen, then a page for each screen.
+// Entries without variants are not screens, so they are left out.
+function designScreens () {
+  return require('./data/design-index').filter((screen) => screen.id && Array.isArray(screen.variants))
+}
+
 router.get('/design', (req, res) => {
-  res.render('design', { screens: require('./data/design-index') })
+  res.render('design', { screens: designScreens() })
+})
+
+router.get('/design/:id', (req, res) => {
+  const screen = designScreens().find((s) => s.id === req.params.id)
+  if (!screen) return res.redirect('/design')
+  // Screenshots are taken with `npm run screenshots` (scripts/design-screenshots.js).
+  const { screenshotUrl } = require('./data/design-screenshots')
+  const variants = screen.variants.map((v) => Object.assign({}, v, { screenshot: screenshotUrl(screen.id, v.label) }))
+  res.render('design-screen', { screen: Object.assign({}, screen, { variants }) })
 })
 
 function redirectToV1 (req, res) {

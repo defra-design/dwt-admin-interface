@@ -1,28 +1,34 @@
 {% extends "layouts/prototype-hub.html" %}
 
-{% set pageName = "Waste Management Admin Portal" %}
-
-{% block beforeContent %}
-  {{ govukPhaseBanner({
-    tag: { text: "Prototype" },
-    html: 'This is a prototype. It is not a real service.'
-  }) }}
-{% endblock %}
+{% set pageName = "DWT admin portal prototypes and designs" %}
 
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <h1 class="govuk-heading-xl">Waste Management Admin Portal</h1>
+    <h1 class="govuk-heading-xl">DWT admin portal prototypes and designs</h1>
 
-    <p class="govuk-body">This page is the index for different versions of the prototype for the Waste Management Admin Portal.</p>
+    <p class="govuk-body govuk-!-margin-bottom-7">Prototypes and design records for the DWT admin portal, an internal Defra tool for the Digital Waste Tracking service team.</p>
 
-    <ul class="govuk-list">
+    {# The same four areas as the navigation. What changed in each version, and
+       why, lives on that version's own page (app/views/versions/). #}
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2"><a class="govuk-link" href="/tested-with-users">Tested with users</a></h2>
+    <p class="govuk-body govuk-!-margin-bottom-6">Prototypes shown to users in research sessions (versions 4, 5 and 10).</p>
 
-      <li><a class="govuk-link" href="/design">Design</a></li>
-      <li><a class="govuk-link" href="/jira-tickets">Jira tickets</a></li>
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2"><a class="govuk-link" href="/design-and-build">Design iterations</a></h2>
+    <p class="govuk-body govuk-!-margin-bottom-6">Prototypes for trying out ideas and designing what the developers build.</p>
 
-    </ul>
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2"><a class="govuk-link" href="/concepts">Concepts</a></h2>
+    <p class="govuk-body govuk-!-margin-bottom-6">Ideas for how the service could work in future: the case file concept and the software provider page concept.</p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2"><a class="govuk-link" href="/as-built">As built</a></h2>
+    <p class="govuk-body govuk-!-margin-bottom-6">A prototype with only the designs from Jira tickets that have been built.</p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2"><a class="govuk-link" href="/jira-tickets">Jira tickets</a></h2>
+    <p class="govuk-body govuk-!-margin-bottom-6">Text for each Jira ticket, with its design reference pages.</p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2"><a class="govuk-link" href="/design">Design history</a></h2>
+    <p class="govuk-body govuk-!-margin-bottom-9">How each page changed between versions, and why.</p>
 
     <ul class="govuk-list">
       <li><a class="govuk-link" href="/about-this-service">About this service</a></li>
@@ -31,370 +37,6 @@
       {% endif %}
       <li><a class="govuk-link" href="/manage-prototype/clear-data">Clear prototype data</a></li>
     </ul>
-
-    <h2 class="govuk-heading-l">Prototype versions</h2>
-
-    {# Each card is kept short so this page stays usable for navigation. What
-       changed in a version, and why, lives on that version's own page
-       (app/views/versions/). #}
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 10
-          {{ govukTag({ text: "Latest version", classes: "govuk-tag--blue govuk-!-margin-left-1" }) }}
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 10</span>',
-            href: "/v10/software-providers",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">For user research on 26 November 2026. Version 9 with the environment tag in the header and a “Change environment” heading, no sign in, and 50 External test and 30 Production clients.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 26 November 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v10">Changes and design rationale for version 10</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 9
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 9</span>',
-            href: "/v9/environment-header-heading/on",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">A copy of version 7, with the developers’ URL pattern for software providers. For the next batch of tickets.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 19 November 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v9">Changes and design rationale for version 9</a></li>
-          <li><a class="govuk-link" href="/v9/sign-in/try">Sign in ideas: Entra ID landing page, return to page and errors (idea A)</a></li>
-          <li><a class="govuk-link" href="/v9/sign-in/try?variant=b">Sign in ideas (idea B)</a></li>
-          <li><a class="govuk-link" href="/v9/sign-in/try?variant=c">Sign in ideas: landing page for all users, External test (idea C)</a></li>
-        </ul>
-
-        <p class="govuk-body-s govuk-!-margin-bottom-1">Ideas for showing the environment on the Software providers page:</p>
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/v9/environment-banner/off">Tag and link under the heading</a></li>
-          <li><a class="govuk-link" href="/v9/environment-banner/on">Banner on every page</a></li>
-          <li><a class="govuk-link" href="/v9/environment-header/on">Tag and link in the header</a></li>
-          <li><a class="govuk-link" href="/v9/environment-header-page-link/on">Tag in the header, link above the Create button</a></li>
-          <li><a class="govuk-link" href="/v9/environment-header-heading/on">Tag in the header, link under a “Change environment” heading</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 7
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 7</span>',
-            href: "/v7/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">A copy of version 6, for changes to the Waste organisations reporting page and the software provider page.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 27 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v7">Changes and design rationale for version 7</a></li>
-          <li><a class="govuk-link" href="/v7/client-credentials/client-6/software-provider-detail">Demo: service error alerts (Error_Demo_Test: add, replace, delete, edit; Error_Demo_Two_Test: remove, delete, edit; new names starting Error_ fail on generate)</a></li>
-          <li><a class="govuk-link" href="/v7/error">Error page: Sorry, there is a problem with the service (not linked from the journey)</a></li>
-          <li><a class="govuk-link" href="/v7/client-credentials/created-panel">Earlier design: copy the client credentials with a panel (created-panel)</a></li>
-          <li><a class="govuk-link" href="/v7/client-credentials/created-warning">Earlier design: copy the client credentials with GOV.UK warning text (created-warning)</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 6
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 6</span>',
-            href: "/v6/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">Changes to journeys for credentials and secrets. Demoed to CDP.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 26 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v6">Changes and design rationale for version 6</a></li>
-          <li><a class="govuk-link" href="/v6/client-credentials/created-panel">Earlier design: copy the client credentials with a panel (created-panel)</a></li>
-          <li><a class="govuk-link" href="/v6/client-credentials/created-warning">Earlier design: copy the client credentials with GOV.UK warning text (created-warning)</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 5
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 5</span>',
-            href: "/v5/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">Moved from API keys to client credentials: a Manage client credentials page for each software provider and package. Built to test with users.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 15 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Shown in two user research sessions, 20 to 22 October 2026
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v5">Changes and design rationale for version 5</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 4
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <p class="govuk-body-s">Tried variations of the credentials list and the create and rotate journeys (4.1 to 4.4). See the table for the focus of each.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 9 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Shown in two user research sessions, 20 to 22 October 2026
-        </p>
-
-        <table class="govuk-table govuk-body-s">
-          <caption class="govuk-table__caption govuk-visually-hidden">Version 4 versions</caption>
-          <thead class="govuk-table__head">
-            <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header">Version</th>
-              <th scope="col" class="govuk-table__header">Focus</th>
-              <th scope="col" class="govuk-table__header">Rationale</th>
-            </tr>
-          </thead>
-          <tbody class="govuk-table__body">
-            <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-4/start"><span class="govuk-visually-hidden">Version </span>4.4</a></td>
-              <td class="govuk-table__cell">Includes rotate journey</td>
-              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-4">View<span class="govuk-visually-hidden"> rationale for version 4.4</span></a></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-3/start"><span class="govuk-visually-hidden">Version </span>4.3</a></td>
-              <td class="govuk-table__cell">Credentials generated page has all credentials for copy</td>
-              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-3">View<span class="govuk-visually-hidden"> rationale for version 4.3</span></a></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-2/start"><span class="govuk-visually-hidden">Version </span>4.2</a></td>
-              <td class="govuk-table__cell">Edit client name and rotate secret links in list</td>
-              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-2">View<span class="govuk-visually-hidden"> rationale for version 4.2</span></a></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a class="govuk-link" href="/v4-1/start"><span class="govuk-visually-hidden">Version </span>4.1</a></td>
-              <td class="govuk-table__cell">Two tables and Create credentials with software provider name field</td>
-              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4-1">View<span class="govuk-visually-hidden"> rationale for version 4.1</span></a></td>
-            </tr>
-            <tr class="govuk-table__row">
-              <td class="govuk-table__cell"><a class="govuk-link" href="/v4/start"><span class="govuk-visually-hidden">Version </span>4</a></td>
-              <td class="govuk-table__cell">One table for Production and test environments</td>
-              <td class="govuk-table__cell"><a class="govuk-link" href="/versions/v4">View<span class="govuk-visually-hidden"> rationale for version 4</span></a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 3
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 3</span>',
-            href: "/v3/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">Replaced the PAT viewer with software providers: add a provider, manage its email addresses and Test and Production API keys. Dropped service metrics.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 23 September 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v3">Changes and design rationale for version 3</a></li>
-          <li><a class="govuk-link" href="/v3/software-providers/example">Software providers with example data</a> (for demos, not part of the journey)</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 2
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 2</span>',
-            href: "/v2/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">Reworked version 1 with the in-service Defra header and navigation. Still the PAT submission viewer, service metrics and waste organisations report.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 21 September 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v2">Changes in version 2</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Version 1
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for version 1</span>',
-            href: "/v1/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">First prototype: a PAT (Production Approval Test) submission viewer, service metrics and a waste organisations report.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 18 September 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/v1">Changes in version 1</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <h2 class="govuk-heading-l govuk-!-margin-top-9">Future state exploration</h2>
-
-    <p class="govuk-body">Concepts for how the service could work in future. They are not part of the numbered versions, which build on each other, and are not designs for the next tickets.</p>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Case file concept
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for the case file concept</span>',
-            href: "/future/case-files/sign-in",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">A future-state concept: a case file for each software provider, built around the October 2026 task flows. Not for the next tickets, which continue in version 9. Previously called version 10.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 11 November 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/future-case-files">Changes and design rationale for the case file concept</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="govuk-summary-card">
-      <div class="govuk-summary-card__title-wrapper">
-        <h3 class="govuk-summary-card__title govuk-!-font-size-24">
-          Software provider page concept
-        </h3>
-      </div>
-      <div class="govuk-summary-card__content">
-        <div>
-          {{ govukButton({
-            html: 'View prototype<span class="govuk-visually-hidden"> for the software provider page concept</span>',
-            href: "/future/software-provider-page/start",
-            classes: "govuk-button--secondary"
-          }) }}
-        </div>
-
-        <p class="govuk-body-s">Built from version 7, for a concept of the software provider detail page. For an internal technical discussion with another team. Not based on research. Previously called version 8.</p>
-
-        <p class="govuk-body-s">
-          <span class="govuk-!-font-weight-bold">Date of last change:</span> 29 October 2026<br>
-          <span class="govuk-!-font-weight-bold">User research status:</span> Not tested
-        </p>
-
-        <ul class="govuk-list govuk-list--bullet govuk-body-s">
-          <li><a class="govuk-link" href="/versions/future-software-provider-page">Changes and design rationale for the software provider page concept</a></li>
-        </ul>
-      </div>
-    </div>
 
   </div>
 </div>

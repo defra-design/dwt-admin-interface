@@ -890,3 +890,52 @@
   font-size: 0.75rem;
   color: #ffffff;
 }
+
+// --- Prototype hub header -------------------------------------------------------
+// The "Prototype" tag sits next to the Defra logo instead of a phase banner.
+// Gap is spacing unit 3 (15px).
+.app-hub-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+// --- Design history screenshots -----------------------------------------------
+// Thumbnails in the variants table. Taken with scripts/design-screenshots.js.
+.app-screenshot {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #b1b4b6; // GOV.UK border colour
+}
+
+// --- Tiles (Design history page) ----------------------------------------------
+// Neither the GOV.UK Design System nor Defra has a card component. These follow
+// the "Your role at Defra" tiles on digital.defra.gov.uk: a heading link and a
+// short description in a grey border. One column on mobile, then two, then three.
+// Gaps are spacing unit 6 (30px); padding is spacing unit 4 (20px).
+.app-tiles {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin: 0 0 40px;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 40.0625em) {
+  .app-tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 48.0625em) {
+  .app-tiles {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.app-tile {
+  padding: 20px;
+  border: 1px solid #b1b4b6; // GOV.UK border colour
+}

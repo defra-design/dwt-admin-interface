@@ -1,79 +1,28 @@
 {% extends "layouts/prototype-hub.html" %}
 
-{% set pageName = "Design" %}
-
-{% block beforeContent %}
-  {{ govukBackLink({ text: "Back to prototype versions", href: "/" }) }}
-{% endblock %}
+{% set pageName = "Design history by page" %}
 
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-    <span class="govuk-caption-l">Waste Management Admin Portal prototype</span>
-    <h1 class="govuk-heading-l">Design</h1>
+    <h1 class="govuk-heading-l">Design history by page</h1>
 
-    <p class="govuk-body">Find a screen and see how it changed between versions. Each link goes to a page in a prototype version or a Jira design reference page. The newest variant is first.</p>
-
-    <h2 class="govuk-heading-m">Screens</h2>
-    <ul class="govuk-list">
-      {% for screen in screens %}
-        <li><a class="govuk-link" href="#{{ screen.id }}">{{ screen.name }}</a></li>
-      {% endfor %}
-    </ul>
+    <p class="govuk-body govuk-!-margin-bottom-7">Choose a page to see how it changed between versions, and why. Each version links to a page in a prototype or a Jira design reference page.</p>
 
   </div>
 </div>
 
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
-
-    {# One table per screen. Rows are built here so the data file stays plain. #}
-    {% for screen in screens %}
-      {% set rows = [] %}
-      {% for variant in screen.variants %}
-        {% set hiddenText = variant.label + ", " + (screen.name | lower) %}
-
-        {% set variantHtml %}
-          {{ variant.label }}<br>
-          {{ govukTag({ text: variant.source, classes: "govuk-tag--grey" }) }}
-        {% endset %}
-
-        {% set differenceHtml %}
-          {{ variant.difference }}
-          {% if variant.linkNote %}<br><span class="govuk-hint govuk-!-margin-bottom-0">{{ variant.linkNote }}</span>{% endif %}
-        {% endset %}
-
-        {% set linksHtml %}
-          <a class="govuk-link" href="{{ variant.href }}">View<span class="govuk-visually-hidden"> {{ hiddenText }}</span></a>
-          {% if variant.rationaleHref %}
-            <br><a class="govuk-link" href="{{ variant.rationaleHref }}">Why<span class="govuk-visually-hidden"> {{ hiddenText }} changed</span></a>
-          {% endif %}
-        {% endset %}
-
-        {% set rows = (rows.push([
-          { html: variantHtml },
-          { html: differenceHtml },
-          { html: linksHtml }
-        ]), rows) %}
-      {% endfor %}
-
-      <h2 class="govuk-heading-m" id="{{ screen.id }}">{{ screen.name }}</h2>
-      <p class="govuk-body">{{ screen.summary }}</p>
-
-      {{ govukTable({
-        caption: "Variants of " + (screen.name | lower),
-        captionClasses: "govuk-visually-hidden",
-        firstCellIsHeader: true,
-        head: [
-          { text: "Variant", classes: "govuk-!-width-one-fifth" },
-          { text: "What was different" },
-          { text: "Links", classes: "govuk-!-width-one-fifth" }
-        ],
-        rows: rows
-      }) }}
-    {% endfor %}
-
-  </div>
-</div>
+{# One tile for each screen in app/data/design-index.js. Only the heading is a
+   link, so each tile is one link for screen reader and keyboard users. #}
+<ul class="app-tiles" role="list">
+  {% for screen in screens %}
+    <li class="app-tile">
+      <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+        <a class="govuk-link" href="/design/{{ screen.id }}">{{ screen.name }}</a>
+      </h2>
+      <p class="govuk-body-s govuk-!-margin-bottom-0">{{ screen.summary }}</p>
+    </li>
+  {% endfor %}
+</ul>
 {% endblock %}
