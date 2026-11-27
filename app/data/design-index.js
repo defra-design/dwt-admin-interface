@@ -13,6 +13,8 @@
 //   linkNote      Optional. Says how to reach the screen if href is not the screen itself
 //   difference    What made this variant different
 //   rationaleHref Optional. The version page, or Jira ticket page, that says why
+//   screenshotJourney Optional. Steps for the screenshot script, for a page that
+//                 only exists after a journey. See scripts/design-screenshots.js.
 //
 // Wording marked TO CONFIRM was not recorded on the version pages. Check it.
 
@@ -448,40 +450,35 @@ module.exports = [
       {
         label: 'Version 5',
         source: 'Prototype',
-        href: '/v5/software-providers',
-        linkNote: 'Select Create new credentials.',
+        href: '/v5/client-credentials/test/create',
         difference: 'Caption names the task and environment, for example “Create external test environment credentials”. Heading is “What is the name of the software provider and package?”, with new help text. Page title is the question, and starts with “Error: ” on an error page.',
         rationaleHref: '/versions/v5'
       },
       {
         label: 'Version 4.4',
         source: 'Prototype',
-        href: '/v4-4/software-providers/test',
-        linkNote: 'Select Create new credentials.',
+        href: '/v4-4/client-credentials/test/create',
         difference: 'Captions now name the task and environment. Same question and heading as version 4.3.',
         rationaleHref: '/versions/v4-4'
       },
       {
         label: 'Version 4.3',
         source: 'Prototype',
-        href: '/v4-3/software-providers/test',
-        linkNote: 'Select Create new credentials.',
+        href: '/v4-3/client-credentials/test/create',
         difference: 'Heading is “What is the name of the software provider and application?”, with a caption showing the environment. TO CONFIRM: the change from version 4.2 is not recorded on the version page.',
         rationaleHref: '/versions/v4-3'
       },
       {
         label: 'Version 4.2',
         source: 'Prototype',
-        href: '/v4-2/software-providers/test',
-        linkNote: 'Select Create new credentials, or Edit in the table.',
+        href: '/v4-2/client-credentials/test/create',
         difference: 'One question, “What is the client name?”, with the software provider name folded in. Edit reuses the same page with the name filled in.',
         rationaleHref: '/versions/v4-2'
       },
       {
         label: 'Version 4.1',
         source: 'Prototype',
-        href: '/v4-1/software-providers/test',
-        linkNote: 'Select Create new credentials.',
+        href: '/v4-1/client-credentials/test/create',
         difference: 'Software provider name and client name fields. Environment is set from the page you started on, and shown in the heading.',
         rationaleHref: '/versions/v4-1'
       },
@@ -541,6 +538,7 @@ module.exports = [
         href: '/v5/software-providers',
         linkNote: 'Select Create new credentials, then save.',
         difference: 'Heading is “Copy the client credentials”, with the caption “Manage client credentials” and the client name as an H2. Warning text under the heading is the only message. The panel starts with Generated on. Copy, then Close.',
+        screenshotJourney: { steps: [{ post: '/v5/client-credentials/test/create', form: { clientName: 'Example_Software' } }], expect: '/created' },
         rationaleHref: '/versions/v5'
       },
       {
@@ -549,6 +547,7 @@ module.exports = [
         href: '/v4-4/software-providers/test',
         linkNote: 'Select Create new credentials, then save.',
         difference: 'Captions say the task and environment, for example “Create test environment credentials”.',
+        screenshotJourney: { steps: [{ post: '/v4-4/client-credentials/test/create', form: { clientName: 'Example_Software' } }], expect: '/created' },
         rationaleHref: '/versions/v4-4'
       },
       {
@@ -557,6 +556,7 @@ module.exports = [
         href: '/v4-3/software-providers/test',
         linkNote: 'Select Create new credentials, then save.',
         difference: 'Heading is “Client secret successfully created”. The index card says all credentials are available to copy. TO CONFIRM: the change from version 4.2 is not recorded on the version page.',
+        screenshotJourney: { steps: [{ post: '/v4-3/client-credentials/test/create', form: { clientName: 'Example_Software' } }], expect: '/created' },
         rationaleHref: '/versions/v4-3'
       },
       {
@@ -565,6 +565,7 @@ module.exports = [
         href: '/v4-2/software-providers/test',
         linkNote: 'Select Create new credentials, then save.',
         difference: 'Heading is “Copy the client credentials”. Client ID and client secret are in one grey block with one Copy button.',
+        screenshotJourney: { steps: [{ post: '/v4-2/client-credentials/test/create', form: { clientName: 'Example_Software' } }], expect: '/created' },
         rationaleHref: '/versions/v4-2'
       },
       {
@@ -573,6 +574,7 @@ module.exports = [
         href: '/v4/client-credentials/create',
         linkNote: 'Complete the form to reach the next page.',
         difference: 'Heading is “Credentials created”. Client ID and client secret each have their own Copy button, with an MoJ information alert saying the secret is only shown once.',
+        screenshotJourney: { steps: [{ post: '/v4/client-credentials/create', form: { softwareProvider: 'Example Software Ltd', clientName: 'Example_Software', environment: 'Test' } }], expect: '/created' },
         rationaleHref: '/versions/v4'
       }
     ]
@@ -655,40 +657,35 @@ module.exports = [
       {
         label: 'Version 5',
         source: 'Prototype',
-        href: '/v5/software-providers',
-        linkNote: 'Select Manage in the table.',
+        href: '/v5/client-credentials/client-1/rotate',
         difference: 'Now “Manage client credentials”, reached from Manage in the table. Client name as the heading and a redacted secret. Add another secret, Replace this secret (or Remove this secret with two secrets) and Cancel. Replace and Remove each have a confirmation page.',
         rationaleHref: '/versions/v5'
       },
       {
         label: 'Version 4.4',
         source: 'Prototype',
-        href: '/v4-4/software-providers/test',
-        linkNote: 'Select Rotate in the table.',
+        href: '/v4-4/client-credentials/client-1/rotate',
         difference: 'Heading changed to “Confirm that you want to rotate the client secret”. Includes the full rotate journey.',
         rationaleHref: '/versions/v4-4'
       },
       {
         label: 'Version 4.3',
         source: 'Prototype',
-        href: '/v4-3/software-providers/test',
-        linkNote: 'Select Rotate in the table.',
+        href: '/v4-3/client-credentials/client-1/rotate',
         difference: 'Rotate page headed “Client credentials”. TO CONFIRM: the change from version 4.2 is not recorded on the version page.',
         rationaleHref: '/versions/v4-3'
       },
       {
         label: 'Version 4.2',
         source: 'Prototype',
-        href: '/v4-2/software-providers/test',
-        linkNote: 'Select Rotate in the table.',
+        href: '/v4-2/client-credentials/client-1/rotate',
         difference: 'No confirmation. Rotate gives a new secret straight away and opens the “Copy the client credentials” page.',
         rationaleHref: '/versions/v4-2'
       },
       {
         label: 'Version 4',
         source: 'Prototype',
-        href: '/v4/software-providers',
-        linkNote: 'Select Rotate in the table.',
+        href: '/v4/client-credentials/client-1/rotate',
         difference: 'Rotate goes to a “not built” page.',
         rationaleHref: '/versions/v4'
       }
@@ -775,6 +772,7 @@ module.exports = [
         href: '/future/case-files/sign-in',
         linkNote: 'Sign in as the auditor, then select Audit.',
         difference: 'A random sample of 10 actions as a GOV.UK task list. Each action shows who did it, when and why, and is marked “No concerns” or “Needs follow-up”. Completing the audit records that it was done. “All actions” lists every action with filters.',
+        screenshotJourney: { steps: [{ post: '/future/case-files/sign-in', form: { signInAs: 'auditor' } }, { get: '/future/case-files/audit' }], expect: '/audit' },
         rationaleHref: '/versions/future-case-files'
       }
     ]

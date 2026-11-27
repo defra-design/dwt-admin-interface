@@ -14,7 +14,7 @@ Live repo, only one designer committing at the moment, grown organically:
 - Match the surrounding file's casing, spacing, and comment style rather than "correcting" it repo-wide.
 - Keep scope tight — touch only the files the task needs.
 - When a change affects a version's behaviour, update its `versions/vN.html` page (changes table and reason) and the date on its version card (`tested-with-users.html` or `design-and-build.html`).
-- After adding a variant, run `npm run screenshots -- --new` with the prototype running, to add its screenshot (`app/assets/images/design-history/`). Run it without `--new` to retake them all after a screen changes. It needs Google Chrome, and outside the agent sandbox.
+- After adding a variant, run `npm run screenshots -- --new` with the prototype running, to add its screenshot (`app/assets/images/design-history/`). Run it without `--new` to retake them all after a screen changes. It needs Google Chrome, and outside the agent sandbox. Link variants straight to the screen where it opens on a first visit. If a screen only exists after a journey (such as the copy page), add `screenshotJourney` steps to the variant instead.
 - When a version or Jira design reference page adds or changes a screen, add or update its variant in `app/data/design-index.js` (shown at `/design`), newest first, with a sentence on what made it different. The Design page only links out — never add screens to it.
 
 ## Git
