@@ -502,6 +502,7 @@ module.exports = [
         href: '/v11/software-providers/create',
         linkNote: 'Enter a client name and select Generate credentials.',
         difference: 'Send credentials: the service emails the credentials. Asks for the software provider’s email address, lists the credentials with the client secret as “[Hidden]”, and has one Send button. No copy button or warning alert.',
+        screenshotJourney: { steps: [{ post: '/v11/software-providers/create', form: { clientName: 'Example_Software' } }], expect: '/created' },
         rationaleHref: '/versions/v11'
       },
       {
